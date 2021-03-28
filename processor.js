@@ -1,31 +1,17 @@
-const REGISTER = {
-    AX: 0,
-    BX: 1,
-    CX: 2,
-    DX: 3,
-    CS: 4,
-    DS: 5,
-    ES: 6,
-    SS: 7,
-    SP: 8,
-    BP: 9,
-    DI: 10,
-    SI: 11,
-    FLAG: 12,
-    IP: 13
-}
 const MEMORY_SIZE = 1048576;
 
 import "OPCODES.js"
 
-class{
+class Processor{
     constructor(){
-        this.RAM = new Array(MEMORY_SIZE);
-        this.Register = new Array(14);
+        this.RAM = new Memory(MEMORY_SIZE);
+        this.register = new Registers();
     }
 
     decode(){
-        var instruction = this.RAM[this.IP];
+        var current_ip = this.register.readReg(IP_REG),
+            current_code_segement = this.register.readReg(CS_REG),
+            instruction = this.RAM.readByte( current_code_segement<<4 + current_ip );
 
         let gut = this.decodeMov(instruction);
     }
@@ -36,39 +22,88 @@ class{
         //======================================================================================
         if (instruction & 0b11111100 == MOV_RM_RM ) 
         {
-            var operandes = this.extractOperand(this.RAM[this.Register[IP]+1]);
+            var current_ip = this.register.readReg(IP_REG),
+                current_code_segement = this.register.readReg(CS_REG);
+
+            var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip));
 
             if (operandes.addr == null) 
             {   // R to R
                 let R1 = operandes.opRegister[0],
                     R2 = operandes.opRegister[1];
 
-                if ((instrcution >> 1) % 2) // On extrait le d
-                    this.Register[R1] =  this.Register[R2];
+                if ( instruction % 2 == 1 ) 
+                {
+                    if ((instruction >> 1) % 2) // On extrait le dif
+                    {
+                        let tmp = this.register.readWordReg(R1);
+                        this.register.writeWordReg(R2, tmp);
+                    }
+                    else
+                    {
+                        let tmp = this.register.readWordReg(R2);
+                        this.register.writeWordReg(R1, tmp);
+                    }
+                }
                 else
-                    this.Register[R2] =  this.Register[R1];      
+                {
+                    if ((instruction >> 1) % 2) // On extrait le dif
+                    {
+                        let tmp = this.register.readByteReg(R1);
+                        this.register.writeByteReg(R2, tmp);
+                    }
+                    else
+                    {
+                        let tmp = this.register.readByteReg(R2);
+                        this.register.writeByteReg(R1, tmp);
+                    }
+                } 
             }
             else
             {   // MEM TO/FROM R
                 let R = operandes.opRegister[0],
                     addr = operandes.addr;
 
-                if ((instrcution >> 1) % 2) // On extrait le d
-                    this.Register[R] =  this.RAM[addr];
-                else
-                    this.RAM[addr] =  this.Register[R];  
+                if ( instruction % 2 == 1 ) //16bits
+                {
+                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+                    {
+                        let tmp = this.RAM.readWord(addr);
+                        this.register.writeWordReg(R, tmp);
+                    }
+                    else
+                    {
+                        let tmp = this.register.readWordReg(R); // d=0 => from reg
+                        this.RAM.writeWord(addr, tmp);
+                    }
+                }
+                else    //8bits
+                {
+                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+                    {
+                        let tmp = this.RAM.readByte(addr);
+                        this.register.writeByteReg(R, tmp);
+                    }
+                    else
+                    {
+                        let tmp = this.register.readByteReg(R); // d=0 => from reg
+                        this.RAM.writeByte(addr, tmp);
+                    }
+                } 
             }
 
-
-            this.Register[IP] += operandes.dispSize + 2;//2 étant la taille de base de l'instruction
+            this.register.incIP(operandes.dispSize + 2);//2 étant la taille de base de l'instruction
         }
         //======================================================================================
         // -------Immediate to Register/Memory--------------------------------------------------
         //======================================================================================
         else if (instruction & 0b11111110 == MOV_IMMEDIATE_TO_RM) 
         {
+            var current_ip = this.register.readReg(IP_REG),
+                current_code_seg = this.register.readReg(CS_REG);
+
             var operandes = this.extractOperand(this.RAM[this.Register[IP]+1], instruction%2),//On extrait le w
-                immediatVal = this.RAM[this.Register[IP] + operandes.dispSize + 2];
+                immediatVal = this.RAM.readByte(current_code_seg<<4 + current_ip + operandes.dispSize + 2);
 
             if (instruction % 2 == 1)  // High Byte selected
                 immediatVal += ( this.RAM[this.Register[IP] + operandes.dispSize + 3] << 8 )
@@ -121,7 +156,7 @@ class{
                 let R1 = operandes.opRegister[0],
                     R2 = operandes.opRegister[1];
 
-                if ((instrcution >> 1) % 2) // On extrait le d
+                if ((instruction >> 1) % 2) // On extrait le d
                     this.Register[R1] =  this.Register[R2];
                 else
                     this.Register[R2] =  this.Register[R1];      
@@ -131,7 +166,7 @@ class{
                 let R = operandes.opRegister[0],
                     addr = operandes.addr;
 
-                if ((instrcution >> 1) % 2) // On extrait le d
+                if ((instruction >> 1) % 2) // On extrait le d
                     this.Register[R] =  this.RAM[addr];
                 else
                     this.RAM[addr] =  this.Register[R];  
@@ -189,7 +224,7 @@ class{
         return {
             addr: addr,
             dispSize: dispSize,
-            opRegister: opRegister,
+            opRegister: opRegister,//array
         };
 
     }
