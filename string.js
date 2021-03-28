@@ -189,7 +189,27 @@ switch(instruction.toUpperCase())
     break; 
 
 }
-
+function convert(str)
+  {
+      if(/^0x|h$/i.test(str))
+      {
+          var str2=str.replace(/^0x|h$/i,"").toUpperCase();
+          return parseInt(str2,16);
+      }
+      else if(/^0b/i.test(str2))
+      {
+        var str2=str.replace(/^0b/i,"").toUpperCase();
+          return parseInt(str2,2);
+      }
+      else if(/^0o/i.test(str2))
+      {
+        var str2=str.replace(/^0o/i,"").toUpperCase();
+          return parseInt(str2,8);
+      }
+      else{
+          return parseInt(str2,10)
+      }     
+  }
 
 }
 
