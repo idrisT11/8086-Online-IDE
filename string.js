@@ -1,26 +1,33 @@
+var wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP']; 
+    byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
+
 function getOps(str){//get operands
     let str2=str.replace(/\w+(?=\s)/,"").replace(/\s/g,"");
     return (/,/.test(str2))?str2.split(','):str2.split();
   }
+
 function convert(str)
 {
     if(/^0x|h$/i.test(str))
     {
-        str.replace(/^0x|h$/i,"").toUpperCase;
-        var bin=0b0;
-        for(let i=0;i<str.length;i++)
-        {
-            let x=str.charCodeAt(i);
-            if(x>64)
-           bin+=(x-55).toString(2);
-           else {
-           bin=(x-48).toString(2); 
-           }
-           bin=bin<<4
-        }
-        return bin;
+        var str2=str.replace(/^0x|h$/i,"").toUpperCase();
+        return parseInt(str2,16);
     }
+    else if(/^0b/i.test(str2))
+    {
+      var str2=str.replace(/^0b/i,"").toUpperCase();
+        return parseInt(str2,2);
+    }
+    else if(/^0o/i.test(str2))
+    {
+      var str2=str.replace(/^0o/i,"").toUpperCase();
+        return parseInt(str2,8);
+    }
+    else{
+        return parseInt(str2,10)
+    }     
 }
+
 function toBcode(str)
 {
 var arr=[];
@@ -218,12 +225,12 @@ function getD(instruction) {
     var operands = getOps(instruction);
 
     // from reg to memory 
-    if (operands[0].includes("["))
+    if (operands[0].includes("[") && (byteRegisters.includes(operands[1]) || wordRegisters.includes(operands[1])))
 
         return 0; 
     
     // memory to reg 
-    else if (operands[0].includes("[") == false && operands[1].includes("[")) 
+    else if (operands[1].includes("[") && (byteRegisters.includes(operands[0]) || wordRegisters.includes(operands[0]))) 
         
         return 1; 
 
@@ -236,10 +243,9 @@ function getD(instruction) {
 
 function getW(instruction) {
 
-    var wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP']; 
-        byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
-        opcodes = getOps(instruction);
-
+    
+    var opcodes = getOps(instruction);
+   
     // register to memory
     if (getD(instruction) == 0) {
         
@@ -273,15 +279,26 @@ function getW(instruction) {
     }
 
     // register to register
-    if (wordRegisters.includes(opcodes[0]) && wordRegisters.includes(opcodes[1]))
+    if (getD(instruction) == -1) {
 
-        return 1;
+        if (wordRegisters.includes(opcodes[0]) && wordRegisters.includes(opcodes[1]))
 
-    else if (byteRegisters.includes(opcodes[0]) && byteRegisters.includes(opcodes[1]))
+            return 1;
 
-        return 0;
+        else if (byteRegisters.includes(opcodes[0]) && byteRegisters.includes(opcodes[1]))
 
-    else 
-        return -1;
+            return 0;
+
+    }
+
+    // immediate to memory
+    if (opcodes[0].includes("[") && getD(instruction) == -1) {
+
+        var imOperand = convert('100'); 
+        console.log(imOperand);
+    }
+    
 }
+
+
 
