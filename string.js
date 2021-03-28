@@ -24,7 +24,7 @@ function convert(str)
         return parseInt(str2,8);
     }
     else{
-        return parseInt(str2,10)
+        return parseInt(str,10)
     }     
 }
 
@@ -294,11 +294,10 @@ function getW(instruction) {
     // immediate to memory
     if (opcodes[0].includes("[") && getD(instruction) == -1) {
 
-        var imOperand = convert('100'); 
+        var imOperand = convert(opcodes[1]);
         console.log(imOperand);
     }
     
 }
-
 
 
