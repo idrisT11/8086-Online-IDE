@@ -227,7 +227,7 @@ class Processor{
                 else
                 {
                     let tmp = this.register.readSegReg(R);
-                    this.RAM.writeWor(addr, tmp);    
+                    this.RAM.writeWord(addr, tmp);    
                 }
             }
         }
@@ -252,26 +252,32 @@ class Processor{
             dispSize = 0,      //Si l'adressage prend un disp, cela tiendra compte de sa taille
             opRegister = [reg, null];
         
+        var current_ip = this.register.readReg(IP_REG),
+            current_code_seg = this.register.readReg(CS_REG),
+            current_data_segement = this.register.readReg(DS_REG);
 
         switch (mode) {
             case NO_DISP:      //No displacement
 
                 if (rm == 0b110) {
-                    addr = this.RAM[this.Register[IP]+1] + (this.RAM[this.Register[IP]+2]<<8);
+                    addr = this.RAM.readWord(current_code_seg<<4 + current_ip+1);//WARING!!
+                    addr += current_data_segement<<4;   //JE pense qu'on doit rajouter 2 par 1
                     dispSize = 2;
                 }   
                 else
-                    addr = this.getAddrIndir(rm);
+                    addr = current_data_segement<<4 + this.getAddrIndir(rm);
 
                 break;
 
             case IWEN_DISP:    // The displacement can be contained in one byte
-                addr = this.getAddrIndir(rm) + this.RAM[this.Register[IP]+1];
+                addr = this.getAddrIndir(rm) + this.RAM.readByte(current_code_seg<<4 + current_ip+1);
+                addr += current_data_segement<<4;
                 dispSize = 1;
                 break;
         
-            case SIN_DISP:    // The displacement can be contained in one byte
-                addr = this.getAddrIndir(rm) + this.RAM[this.Register[IP]+1] + this.RAM[this.Register[IP]+2];
+            case SIN_DISP:    // The displacement is contained in two bytes
+                addr = this.getAddrIndir(rm) + this.RAM.readWord(current_code_seg<<4 + current_ip+1);
+                addr += current_data_segement<<4;
                 dispSize = 2;
                 break;
             
