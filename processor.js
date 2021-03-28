@@ -100,7 +100,7 @@ class Processor{
         //======================================================================================
         else if (instruction & 0b11111110 == MOV_IMMEDIATE_TO_RM) 
         {
-            var operandes = this.extractOperand(this.RAM[this.Register[IP]+1], instruction%2),//On extrait le w
+            var operandes = this.extractOperand(this.RAM[this.Register[IP]+1]),//On extrait le w
                 immediateAddr = current_code_seg<<4 + current_ip + 2 + operandes.dispSize ;
 
             var R = operandes.opRegister[0],
