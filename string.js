@@ -223,7 +223,7 @@ function getD(instruction) {
         return 0; 
     
     // memory to reg 
-    else if (operands[0].includes("[") == false) 
+    else if (operands[0].includes("[") == false && operands[1].includes("[")) 
         
         return 1; 
 
@@ -272,7 +272,16 @@ function getW(instruction) {
 
     }
 
+    // register to register
+    if (wordRegisters.includes(opcodes[0]) && wordRegisters.includes(opcodes[1]))
 
+        return 1;
+
+    else if (byteRegisters.includes(opcodes[0]) && byteRegisters.includes(opcodes[1]))
+
+        return 0;
+
+    else 
+        return -1;
 }
-
 
