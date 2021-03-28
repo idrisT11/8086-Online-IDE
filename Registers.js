@@ -25,7 +25,7 @@ class Registers{
 
     readByteReg(registerByteId){
         var registerId = WORD_REGISTERS_TABLE[registerByteId%4],
-            HighByte = (registerByteId >> 2) % 1;
+            HighByte = (registerByteId >> 2);
 
         if (HighByte)  //AH, BH, CH, DH
             return (this.R[registerId] & 0xFF00) >> 8;
@@ -52,7 +52,7 @@ class Registers{
 
     writeByteReg(registerByteId, value){
         var registerId = WORD_REGISTERS_TABLE[registerByteId%4],
-            HighByte = (registerByteId >> 2) % 1;
+            HighByte = (registerByteId >> 2);
 
         if (value >> 8 != 0) {
             console.log("Error: Trying to write a word value in a byte register.");
