@@ -100,7 +100,7 @@ class Processor{
         //======================================================================================
         else if (instruction & 0b11111110 == MOV_IMMEDIATE_TO_RM) 
         {
-            var operandes = this.extractOperand(this.RAM[this.Register[IP]+1]),//On extrait le w
+            var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip)),//On extrait le w
                 immediateAddr = current_code_seg<<4 + current_ip + 2 + operandes.dispSize ;
 
             var R = operandes.opRegister[0],
@@ -191,7 +191,7 @@ class Processor{
         //======================================================================================
         else if (instruction & 0b11111101 == MOV_RM_SEGEMENT) 
         {
-            var operandes = this.extractOperand(this.RAM[this.Register[IP]+1]);
+            var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip));
 
             if (operandes.addr == null) 
             {   // R to R
