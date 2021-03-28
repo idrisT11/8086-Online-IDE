@@ -79,6 +79,10 @@ class Registers{
 
         this.R[registerId] = value;
     }
+        
+    incIP(base){
+            this.R[IP_REG] += base;
+    }
 
     movRegTyped(registerId_1, registerId_2, type1, type2)
     {
@@ -115,17 +119,17 @@ class Registers{
 const   SEGMENT_REGISTERS_TABLE = [ES, CS, SS, DS],
         WORD_REGISTERS_TABLE = [AX, CX, DX, BX, SP, BP, SI, DI];
 
-const   AX = 0,
-        BX = 1,
-        CX = 2,
-        DX = 3,
-        CS = 4,
-        DS = 5,
-        ES = 6,
-        SS = 7,
-        SP = 8,
-        BP = 9,
-        DI = 10,
-        SI = 11,
-        FLAG = 12,
-        IP = 13;
+const   AX_REG = 0,
+        BX_REG = 1,
+        CX_REG = 2,
+        DX_REG = 3,
+        CS_REG = 4,
+        DS_REG = 5,
+        ES_REG = 6,
+        SS_REG = 7,
+        SP_REG = 8,
+        BP_REG = 9,
+        DI_REG = 10,
+        SI_REG = 11,
+        FLAG_REG = 12,
+        IP_REG = 13;
