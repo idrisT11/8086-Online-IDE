@@ -22,12 +22,14 @@ function getOps(str){
       return operands
     }
 
-function getDecodedInst(opcode, operands) {
+function encodeMov(opcode, D, W) {
 
     let decoded = opcode; 
     decoded = decoded << 2; 
-    decoded = decoded + (getD(operands) << 1) + getW(operands); 
 
+    decoded = decoded + (D << 1) + W;
+    
+    
     return decoded;
 
 }
@@ -43,22 +45,39 @@ switch(instruction[0].toUpperCase())
 {
   case "MOV":
 
-    //Register/Memory to/from Register
+    // Register/Memory to/from Register
+    if (/R|M/.test(operands[2])  && /R|M/.test(operands[3])) {
 
-    if (operands[2] == 'M' && (operands[3] == 'RX' || operands[3] == 'RL')) {
+        let opcode = 0b100010;
+            w = getW(operands);
+            mode = getMod(operands);
+            result = 0;
+            
 
-        let movop = 0b100010; 
-        arr.push(getDecodedInst(movop, operands));
+        // register to memory
+        if (/M/.test(operands[2]) && /R/.test(operands[3])) {
+
+            arr.push(encodeMov(opcode, 0, w));
+            result = (mode << 6) + (regToId(operands[3]) << 3) +  regMem(operands);
+
+            arr.push(result);
+
+        }
+        // memory to register 
+        else if (/R/.test(operands[2])) {
+
+            arr.push(encodeMov(opcode, 1, w ));
+
+            result = (mode << 6) + (regToId(operands[2]) << 3) +  regMem(operands);
+            arr.push(result);
+
+        }            
+
     }
 
-    else if ((operands[2] == 'RX' || operands[3] == 'RL') && (operands[3] == 'M')) {
+    // Immediate to Register/Memory
 
-        let movop = 0b100010;
-        arr.push(getDecodedInst(movop, operands)); 
-    }
-
-     
-
+    
     break;
 
   case "PUSH":
@@ -463,4 +482,4 @@ function regToId(regname){
     }
 }
 
-toBcode("MOV AX, [BX+3]");
+console.log(toBcode("MOV [BX+3], CX"));
