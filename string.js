@@ -1,11 +1,26 @@
 "use strict";
     var wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP']; 
-    byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
-
-function getOps(str){//get operands
+    var byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
+    var segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
+ //get operands and its types exp: ["ax",'[1254+bx]',''Rx","M"] or ["al",0x12FF,''RL","I"]]
+function getOps(str){
+  let operands=[];
     let str2=str.replace(/\w+(?=\s)/,"").replace(/\s/g,"");
-    return (/,/.test(str2))?str2.split(','):str2.split();
-  }
+    operands=(/,/.test(str2))?str2.split(','):str2.split();
+    if (operands[0]!=""){
+      let i=0;
+      let opsnumber=operands.length;
+      console.log("this a test "+operands[0].toUpperCase);
+      for(i; i<opsnumber;i++){
+        if (/\[.*\]/.test(operands[i])) {operands.push('M')}
+        else if (segmentRegisters.includes(operands[i].toUpperCase())){operands.push('RS')}
+        else if (wordRegisters.includes(operands[i].toUpperCase())) { operands.push('RX')}
+        else if (byteRegisters.includes(operands[i].toUpperCase())){operands.push('Rl')}
+        else (operands.push('I'))
+        }
+      }
+      return operands
+    }
 function toBcode(str) // original functio to be class later 
 {
 var arr=[];
@@ -15,6 +30,7 @@ let instruction=str.match(regex);//match instruction
 switch(instruction.toUpperCase())
 {
   case "MOV":
+
    break;
   case "PUSH":
    break;
@@ -173,7 +189,7 @@ switch(instruction.toUpperCase())
     arr.push(0b11110100);
     break; 
 
-}
+}}
   function convert(str)
   {
       if(/^0x|h$/i.test(str))
@@ -196,9 +212,7 @@ switch(instruction.toUpperCase())
       }     
   }
 
-function getD(instruction) {
-
-    var operands = getOps(instruction);
+function getD(operands) {
 
     // from reg to memory 
     if (operands[0].includes("["))
@@ -218,9 +232,6 @@ function getD(instruction) {
 }
 
 function getW(instruction) {
-
-    var wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP']; 
-        byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
         opcodes = getOps(instruction);
 
     // register to memory
@@ -273,43 +284,73 @@ function regMem(ops){
      else if (/bx/i.test(ops[i])){return 7 }
     }
     }
-//---------------------------------------------------------------------------------------------------    
-     
-"use strict";
-    var wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP']; 
-    byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
+//---------------------------------------------get mod of instruction ------------------------------------------------------    
 
+function getMod(arr){
+  if( arr[0]!=""){
+      if(arr.length===2){     //if there's one operand
+      if(/R/.test(arr[1]))//if it's a register
+          {
+              return 0b11;
+          }
+      else if(arr[1]==="M")
+          {
+          
+              var array=arr[0].slice(1,arr[0].length-1).split("+");//turn string to table of elements ex[ax,1234,bx]
+              
+                   for(var i=0;/[A-D][XHL]|[ECSD][S]|[BSD][PSI]]/.test(array[i]) && i<array.length;i++){}//decouvrer lindice de la partie numeric
+                   console.log("this is the first case i"+i);
+                   if(i<arr.length){
+                   if(convert(array[i])===0){
+                      return 0;
+                  }
+                  else if(convert(array[i])>255){
+                      return 0b10;
+                  }
+                  else{
+                      return 1;
+                  }
+                  } else {
+                   return 0;
+               }
+          }              
+      }
+      else{
+          if(/R/.test(arr[2]) && /R/.test(arr[3]) )
+          {
+              return 0b11;
+          }
+          else  {
+              var z=0;
+              (arr[2]==="M")?z=0:z=1;
+              var array=arr[z].slice(1,arr[0].length-1).split("+");//turn string to table of elements ex[ax,1234,bx]
+              for(var i=0;/[A-D][XHL]|[ECSD][S]|[BSD][PSI]]/i.test(array[i]) && i<array.length;i++){}//decouvrer lindice de la partie numeric
+              console.log("this is the second case  i "+i);
+              console.log(array[0]);
+              if(i<arr.length){
+                        if(convert(array[i])===0){
+                          return 0;
+                              }
+                        else if(convert(array[i])>255){
+                                  return 0b10;
+                              }
+                        else{
+                                  return 1;
+                              }
+               }
+                else {
+                    return 0;
+                }  
 
-    function getMod(arr){
-        if(arr.length==1 && arr[0]!=""){//if there's one operand
-            if(wordRegisters.test(arr[0])|| byteRegisters.test(arr[0])){//case r     
-               return 0b11;
-            }
-        }
-        else if((wordRegisters.test(arr[0]) || byteRegisters.test(arr[0]))&&(wordRegisters.test(arr[1]) || byteRegisters.test(arr[1]))){
-             return 0b11;
-         }        
-        else {
-             var z;
-            (/\[.*\]/.test(arr[0]))?z=0:z=1;
-            var array=arr[z].slice(1,str.length-1).split("+");//turn string to table of elements ex[ax,1234,bx]
-            for(var i=0;/\d/.test(array[i]);i++){}//decouvrer lindice de la partie numeric 
-            if(convert(array[i])===0){
-                return 00;
-            }
-            else if(convert(array[i])>255){
-                return 0b10;
-            }
-            else{
-                return 01;
-            }   
-         }
-        } 
-
+          }
+      }
+  }
+  return -1;
+  }
 // -----------function return register id by passing it name as a parameter----------------------
 
 function regToId(regname){
-    switch(regname){
+    switch(regname.toLowerCase()){
         case 'al':
         case 'ax':
         case 'es':
