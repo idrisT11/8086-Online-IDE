@@ -291,12 +291,31 @@ function getW(instruction) {
 
     }
 
+    var imOperand = convert(opcodes[1]);
+
     // immediate to memory
     if (opcodes[0].includes("[") && getD(instruction) == -1) {
 
-        var imOperand = convert(opcodes[1]);
-        console.log(imOperand);
+        // word instruction
+        if (imOperand > 255) 
+            return 1; 
+        
+        // byte instruction
+        return 0;
     }
+
+    // immediate to register
+    if (imOperand > 255) 
+
+        return 1;
+
+    else if (imOperand <= 255)
+        
+        return 0;
+
+    else 
+        
+        return -1;
     
 }
 
