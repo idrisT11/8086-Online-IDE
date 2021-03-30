@@ -308,6 +308,7 @@ case "MOV":
 
             if (w == 1) {
 
+                // least significant byte and then most significant byte
                 arr.push(operands[1] & 0xFF); 
                 arr.push((operands[1] & 0xFF) >> 8);
             }
@@ -462,7 +463,7 @@ function getW(operands) {
           return 0;  
   
         //just for debugging
-        return -1;
+       return -1;
   }
 
 
