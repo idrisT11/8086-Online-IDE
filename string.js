@@ -298,7 +298,7 @@ function getW(operands) {
             return 0; 
 
         //just for debugging
-        return -1; 
+        return -1;
     }
 
     // memory to register 
@@ -312,7 +312,8 @@ function getW(operands) {
 
             return 0; 
 
-        return -1;
+        else 
+            return -1;
 
     }
 
@@ -477,5 +478,5 @@ function regToId(regname){
             break;
     }
 }
-
-console.log(toBcode("MOV [BX+3], CX"));
+var ops = getOps("MOV [AH+6], BL")
+console.log(getW(ops));
