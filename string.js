@@ -335,8 +335,15 @@ function getW(operands) {
       // byte instruction
       else if (byteRegisters.includes((operands[1]).toUpperCase())) 
 
+
           return 0;  
+  
+
+
+        //just for debugging
+        return -1;
   }
+
 
   // memory to register 
   if (getD(operands) == 1) {
@@ -515,5 +522,3 @@ function regToId(regname){
           break;
   }
 }
-
-console.log(toBcode("MOV [BX+3], CX"));
