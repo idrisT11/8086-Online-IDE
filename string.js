@@ -333,16 +333,11 @@ function getW(operands) {
       // byte instruction
       else if (byteRegisters.includes((operands[1]).toUpperCase())) 
 
-<<<<<<< HEAD
             return 0; 
 
         //just for debugging
         return -1;
     }
-=======
-          return 0;  
-  }
->>>>>>> b91fed0dba835c38419471b23a5d7897cd3e6399
 
   // memory to register 
   if (getD(operands) == 1) {
@@ -355,12 +350,7 @@ function getW(operands) {
 
           return 0; 
 
-<<<<<<< HEAD
-        else 
-            return -1;
-=======
       return -1;
->>>>>>> b91fed0dba835c38419471b23a5d7897cd3e6399
 
   }
 
@@ -526,10 +516,5 @@ function regToId(regname){
           break;
   }
 }
-<<<<<<< HEAD
 var ops = getOps("MOV [AH+6], BL")
 console.log(getW(ops));
-=======
-
-console.log(toBcode("MOV [BX+3], CX"));
->>>>>>> b91fed0dba835c38419471b23a5d7897cd3e6399
