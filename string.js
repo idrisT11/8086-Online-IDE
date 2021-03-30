@@ -516,5 +516,4 @@ function regToId(regname){
           break;
   }
 }
-var ops = getOps("MOV [AH+6], BL")
-console.log(getW(ops));
+
