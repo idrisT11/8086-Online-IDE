@@ -82,6 +82,17 @@ class Registers{
         
     incIP(base){
             this.R[IP_REG] += base;
+            this.R[IP_REG] &= 0xFFFF;
+    }
+        
+    incSP(){
+            this.R[SP_REG] -= 2;
+            this.R[SP_REG] &= 0xFFFF;
+    }
+        
+    decSP(){
+            this.R[SP_REG] += 2;
+            this.R[SP_REG] &= 0xFFFF;
     }
 
     movRegTyped(registerId_1, registerId_2, type1, type2)
