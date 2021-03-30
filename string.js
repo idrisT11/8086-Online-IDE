@@ -3,6 +3,7 @@
   var wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP']; 
   var byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
   var segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
+  var justNumbers=false;
 //get operands and its types exp: ["ax",'[1254+bx]',''Rx","M"] or ["al",0x12FF,''RL","I"]]
 function getOps(str){
   
@@ -73,14 +74,15 @@ case "MOV":
       let opcode = 0b100010,
           w = getW(operands),
           mode = getMod(operands),
-          result = 0;
-          
+          result = 0,
+          regmem=regMem(operands);
+          if(justNumbers) mode=0;
 
       // register to memory
       if (/M/.test(operands[2]) && /R/.test(operands[3])) {
 
           arr.push(encodeMov(opcode, 0, w));
-          result = (mode << 6) + (regToId(operands[1]) << 3) +  regMem(operands);
+          result = (mode << 6) + (regToId(operands[1]) << 3) +  regmem;
 
           arr.push(result);
 
@@ -90,7 +92,7 @@ case "MOV":
 
           arr.push(encodeMov(opcode, 1, w ));
 
-          result = (mode << 6) + ((regToId(operands[0])) << 3) +  regMem(operands);
+          result = (mode << 6) + ((regToId(operands[0])) << 3) +  regmem;
           arr.push(result);
       }
        // Immediate to Register/Memory
@@ -98,7 +100,7 @@ case "MOV":
   {
       w=getW(operands);
       arr.push(encodeMov(opcode, 1, w));
-      arr.push((mode<<6)+regMem(operands));
+      arr.push((mode<<6)+regmem);
       if(w===1){
           let byte=splitNum(operands[1]);
           arr.push(byte[0]);
@@ -112,13 +114,13 @@ case "MOV":
   else if(/M|R/.test(operands[2])  && /RS/.test(operands[3]))
   {
       arr.push(0b10001100);
-      arr.push((mode<<6)+(regToId(operands[0])<<3)+regMem(operands));
+      arr.push((mode<<6)+(regToId(operands[0])<<3)+regmem);
   }
   // memory/register to segment register
   else if(/RS/.test(operands[2])  && /R|M/.test(operands[3]))
   {
       arr.push(0b10001110);
-      arr.push((mode<<6)+(regToId(operands[0])<<3)+regMem(operands));
+      arr.push((mode<<6)+(regToId(operands[0])<<3)+regmem);
   }
                 
   let disp=splitNum(getNum(str)); 
@@ -333,11 +335,15 @@ function getW(operands) {
       // byte instruction
       else if (byteRegisters.includes((operands[1]).toUpperCase())) 
 
-            return 0; 
+
+          return 0;  
+  
+
 
         //just for debugging
         return -1;
-    }
+  }
+
 
   // memory to register 
   if (getD(operands) == 1) {
@@ -410,7 +416,7 @@ function regMem(ops){
    else if (/di/i.test(ops[i])){return 5 }
    else if (/bp/i.test(ops[i])){return 6 }
    else if (/bx/i.test(ops[i])){return 7 }
-   else{return 0b110;}
+   else{justNumbers=true;return 0b110;}
   }
   }
 //---------------------------------------------get mod of instruction ------------------------------------------------------    
