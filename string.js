@@ -21,7 +21,7 @@ let operands=[];
       else (operands.push('I'))
       }
     }
-    return operands
+    return operands.map(x=>(x.toUpperCase()));
   }
 
 function encodeMov(opcode, D, W) {
@@ -314,12 +314,6 @@ function getD(operands) {
   else if (operands[1].includes("[") && (byteRegisters.includes(operands[0]) || wordRegisters.includes(operands[0]))) 
       
       return 1; 
-
-  
-  // other modes like immediate to memory 
-  return -1 ;
-
-
 }
 
 function getW(operands) {
@@ -328,22 +322,15 @@ function getW(operands) {
   if (getD(operands) == 0) {
       
       // word instruction
-      if (wordRegisters.includes((operands[1]).toUpperCase()))
+      if (wordRegisters.includes(operands[1]))
 
           return 1; 
 
       // byte instruction
-      else if (byteRegisters.includes((operands[1]).toUpperCase())) 
-
+      else if (byteRegisters.includes(operands[1])) 
 
           return 0;  
-  
-
-
-        //just for debugging
-        return -1;
   }
-
 
   // memory to register 
   if (getD(operands) == 1) {
@@ -356,7 +343,6 @@ function getW(operands) {
 
           return 0; 
 
-      return -1;
 
   }
 
@@ -522,3 +508,5 @@ function regToId(regname){
           break;
   }
 }
+
+console.log(toBcode("MOV [BX+3], CX"));
