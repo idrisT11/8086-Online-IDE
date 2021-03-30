@@ -20,7 +20,7 @@ let operands=[];
       else (operands.push('I'))
       }
     }
-    return operands
+    return operands.map(op=>op.toUpperCase());
   }
 
 function encodeMov(opcode, D, W) {
@@ -516,4 +516,3 @@ function regToId(regname){
           break;
   }
 }
-
