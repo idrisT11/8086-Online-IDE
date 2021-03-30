@@ -6,6 +6,8 @@ class Processor{
     constructor(){
         this.RAM = new Memory(MEMORY_SIZE);
         this.register = new Registers();
+
+        this.activeSegment = 0b11; // Par defaut on travail sur le DATA SEGMENT (ds_id = 0b11)
     }
 
     decode(){
@@ -301,7 +303,7 @@ class Processor{
             var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip+1)),
                 immediateAddr = current_code_seg<<4 + current_ip + 2 + operandes.dispSize ;
 
-            var carry = operandes.opRegister[0] == 0b010 ? this.registerExtract('C') : 0;
+            var carry = operandes.opRegister[0] == 0b010 ? this.extractFlag('C') : 0;
 
             if (operandes.addr == null) 
             {   // immediat to R
@@ -341,9 +343,276 @@ class Processor{
         }
     }
 
-    
+    decodeJmpCall(instruction){
+        var current_ip = this.register.readReg(IP_REG),
+            current_code_seg = this.register.readReg(CS_REG),
+            current_data_segement = this.register.readReg(DS_REG);
 
-    extractOperand(addrModeByte){
+        //======================================================================================
+        // -------UNCONDITIONAL JUMP IN SEGMENT DIRECT----------------------------------------------
+        //======================================================================================
+        if ( instruction & 0xFF == JMP_SEG ) 
+        {
+            let disp = this.RAM.readWord(current_code_seg<<4 + current_ip + 1);
+
+            this.register.writeReg(IP_REG, disp);
+        }
+
+        //======================================================================================
+        // -------SHORT UNCONDITIONAL JUMP IN SEGMENT DIRECT----------------------------------------------
+        //======================================================================================
+        else if ( instruction & 0xFF == JMP_SEG_SHORT ) 
+        {
+            let disp = this.RAM.readByte(current_code_seg<<4 + current_ip + 1);
+
+            disp |= (this.register.readReg(IP_REG) & 0xFF00);
+
+            this.register.writeReg(IP_REG, disp);
+        }
+
+        //======================================================================================
+        // -------UNCONDITIONAL JUMP/CALL IN/INTER SEGEMENT INDIRECT----------------------------------------------
+        //======================================================================================
+        else if ( instruction & 0xFF == JMP_IND_SEG ) 
+        {
+            let operandes = this.extractOperand(current_code_seg<<4 + current_ip + 1);
+            //INDIRECT JUMP In SEGMENT
+            if ( operandes.opRegister[0] == 0b100 ) {
+
+                if ( operandes.addr == null ) 
+                {
+                    let disp = this.register.readReg( operandes.opRegister[1] );
+                    this.register.writeReg(IP_REG, disp);
+                }
+                else
+                {
+                    //WARNING ADDR ILA ZYISS L'OFFSET
+                    let disp = this.RAM.readWord( operandes.addr );
+                    this.register.writeReg(IP_REG, disp);
+                }
+            }
+
+            //INDIRECT JUMP INTER SEGMENT
+            else if ( operandes.opRegister[0] == 0b101 ) {
+                console.log('salem khay');
+            }
+
+            //INDIRECT CALL IN SEGMENT
+            else if ( operandes.opRegister[0] == 0b010 ) {
+
+                if ( operandes.addr == null ) 
+                {
+                    let disp = this.register.readReg( operandes.opRegister[1] );
+                    let old_IP = this.register.readReg( IP_REG );
+                    this.register.writeReg(IP_REG, disp);
+
+                    this.register.incSP();
+                    this.RAM.writeWord( this.register.readReg( SS_REG )<<4 
+                                      + this.register.readReg( SP_REG ),
+                                        old_IP );
+                }
+                else
+                {
+                    //WARNING ADDR ILA ZYISS L'OFFSET
+                    this.register.writeReg(IP_REG, disp);
+                }
+            }
+
+            //INDIRECT CALL INTER SEGMENT
+            else if ( operandes.opRegister[0] == 0b011 ) {
+                console.log('salem khay');
+            }
+        }
+        //======================================================================================
+        // -------UNCONDITIONAL JUMP INTERSEGEMENT DIRECT----------------------------------------------
+        //======================================================================================
+        else if ( instruction & 0xFF == JMP_DIR_INTSEG ) 
+        {
+            let dispOFF = this.RAM.readWord(current_code_seg<<4 + current_ip + 1),
+                dispSEG = this.RAM.readWord(current_code_seg<<4 + current_ip + 3);
+
+            this.register.writeReg(IP_REG, dispOFF);
+            this.register.writeReg(CS_REG, dispSEG);
+        }
+        //======================================================================================
+        // -------CALL IN SEGEMENT DIRECT----------------------------------------------
+        //======================================================================================
+        else if ( instruction & 0xFF == CALL_DIR_SEG ) 
+        {
+            let disp = this.RAM.readWord(current_code_seg<<4 + current_ip + 1);
+            let old_IP = this.register.readReg( IP_REG );
+
+            this.register.incSP();
+            this.RAM.writeWord( this.register.readReg( SS_REG )<<4 
+                              + this.register.readReg( SP_REG ),
+                                old_IP );
+            this.register.writeReg(IP_REG, disp);
+        }
+        //======================================================================================
+        // -------CALL INTERSEGEMENT DIRECT----------------------------------------------
+        //======================================================================================
+        else if ( instruction & 0xFF == CALL_DIR_INTSEG ) 
+        {
+            let dispOFF = this.RAM.readWord(current_code_seg<<4 + current_ip + 1),
+                dispSEG = this.RAM.readWord(current_code_seg<<4 + current_ip + 1);
+            let old_IP = this.register.readReg( IP_REG ),
+                old_CS = this.register.readReg( CS_REG );
+
+            this.register.incSP();
+            this.RAM.writeWord( this.register.readReg( SS_REG )<<4 
+                              + this.register.readReg( SP_REG ),
+                                old_CS );
+
+            this.register.incSP();
+            this.RAM.writeWord( this.register.readReg( SS_REG )<<4 
+                              + this.register.readReg( SP_REG ),
+                                old_IP );
+            
+            this.register.writeReg(CS_REG, dispSEG);
+            this.register.writeReg(IP_REG, dispOFF);
+        }
+        else
+            return -1;
+
+        return 0;
+    }
+
+    decodeRet(instruction)
+    {
+        var current_ip = this.register.readReg(IP_REG),
+            current_code_seg = this.register.readReg(CS_REG),
+            current_data_segement = this.register.readReg(DS_REG);
+
+        if ( instruction & 0xFF == RET_SEG ) 
+        {
+            let new_IP = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
+                                          + this.register.readReg( SP_REG ));
+            this.register.decSP();
+
+            this.register.writeReg(IP_REG, new_IP);
+        }
+
+        else if ( instruction & 0xFF == RET_INTERSEG ) 
+        {
+            let new_IP = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
+                                          + this.register.readReg( SP_REG ));
+            this.register.decSP();
+
+            let new_CS = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
+                                          + this.register.readReg( SP_REG ));
+            
+            this.register.decSP();
+
+            this.register.writeReg(IP_REG, new_IP);
+            this.register.writeReg(CS_REG, new_CS);
+        }
+    }
+
+    decodeUncJump(instruction)
+    {
+        var current_ip = this.register.readReg(IP_REG),
+            current_code_seg = this.register.readReg(CS_REG);
+
+
+        if ( instruction & 0xF0 == UNC_JUMP ) 
+        {
+            let executeJump = false;//If True, the jump instruction shall be executed
+
+            switch(instruction)
+            {
+                case JE:
+                    executed = this.extractFlag('Z');
+                    break;
+
+                case JL:
+                    executed = this.extractFlag('S') != this.extractFlag('O');
+                    break;
+
+                case JLE:
+                    executed = this.extractFlag('Z') || (this.extractFlag('S') != this.extractFlag('O'));
+                    break;
+
+                case JB:
+                    executed = this.extractFlag('C');
+                    break;
+
+                case JBE:
+                    executed = this.extractFlag('Z') || this.extractFlag('C');
+                    break;
+
+                case JP:
+                    executed = this.extractFlag('P');
+                    break;
+
+                case JO:
+                    executed = this.extractFlag('O');
+                    break;
+
+                case JS:
+                    executed = this.extractFlag('S');
+                    break;
+
+                case JNE:
+                    executed = this.extractFlag('Z') == 0;
+                    break;
+
+                case JNL:
+                    executed = this.extractFlag('S') == this.extractFlag('O');
+                    break;
+
+                case JNLE:
+                    executed = (this.extractFlag('Z') == 0) && (this.extractFlag('S') == this.extractFlag('O'));
+                    break;
+
+                case JNB:
+                    executed = this.extractFlag('C') == 0;
+                    break;
+
+                case JNBE:
+                    executed = this.extractFlag('Z') == 0 && this.extractFlag('C') == 0;
+                    break;
+
+                case JNP:
+                    executed = this.extractFlag('P') == 0;
+                    break;
+                case JNO:
+                    executed = this.extractFlag('O') == 0;
+                    break;
+                case JNS:
+                    executed = this.extractFlag('S') == 0;
+                    break;
+            }
+
+            if (executeJump) 
+            {
+                let disp = this.RAM.readByte(current_code_seg<<4 + current_ip);
+                disp |= (this.register.readReg(IP_REG) & 0xFF00);
+
+                this.register.writeReg(IP_REG, disp);
+            }
+
+            return 0;
+        }
+        else
+            return -1;
+        
+    }
+
+    decodeSegOverride(instruction){
+        if ( instruction & 0b00100110 == SEG_OVER_PREF ) {
+            let segRegId = (instruction >> 3) % 4;
+
+            this.activeSegment = segRegId;
+
+            this.register.incIP(1);
+
+            return 0;
+        }
+        else
+            return -1;
+    }
+
+    extractOperand(addrModeByte, segmentEnabled=true){
         /*
             |m|m|r|r|r|/|/|/|
             m: mode byte
@@ -360,36 +629,39 @@ class Processor{
         
         var current_ip = this.register.readReg(IP_REG),
             current_code_seg = this.register.readReg(CS_REG),
-            current_data_segement = this.register.readReg(DS_REG);
+            act_seg = this.register.readSegReg(this.activeSegment);
 
         switch (mode) {
             case NO_DISP:      //No displacement
 
                 if (rm == 0b110) {
                     addr = this.RAM.readWord(current_code_seg<<4 + current_ip+1);//WARING!!
-                    addr += current_data_segement<<4;   //JE pense qu'on doit rajouter 2 par 1
+                        //JE pense qu'on doit rajouter 2 par 1
                     dispSize = 2;
                 }   
                 else
-                    addr = current_data_segement<<4 + this.getAddrIndir(rm);
+                    addr = this.getAddrIndir(rm);
 
                 break;
 
             case IWEN_DISP:    // The displacement can be contained in one byte
                 addr = this.getAddrIndir(rm) + this.RAM.readByte(current_code_seg<<4 + current_ip+1);
-                addr += current_data_segement<<4;
                 dispSize = 1;
                 break;
         
             case SIN_DISP:    // The displacement is contained in two bytes
                 addr = this.getAddrIndir(rm) + this.RAM.readWord(current_code_seg<<4 + current_ip+1);
-                addr += current_data_segement<<4;
+                
                 dispSize = 2;
                 break;
             
             case REG_MODE:
                 opRegister[1] = rm;
 
+        }
+
+        if ( addr != null && segmentEnabled ) {
+            addr += act_seg<<4;
         }
 
         return {
