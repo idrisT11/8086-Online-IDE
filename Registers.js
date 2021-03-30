@@ -116,8 +116,6 @@ class Registers{
     }
 }
 
-const   SEGMENT_REGISTERS_TABLE = [ES, CS, SS, DS],
-        WORD_REGISTERS_TABLE = [AX, CX, DX, BX, SP, BP, SI, DI];
 
 const   AX_REG = 0,
         BX_REG = 1,
@@ -133,3 +131,7 @@ const   AX_REG = 0,
         SI_REG = 11,
         FLAG_REG = 12,
         IP_REG = 13;
+
+
+const   SEGMENT_REGISTERS_TABLE = [ES_REG, CS_REG, SS_REG, DS_REG],
+        WORD_REGISTERS_TABLE = [AX_REG, CX_REG, DX_REG, BX_REG, SP_REG, BP_REG, SI_REG, DI_REG];
