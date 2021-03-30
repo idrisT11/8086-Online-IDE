@@ -33,6 +33,26 @@ function encodeMov(opcode, D, W) {
     return decoded;
 
 }
+function getNum(str)//turn a string number BETWEEN BRACKETS to number
+{
+    var x=str.match(/(?<=(\s|\+|\[))(0x\w+|\d+|0b\d+)(?=(\s|\+|\]))/gi);
+    return convert(x[0]);
+}
+
+function splitNum(num){
+    var arr=[];
+     if(num>255)
+     {
+         arr.push(num & 0b0000000011111111);
+         num>>=8;
+       arr.push(num );
+     }
+     else{
+         arr.push(num);
+     }
+     return arr;
+}
+
 function toBcode(str) // original function to be class later 
 {
 var arr=[];
@@ -242,27 +262,6 @@ switch(instruction[0].toUpperCase())
 
     console.log(arr);
 }
-  function convert(str)
-  {
-      if(/^0x|h$/i.test(str))
-      {
-          var str2=str.replace(/^0x|h$/i,"").toUpperCase();
-          return parseInt(str2,16);
-      }
-      else if(/^0b/i.test(str2))
-      {
-        var str2=str.replace(/^0b/i,"").toUpperCase();
-          return parseInt(str2,2);
-      }
-      else if(/^0o/i.test(str2))
-      {
-        var str2=str.replace(/^0o/i,"").toUpperCase();
-          return parseInt(str2,8);
-      }
-      else{
-          return parseInt(str,10)
-      }     
-  }
 
 function getD(operands) {
 
@@ -378,66 +377,63 @@ function regMem(ops){
 //---------------------------------------------get mod of instruction ------------------------------------------------------    
 
 function getMod(arr){
-  if( arr[0]!=""){
-      if(arr.length===2){     //if there's one operand
-      if(/R/.test(arr[1]))//if it's a register
-          {
-              return 0b11;
-          }
-      else if(arr[1]==="M")
-          {
-          
-              var array=arr[0].slice(1,arr[0].length-1).split("+");//turn string to table of elements ex[ax,1234,bx]
-              
-                   for(var i=0;/[A-D][XHL]|[ECSD][S]|[BSD][PSI]]/.test(array[i]) && i<array.length;i++){}//decouvrer lindice de la partie numeric
-                   console.log("this is the first case i"+i);
-                   if(i<arr.length){
-                   if(convert(array[i])===0){
-                      return 0;
-                  }
-                  else if(convert(array[i])>255){
-                      return 0b10;
-                  }
-                  else{
-                      return 1;
-                  }
-                  } else {
-                   return 0;
-               }
-          }              
-      }
-      else{
-          if(/R/.test(arr[2]) && /R/.test(arr[3]) )
-          {
-              return 0b11;
-          }
-          else  {
-              var z=0;
-              (arr[2]==="M")?z=0:z=1;
-              var array=arr[z].slice(1,arr[0].length-1).split("+");//turn string to table of elements ex[ax,1234,bx]
-              for(var i=0;/[A-D][XHL]|[ECSD][S]|[BSD][PSI]]/i.test(array[i]) && i<array.length;i++){}//decouvrer lindice de la partie numeric
-              console.log("this is the second case  i "+i);
-              console.log(array[0]);
-              if(i<arr.length){
-                        if(convert(array[i])===0){
-                          return 0;
-                              }
-                        else if(convert(array[i])>255){
-                                  return 0b10;
-                              }
-                        else{
-                                  return 1;
-                              }
-               }
-                else {
-                    return 0;
-                }  
-
-          }
-      }
+    if( arr[0]!=""){
+                var num=0;
+                if(arr.length===2){     //if there's one operand
+                if(/R/.test(arr[1]))//if it's a register
+                    {
+                        return 0b11;
+                    }
+                else if(arr[1]==="M")
+                    {
+                      if(!/\d/.test(arr[0]))
+                      {
+                        return 0;
+                      }else{
+                     num=getNum(arr[0])
+                            if(num===0){return 0;}
+                            else if(num>255){return 0b10;}
+                            else{return 1;}}
+                }}
+                else{
+                    if(/R/.test(arr[2]) && /R/.test(arr[3]) )
+                    {return 0b11;}
+                    else  {
+                        var z=(arr[2]==="M")?0:1;
+                         if(!/\d/.test(arr[z]))
+                      {
+                        return 0;
+                      }else{
+                        num=getNum(arr[z])
+                                if( num===0){ return 0; }
+                                else if(num>255){ return 0b10; }
+                                else{ return 1; }}
+                                       
+                    }
+                }
+    }
+    }
+function convert(str)
+{
+  if(/^0x|0[A-D]h|\w+h$/i.test(str))
+  {
+      var str2=str.replace(/^0x|h$/i,"").toUpperCase();
+      return parseInt(str2,16);
   }
-  return -1;
+  else if(/^0b/i.test(str))
+  {
+    var str2=str.replace(/^0b/i,"");
+      return parseInt(str2,2);
   }
+  else if(/^0o/i.test(str))
+  {
+    var str2=str.replace(/^0o/i,"").toUpperCase();
+      return parseInt(str2,8);
+  }
+  else{
+      return parseInt(str,10)
+  }     
+}
 // -----------function return register id by passing it name as a parameter----------------------
 
 function regToId(regname){
