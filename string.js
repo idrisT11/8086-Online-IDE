@@ -494,71 +494,172 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
   case "JUMP" :break;
   case "RET" :break;
   case "REP" :break; 
-  case "MOVS": break; 
-  case "CMPS" :break; 
-  case "SCAS" :break;
-  case "LODS" :break;
-  case "STOS" :break;
-  case "JE": case"JZ": 
-  arr.push(0b01110100);
-  break;
-  case "JL" :case "JNGE": 
-  arr.push(0b01111100);
-  break;
-  case"JLE" :case "JNG" :
-  arr.push(0b01111110);
-  break; 
-  case"JB" :case "JNAE" :
-  arr.push(0b01110010);
-  break; 
-  case"JBE": case "JNA": 
-  arr.push(0b01110110);
-  break; 
-  case "JP" :case "JPE":
-  arr.push(0b01111010); 
-  break;
+  case "MOVS":
+    
+    arr.push(0b10100100 + w);
+    break; 
+
+  case "CMPS" :
+    
+    arr.push(0b10100110 + w);
+
+    break; 
+  case "SCAS" :
+
+    arr.push(0b10101110 + w);
+    break;
+
+  case "LODS" :
+
+    arr.push(0b10101100 + w);
+    break;
+
+  case "STOS" :
+
+    arr.push(0b10101010 + w);
+    break;
+
+  case "JE": 
+  case "JZ":
+
+    arr.push(0b01110100); 
+    arr.push(convert(operands[0]));
+
+    break;
+  
+  case "JL" :
+  case "JNGE": 
+
+    arr.push(0b01111100);
+    arr.push(convert(operands[0]));
+
+    reak;
+
+  case"JLE" :
+  case "JNG" :
+
+    arr.push(0b01111110);
+    arr.push(convert(operands[0]));
+
+    break; 
+    
+  case"JB" :
+  case "JNAE" :
+
+    arr.push(0b01110010);
+    arr.push(convert(operands[0]));
+    break; 
+
+  case"JBE": 
+  case "JNA": 
+
+    arr.push(0b01110110);
+    arr.push(convert(operands[0]));
+
+    break; 
+
+  case "JP" :
+  case "JPE":
+
+    arr.push(0b01111010);
+    arr.push(convert(operands[0]));
+
+    break;
+
   case "JO": 
-  arr.push(0b01110000);
-  break; 
+
+    arr.push(0b01110000);
+    arr.push(convert(operands[0])); 
+
+    break; 
+
   case "JS":
-  arr.push(0b01111000);
-  break; 
-  case "JNE" :case "JNZ":
-  arr.push(0b01110101); 
-  break; 
-  case "JNL" :case "JGE":
-  arr.push(0b01111101); 
-  break; 
-  case "JNLE" :case "JG":
-  arr.push(0b01111111);
-  break; 
-  case "JNB": case "JAE":
-  arr.push(0b01110011);
-  break; 
-  case "JNBE":case "JA":
-  arr.push(0b01110111);
-  break; 
-  case "JNP": case "JPO":
-  arr.push(0b01111011);
-  break; 
+
+    arr.push(0b01111000);
+    arr.push(convert(operands[0]));
+
+    break; 
+
+  case "JNE" :
+  case "JNZ":
+
+    arr.push(0b01110101);
+    arr.push(convert(operands[0]));
+    break;
+
+  case "JNL" :
+  case "JGE":
+
+    arr.push(0b01111101);
+    arr.push(convert(operands[0]));
+    break; 
+
+  case "JNLE":
+  case "JG":
+
+    arr.push(0b01111111);
+    arr.push(convert(operands[0]));
+    break; 
+
+  case "JNB": 
+  case "JAE":
+
+    arr.push(0b01110011);
+    arr.push(convert(operands[0]));
+    break; 
+
+  case "JNBE":
+  case "JA":
+
+    arr.push(0b01110111);
+    arr.push(convert(operands[0]));
+    break; 
+
+  case "JNP": 
+  case "JPO":
+
+    arr.push(0b01111011);
+    arr.push(convert(operands[0]));
+    break; 
+
   case "JNO":
-  arr.push(0b01110001);
-  break; 
+
+    arr.push(0b01110001);
+    arr.push(convert(operands[0]));
+    break; 
+
   case "JNS":
-  arr.push(0b01111001);
-  break; 
+
+    arr.push(0b01111001);
+    arr.push(convert(operands[0]));
+    break; 
+
   case "LOOP":
-  arr.push(0b11100010);
-  break;
-  case "LOOPZ":case "LOOPE":
-  arr.push(0b11100001);
-  break; 
-  case "LOOPNZ":case "LOOPNE":
-  arr.push(0b11100000);
-  break; 
+
+    arr.push(0b11100010);
+    arr.push(convert(operands[0]));
+    break;
+
+  case "LOOPZ":
+  case "LOOPE":
+
+    arr.push(0b11100001);
+    arr.push(convert(operands[0]));
+    break;
+
+  case "LOOPNZ":
+  case "LOOPNE":
+
+    arr.push(0b11100000);
+    arr.push(convert(operands[0]));
+    break; 
+
   case "JCXZ" :
-  arr.push(0b11100011);
-  break; 
+
+    arr.push(0b11100011);
+    arr.push(convert(operands[0]));
+    break; 
+
   case "INT" :
   arr.push();
   break; 
@@ -761,4 +862,6 @@ function regToId(regname){
           return 7;
           break;
   }
+}
 
+var ops = getOps("JE 0x10H");
