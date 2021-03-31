@@ -462,8 +462,8 @@ function getD(operands) {
   }
 //get value of w
 function getW(operands) {
-    let x;
- if (operands.length===4){
+  let x;
+if (operands.length===4){
 if (/R[XS]/.test(operands[2])) {  return 1;}
 if (/RL/.test(operands[2]) ){return 0;}
 if (/R[XS]/.test(operands[3])) {  return 1;}
@@ -472,20 +472,20 @@ if (/RL/.test(operands[3]) ){return 0;}
 if (/WORD|W./.test(operands[x])) return 1;
 else if (/BYTE|B\./.test(operands[x])){return 0;}
 else {
-    return (convert(operands[!x? 0:1]))>255? 1:0;
+  return (convert(operands[x?0:1]))>255? 1:0;
+
 }
- }
+}
 else{
 if (/R[XS]/.test(operands[1])) { return 1;}
 if (/RL/.test(operands[1]) ){ return 0;}
 if (/WORD|W./.test(operands[1])) return 1;
-else if (/BYTE|B\./.test(operands[1])){return 0;}
+else if (/BYTE|B./.test(operands[1])){return 0;}
 else {
-    return convert(operands[0])>255? 1:0;
+  return convert(operands[0])>255? 1:0;
 }
 }
 }
-
   
 // ------------------------------- function define the zone (r/m) in op codes
 
@@ -619,7 +619,7 @@ function regToId(regname){
   }
 }
 
-var ops = getOps("MOV [BX+6], -200");
+var ops = getOps("MOV [BX+6], 130");
 var rgId = regToId(ops[0]);
 var regmem = regMem(ops);
 var mode = getMod(ops)
