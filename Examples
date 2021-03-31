@@ -1,1 +1,21 @@
 Dayi i nhwaj les examples-nni
+wach bi rabk takteb bl kabye 5ayi fuckkkkkkkkk u
+mov [bx],cl
+[ 136, 15 ]
+mov [bx+di],cx
+[ 137, 9 ]
+mov [di+125h],0x215
+[ 199, 133, 37, 1, 21, 2 ]
+mov [bp],-2153
+[ 199, 6, 150, 247 ]
+mov al,b.[sp]
+[ 138, 6 ]
+mov w.[bx],05
+[ 199, 7, 5, 0 ]
+mov ax,b.[si+bp]
+[ 139, 2 ]
+mov es,ax
+[ 139, 192 ]
+mov es,[bx]
+[ 139, 7 ]
+
