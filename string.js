@@ -470,16 +470,16 @@ if (/R[XS]/.test(operands[3])) {  return 1;}
 if (/RL/.test(operands[3]) ){return 0;}
 (/M/.test(operands[2]))?x=0:x=1;
 if (/WORD|W./.test(operands[x])) return 1;
-else if (/BYTE|B./.test(operands[x])){return 0;}
+else if (/BYTE|B\./.test(operands[x])){return 0;}
 else {
-    return convert(operands[!x])>255? 1:0;
+    return (convert(operands[!x? 0:1]))>255? 1:0;
 }
  }
 else{
 if (/R[XS]/.test(operands[1])) { return 1;}
 if (/RL/.test(operands[1]) ){ return 0;}
 if (/WORD|W./.test(operands[1])) return 1;
-else if (/BYTE|B./.test(operands[1])){return 0;}
+else if (/BYTE|B\./.test(operands[1])){return 0;}
 else {
     return convert(operands[0])>255? 1:0;
 }
@@ -619,9 +619,9 @@ function regToId(regname){
   }
 }
 
-var ops = getOps("POP AX");
+var ops = getOps("MOV [BX+6], -200");
 var rgId = regToId(ops[0]);
 var regmem = regMem(ops);
 var mode = getMod(ops)
 //console.log((mode << 6 )  + regmem);
-console.log(toBcode("POP AX"));
+console.log(getW(ops));
