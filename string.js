@@ -353,12 +353,46 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
   case "CALL" :break;
   case "JUMP" :break;
   case "RET" :break;
-  case "REP" :break; 
-  case "MOVS": break; 
-  case "CMPS" :break; 
-  case "SCAS" :break;
-  case "LODS" :break;
-  case "STOS" :break;
+  case "REP" :
+    
+    let z = 0; 
+    opcode = 0b11110010; 
+    arr.push(opcode + z); 
+
+    break; 
+
+  case "MOVS": 
+
+    opcode = 0b10100100; 
+    arr.push(opcode + w);
+
+    break; 
+
+  case "CMPS" :
+    
+    opcode = 0b10100110; 
+    arr.push(opcode + w);
+
+    break; 
+
+  case "SCAS" :
+    
+    opcode = 0b10101110; 
+    arr.push(opcode + w);
+    break;
+
+  case "LODS" :
+    
+    opcode = 0b10101100; 
+    arr.push(opcode + w);
+
+    break;
+
+  case "STOS" :
+    opcode = 0b10101010;
+    arr.push(opcode + w);
+    break;
+
   case "JE": case"JZ": 
   arr.push(0b01110100);
   break;
