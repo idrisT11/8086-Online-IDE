@@ -460,7 +460,8 @@ class Processor{
 
         this.register.incIP(operandes.dispSize + 2);
     }
-     //and
+
+      //and
    decodeAnd(instruction)
    {
       
@@ -601,6 +602,58 @@ class Processor{
        
        
    }
+
+
+//decodeNot
+   decodeNot(instruction)
+   {
+    let current_ip=this.register.readWordReg(IP_REG);
+    let current_code_segement=this.register(CS_REG);
+    
+       if(instruction&b11111110==NOT&&(this.RAM.readRegByte(current_code_segement<<16+current_ip+1)<<2)>>3)
+       {
+        let operandes=this.extractOperand(this.RAM.readRegByte(current_code_segement<<16+current_ip+1));
+        if(operandes.addr==null) // not reg
+        {
+            let R=operandes.opRegister[1];
+
+            if(instruction%2==1)//w
+            {
+                let val=this.register.readWordReg(R);
+                val=0-val;
+                this.register.writeWordReg(R,val);
+
+            }else 
+            {
+                let val=this.register.readByteReg(R);
+                val=0-val;
+                this.register.writeBytewReg(R,val);
+
+            }
+        }
+        else  //NOT [addr]
+        {
+            if(instruction%2==1)//w
+            {
+                let val=this.RAM.readWord(operandes.addr);
+                val=0-val;
+                this.register.writeWord(operandes.addr,val);
+
+            }else 
+            {
+                let val=this.RAM.readByte(operandes.addr);
+                val=0-val;
+                this.RAM.writeByte(operandes.addr,val);
+
+            }
+
+        }
+        this.register.incIP(operandes.dispSize + (instruction % 2) + 3);
+       }
+       
+   }
+   //
+
     //or
    decodeOr(instruction)
    {
@@ -741,6 +794,7 @@ class Processor{
         }
        
        
+
    }
      //xor
    decodeXor(instruction)
@@ -882,6 +936,7 @@ class Processor{
         }
        
        
+
    }
 
     decodeJmpCall(instruction){
