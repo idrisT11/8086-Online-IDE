@@ -1637,90 +1637,91 @@ class Processor{
             return -1;
     }
 
-    extractOperand(addrModeByte, segmentEnabled=true){
-        /*
-            |m|m|r|r|r|/|/|/|
-            m: mode byte
-            r: register byte
-            /: r/m byte
-        */
-        var mode = (addrModeByte & 0xC0) >> 6,
-            reg  = (addrModeByte & 0x38) >> 3,
-            rm   = (addrModeByte & 0x07);
+   extractOperand(addrModeByte, segmentEnabled=true){
+		        /*
+		            |m|m|r|r|r|/|/|/|
+		            m: mode byte
+		            r: register byte
+		            /: r/m byte
+		        */
+		        var mode = (addrModeByte & 0xC0) >> 6,
+		            reg  = (addrModeByte & 0x38) >> 3,
+		            rm   = (addrModeByte & 0x07);
 
-        var addr = null,        //addr de l'un des operandes
-            dispSize = 0,      //Si l'adressage prend un disp, cela tiendra compte de sa taille
-            opRegister = [reg, null];
-        
-        var current_ip = this.register.readReg(IP_REG),
-            current_code_seg = this.register.readReg(CS_REG),
-            act_seg = this.register.readSegReg(this.activeSegment);
+		        var addr = null,        //addr de l'un des operandes
+		            dispSize = 0,      //Si l'adressage prend un disp, cela tiendra compte de sa taille
+		            opRegister = [reg, null];
+		        
+		        var current_ip = this.register.readReg(IP_REG),
+		            current_code_seg = this.register.readReg(CS_REG),
+		            act_seg = this.register.readSegReg(this.activeSegment);
 
-        switch (mode) {
-            case NO_DISP:      //No displacement
+		        switch (mode) {
+		            case NO_DISP:      //No displacement
 
-                if (rm == 0b110) {
-                    addr = this.RAM.readWord(current_code_seg<<4 + current_ip+1);//WARING!!
-                        //JE pense qu'on doit rajouter 2 par 1
-                    dispSize = 2;
-                }   
-                else
-                    addr = this.getAddrIndir(rm);
+		                if (rm == 0b110) {
+		                    addr = this.RAM.readWord((current_code_seg<<4) + current_ip+2);//WARING!!
+		                        //JE pense qu'on doit rajouter 2 par 1
+		                    dispSize = 2;
+		                }   
+		                else
+		                    addr = this.getAddrIndir(rm);
 
-                break;
+		                break;
 
-            case IWEN_DISP:    // The displacement can be contained in one byte
-                addr = this.getAddrIndir(rm) + this.RAM.readByte(current_code_seg<<4 + current_ip+1);
-                dispSize = 1;
-                break;
-        
-            case SIN_DISP:    // The displacement is contained in two bytes
-                addr = this.getAddrIndir(rm) + this.RAM.readWord(current_code_seg<<4 + current_ip+1);
-                
-                dispSize = 2;
-                break;
-            
-            case REG_MODE:
-                opRegister[1] = rm;
+		            case IWEN_DISP:    // The displacement can be contained in one byte
+		                addr = this.getAddrIndir(rm) + this.RAM.readByte((current_code_seg<<4) + current_ip+2);
+		                dispSize = 1;
+		                break;
+		        
+		            case SIN_DISP:    // The displacement is contained in two bytes
+		                addr = this.getAddrIndir(rm) + this.RAM.readWord((current_code_seg<<4) + current_ip+2);
+		                
+		                dispSize = 2;
+		                break;
+		            
+		            case REG_MODE:
+		                opRegister[1] = rm;
 
-        }
+		        }
 
-        if ( addr != null && segmentEnabled ) {
-            addr += act_seg<<4;
-        }
+		        if ( addr != null && segmentEnabled ) {
+		        	let current_segment = act_seg;
+		            addr += (current_segment<<4);
+		        }
 
-        return {
-            addr: addr,
-            dispSize: dispSize,
-            opRegister: opRegister,//array
-        };
+		        return {
+		            addr: addr,
+		            dispSize: dispSize,
+		            opRegister: opRegister,//array
+		        };
 
-    }
+	}
 
-    getAddrIndir(rm){   //mazel la segmentation a gérer
-        switch (rm) {
-            case 0x00:
-                return this.Register[BX] + this.Register[SI];
-            case 0x01:
-                return this.Register[BX] + this.Register[DI];
-            case 0x02:
-                return this.Register[BP] + this.Register[SI];
-            case 0x03:
-                return this.Register[BP] + this.Register[DI];
+	getAddrIndir(rm){   //mazel la segmentation a gérer
+		        switch (rm) {
+		            case 0x00:
+		                return this.register.readReg(BX_REG) + this.register.readReg(SI_REG);
+		            case 0x01:
+		                return this.register.readReg(BX_REG) + this.register.readReg(DI_REG);
+		            case 0x02:
+		                return this.register.readReg(BP_REG) + this.register.readReg(SI_REG);
+		            case 0x03:
+		                return this.register.readReg(BP_REG) + this.register.readReg(DI_REG);
 
-            case 0x04:
-                return this.Register[SI];
-            case 0x05:
-                return this.Register[DI];
-            case 0x06:
-                return this.Register[BP];
-            case 0x07:
-                return this.Register[BX];
+		            case 0x04:
+		                return this.register.readReg(SI_REG);
+		            case 0x05:
+		                return this.register.readReg(DI_REG);
+		            case 0x06:
+		                return this.register.readReg(BP_REG);
+		            case 0x07:
+		                return this.register.readReg(BX_REG);
 
-            default:
-                return -1;
-        }
-    }
+		            default:
+		                return -1;
+		        }
+	}
 }
 
 
