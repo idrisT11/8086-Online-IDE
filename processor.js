@@ -13,7 +13,7 @@ class Processor{
     decode(){
         var current_ip = this.register.readReg(IP_REG),
             current_code_seg = this.register.readReg(CS_REG),
-            instruction = this.RAM.readByte( current_code_seg<<4 + current_ip );
+            instruction = this.RAM.readByte( (current_code_seg<<4) + current_ip );
 
         let gut = this.decodeMov(instruction);
     }
