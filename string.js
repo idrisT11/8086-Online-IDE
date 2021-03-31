@@ -5,6 +5,20 @@
   var segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
   var justNumbers=false;
 //get operands and its types exp: ["ax",'[1254+bx]',''Rx","M"] or ["al",0x12FF,''RL","I"]]
+function byteConcat(str,arr) {
+
+    
+    let disp=splitNum(getNum(str)); 
+
+    if (disp!=0){
+
+      return (arr.concat(disp));
+
+    }
+
+    else 
+      return arr;
+}
 function getOps(str){
   
 let operands=[];
@@ -21,19 +35,11 @@ let operands=[];
       else (operands.push('I'))
       }
     }
-    return operands.map(op=>op.toUpperCase());
-  }
+    return operands.map(x=>(x.toUpperCase()));
+}
 
 function encodeMov(opcode, D, W) {
-
-  let decoded = opcode; 
-  decoded = decoded << 2; 
-
-  decoded = decoded + (D << 1) + W;
-  
-  
-  return decoded;
-
+  return (opcode<<2 )+ (D << 1) + W;
 }
 function getNum(str)//turn a string number BETWEEN BRACKETS to number
 {
@@ -55,28 +61,22 @@ function splitNum(num){
    }
    return disp;
 }
-
-function byteConcat(str) {
-    
-    let disp=splitNum(getNum(str)); 
-    if (disp[0]!=0){
-
-      arr=arr.concat(disp);
-}
-
-}
 function toBcode(str) // original function to be class later 
 {
 var arr=[];
-var regex=/(?<=\s*)\S+/;
+let regex=/(?<=\s*)\S+/;
 var operands = getOps(str);
-var instruction = str.match(regex);
-var w = getW(operands);
-var mode = getMod(operands);
-var result = 0;
-var regmem=regMem(operands);
-var d = getD(operands);
-var opcode = 0b000;
+let instruction = str.match(regex);
+var w = getW(operands),
+opcode=0,
+d=getD(operands),
+mode = getMod(operands),
+result = 0,
+regmem=regMem(operands);
+if(justNumbers) mode=0;
+console.log("this id the operands  ");
+console.log(operands);
+console.log("wwwwwwwww "+ w);
 //match instruction
 switch(instruction[0].toUpperCase())
 {
@@ -85,36 +85,33 @@ case "MOV":
   // Register/Memory to/from Register
   if (/R|M/.test(operands[2])  && /R|M/.test(operands[3])) {
 
-    opcode = 0b100010;
-          
-
-    if(justNumbers) 
-        mode=0;
-
+      opcode = 0b100010;
       // register to memory
       if (/M/.test(operands[2]) && /R/.test(operands[3])) {
-
           arr.push(encodeMov(opcode, 0, w));
           result = (mode << 6) + (regToId(operands[1]) << 3) +  regmem;
-
           arr.push(result);
+       
 
       }
       // memory to register+register to register 
       else if (/R/.test(operands[2])) {
 
           arr.push(encodeMov(opcode, 1, w ));
-
+          console.log(opcode)
           result = (mode << 6) + ((regToId(operands[0])) << 3) +  regmem;
           arr.push(result);
+         
       }
+      console.log("before" +arr);
+      arr=byteConcat(str,arr);
+      console.log("sfter" +arr);
        // Immediate to Register/Memory
   } else if(/M|R/.test(operands[2])  && /I/.test(operands[3])) 
   {
-      opcode = 0b1100011;
-      w=getW(operands);
-      arr.push(encodeMov(opcode, 1, w));
+      arr.push(encodeMov(0b110001 , 1, w));
       arr.push((mode<<6)+regmem);
+      arr=byteConcat(str,arr);  
       if(w===1){
           let byte=splitNum(operands[1]);
           arr.push(byte[0]);
@@ -129,40 +126,33 @@ case "MOV":
   {
       arr.push(0b10001100);
       arr.push((mode<<6)+(regToId(operands[0])<<3)+regmem);
-      byteConcat(str);
+      arr=byteConcat(str,arr);  
   }
   // memory/register to segment register
   else if(/RS/.test(operands[2])  && /R|M/.test(operands[3]))
   {
       arr.push(0b10001110);
       arr.push((mode<<6)+(regToId(operands[0])<<3)+regmem);
+      arr=byteConcat(str,arr);  
   }
-                
-  
+//concatenation of the bytes in an array deplacement           
   
   break;
 
   case "PUSH":
       if(/RS/.test(operands[1]))
-
       {
-          arr.push(regToId(operands[0]) << 3 + 0b110);
+          arr.push((((regToId(operands[0]))<<3)+0b110));
       }
-
       else if(/R|M/.test(operands[1]))
-
       {
           arr.push(0b11111111);
-          arr.push((getMod(operands)) << 6 + 0b110000 + regMem(operands));
-          byteConcat(str);
-
+          arr.push(((getMod(operands))<<6)+0b110000+regmem);
+          console.log("hello" +regmem);
+          arr=byteConcat(str,arr);  
       }
-
-
-    break;
-
-  case "POP":
-    
+  break;
+case "POP" :
     // segment register
     if (/RS/.test(operands[1]))
       
@@ -173,11 +163,14 @@ case "MOV":
         
         arr.push(0b10001111);
         arr.push((getMod(operands) << 6) + regMem(operands));
-        byteConcat(str);
+        arr = byteConcat(str, arr);
     }
     
  break;
   case "XCHG" :
+      arr.push(0b10000110+getW(operands));
+      arr.push((mode<<6)+(regToId(operands[0]))<<2+regmem);
+      arr=byteConcat(str,arr);       
   break;
   case "LEA" :
   break;
@@ -197,36 +190,26 @@ case "MOV":
   case "ADD":
       
     //Reg./Memory with Register to Either
-    if (/R/.test(operands[3])) {
-
-        opcode = 0b000000; 
-        
-        // register with register
-        if (/R/.test(operands[2])) {
-
-            d = 1;
-            arr.push((opcode << 2) + ( d << 1) + w); 
-            arr.push((mode << 6) + 0b000 + regmem);
-        }
-
-        // memory with register
-        else if (/M/.test(operands[2])) {
-
-            d = 0; 
-            arr.push((opcode << 2) + (d << 1) + w);
-            arr.push((mode << 6) + 0b000 + regmem);
-
-        }
+    if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
+            console.log(( w<< 1) + 1);
+            arr.push( ( w << 1) + 1); 
+            arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+            arr=byteConcat(str,arr);
     }
-
     //Immediate to Register/Memory 
-    else if (/I/.test(operands[3])) {
+    else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
 
         opcode = 0b100000;
-
+        let s=(convert((/I/.test(operands[2]))?operands[0]:operands[1])<0)?1:0;
+        arr.push((opcode<<2)+(s<<1)+w);
+        arr.push((mode<<6)+regmem);
+        arr=byteConcat(str,arr);
+        arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & 0x0ff);
+        if(w===1)
+        {
+            arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1])>>8);
+        }
     }
-
-    
   break;
   case "ADC":
   break;
@@ -234,24 +217,108 @@ case "MOV":
   arr.push(0b00110111);
   break;             
   case "INC": 
+  arr.push(0b11111110+w);
+  arr.push((mode<<6)+regmem);
   break;
   case "SUB": 
+    //Reg./Memory with Register to Either
+    if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
+          arr.push( ( 0b01010<< 2) + (getD(operands)<<1)+w); 
+          arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+              arr=byteConcat(str,arr);
+  }
+  //Immediate to Register/Memory 
+  else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
+      opcode = 0b100000;
+      let s=(convert((/I/.test(operands[2]))?operands[0]:operands[1])<0)?1:0;
+      arr.push((opcode<<2)+(s<<1)+w);
+      arr.push((mode<<6)+regmem);
+      arr=byteConcat(str,arr);
+      arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & 0x0ff);
+      if(w===1)
+      {
+          arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1])>>8);
+      }
+  }
   break;
   case "SSB": 
+  //r/m to r/m
+  if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
+    arr.push( ( 0b000110<< 2) + (getD(operands)<<1)+w); 
+    arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+        arr=byteConcat(str,arr);
+}
+//Immediate to Register/Memory 
+else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
+opcode = 0b100000;
+let s=(convert((/I/.test(operands[2]))?operands[0]:operands[1])<0)?1:0;
+arr.push((opcode<<2)+(s<<1)+w);
+arr.push((mode<<6)+regmem);
+arr=byteConcat(str,arr);
+arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & 0x0ff);
+if(w===1)
+{
+    arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1])>>8);
+}
+}
   break;
   case "DEC": 
+  arr.push(0b11111110+w);
+  arr.push((mode<<6)+(0b1000)+regmem);
   break;
   case "CMP":
+        //Reg./Memory with Register to Either
+    if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
+        arr.push( ( 0b01110<< 2) + (getD(operands)<<1)+w); 
+        arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+            arr=byteConcat(str,arr);
+}
+//Immediate to Register/Memory 
+else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
+    opcode = 0b100000;
+    let s=(convert((/I/.test(operands[2]))?operands[0]:operands[1])<0)?1:0;
+    arr.push((opcode<<2)+(s<<1)+w);
+    arr.push((mode<<6)+regmem);
+    arr=byteConcat(str,arr);
+    arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & 0x0ff);
+    if(w===1)
+    {
+        arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1])>>8);
+    }
+}
   break;
   case "MUL": 
-    
-    opcode = 0b1111011; 
-    arr.push((opcode << 2) + w); 
-    arr.push((mode << 6 ) + 0b100 + regmem);
-
+  arr.push(0b11110110+w);
+  arr.push((mode)<<6+0b100000+regmem);
+  if(/M/.operands[1])
+  {
+      arr=byteConcat(str,arr);
+  }
   break;
   case "IMUL": 
+  arr.push(0b11110110+w);
+  arr.push((mode)<<6+0b101000+regmem);
+  if(/M/.operands[1])
+  {
+      arr=byteConcat(str,arr);
+  }
   break;
+  case "DIV":
+    arr.push(0b11110110+w);
+    arr.push((mode)<<6+0b110000+regmem);
+    if(/M/.operands[1])
+    {
+        arr=byteConcat(str,arr);
+    }   
+   break;
+   case "IDIV":
+        arr.push(0b11110110+w);
+        arr.push((mode)<<6+0b111000+regmem);
+        if(/M/.operands[1])
+        {
+            arr=byteConcat(str,arr);
+        }  
+          break;
   case "CBW": 
   arr.push(0b10011000);
   break;
@@ -259,7 +326,20 @@ case "MOV":
   arr.push(0b10011001);
   break;
   case "NOT" :break; 
-  case "SHL" :break;
+  arr.push(0b11110110+w);
+  arr.push((mode)<<6+0b010000+regmem);
+  if(/M/.operands[1])
+  {
+      arr=byteConcat(str,arr);
+  }  
+  case "SHL" :case "SAL" :
+    arr.push(0b11110110+w);
+    arr.push((mode)<<6+0b010000+regmem);
+    if(/M/.operands[1])
+    {
+        arr=byteConcat(str,arr);
+    } 
+      break;
   case "SHR" :break;
   case "SAR" :break;
   case "ROL" :break;
@@ -267,62 +347,7 @@ case "MOV":
   case "RCL" :break; 
   case "RCR" :break;
   case "AND" :break;
-  case "XOR" :
-
-    //Reg./Memory and Register to Either
-    if (/R/.test(operands[3])) {
-
-        opcode = 0b001100;
-
-        // register with register
-        if (/R/.test(operands[2])) {
-
-            d = 1 ; 
-            arr.push((opcode << 2 ) + ( d << 1) + w); 
-            arr.push((mode << 6) + regToId(operands[3]) << 3 + regmem);
-        }
-
-        // memory with register
-        else if (/M/.test(operands[2])) {
-
-            d = 0; 
-            arr.push((opcode << 2) + ( d << 1) + w);
-            arr.push((mode << 6) + regToId(operands[3]) << 3 + regmem);
-
-        }
-
-    }
-
-    // Immediate to Register/Memory
-
-    else if (/I/.test(operands[3])) {
-
-        opcode = 0b1000000;
-
-        //register with immediate
-        if (/R/.test(operands[2])) {
-
-            d = 1;
-            arr.push((opcode << 2) + (d << 1) + w);
-            arr.push((mode << 6 ) + 0b110 + regmem);
-
-            if (w == 1) {
-
-                // least significant byte and then most significant byte
-                arr.push(operands[1] & 0xFF); 
-                arr.push((operands[1] & 0xFF) >> 8);
-            }
-
-            arr.push(operands[1]);
-        }
-
-        // immediate with memory
-        else if (/M/.test(operands[2])) {
-
-        }
-    }
-      
-    break;
+  case "XOR" :break;
   case "OR" :break;
   case "TEST": break;
   case "CALL" :break;
@@ -427,106 +452,52 @@ case "MOV":
 
   console.log(arr);
 }
-
+//get value of d
 function getD(operands) {
 
-  // from reg to memory 
-  if (operands[0].includes("[") && (byteRegisters.includes(operands[1]) || wordRegisters.includes(operands[1])))
-
-      return 0; 
+    // from reg to memory 
+    if (/M/.test(operands[0]) && /R/.test(operands[1]))
   
-  // memory to reg 
-  else if (operands[1].includes("[") && (byteRegisters.includes(operands[0]) || wordRegisters.includes(operands[0]))) 
-      
-      return 1; 
-
-  
-  // other modes like immediate to memory 
-  return -1 ;
-
-
-}
-
+        return 0; 
+    
+    // memory to reg 
+    else if (/M/.test(operands[1]) && /R/.test(operands[1]) ) 
+        
+        return 1; 
+  }
+//get value of w
 function getW(operands) {
-
-  // register to memory
-  if (getD(operands) == 0) {
-      
-      // word instruction
-      if (wordRegisters.includes((operands[1]).toUpperCase()))
-
-          return 1; 
-
-      // byte instruction
-      else if (byteRegisters.includes((operands[1]).toUpperCase())) 
-
-          return 0;  
-  
-        //just for debugging
-       return -1;
-  }
-
-
-  // memory to register 
-  if (getD(operands) == 1) {
-
-      if (wordRegisters.includes(operands[0])) 
-
-          return 1;
-
-      else if (byteRegisters.includes(operands[0]))
-
-          return 0; 
-
-      return -1;
-
-  }
-
-  // register to register
-  if (getD(operands) == -1) {
-
-      if (wordRegisters.includes(operands[0]) && wordRegisters.includes(operands[1]))
-
-          return 1;
-
-      else if (byteRegisters.includes(operands[0]) && byteRegisters.includes(operands[1]))
-
-          return 0;
-
-  }
-
-  var imOperand = convert(operands[1]);
-
-  // immediate to memory
-  if (operands[0].includes("[") && getD(operands) == -1) {
-
-      // word instruction
-      if (imOperand > 255 || operands[0].includes("W"))  
-          return 1; 
-      
-      // byte instruction
-      return 0;
-  }
-
-  // immediate to register
-  if (imOperand > 255) 
-
-      return 1;
-
-  else if (imOperand <= 255)
-      
-      return 0;
-
-  else 
-      
-      return -1;
+    let x;
+ if (operands.length===4){
+if (/R[XS]/.test(operands[2])) {  return 1;}
+if (/RL/.test(operands[2]) ){return 0;}
+if (/R[XS]/.test(operands[3])) {  return 1;}
+if (/RL/.test(operands[3]) ){return 0;}
+(/M/.test(operands[2]))?x=0:x=1;
+if (/WORD|W./.test(operands[x])) return 1;
+else if (/BYTE|B./.test(operands[x])){return 0;}
+else {
+    return convert(operands[!x])>255? 1:0;
+}
+ }
+else{
+if (/R[XS]/.test(operands[1])) { return 1;}
+if (/RL/.test(operands[1]) ){ return 0;}
+if (/WORD|W./.test(operands[1])) return 1;
+else if (/BYTE|B./.test(operands[1])){return 0;}
+else {
+    return convert(operands[0])>255? 1:0;
+}
+}
 }
 
+  
 // ------------------------------- function define the zone (r/m) in op codes
 
 function regMem(ops){
+    justNumbers=false;
   if (getMod(ops)==3){
-      return regToId(ops[1]);}
+      return (ops.length==4)?regToId(ops[1]):regToId(ops[0])}
   else{
   let i;
   (/\[/.test(ops[0]))?i=0:/\[/.test(ops[1])?i=1:i=-1;
@@ -580,27 +551,35 @@ function getMod(arr){
               }
   }
   }
-function convert(str)
-{
-if(/^0x|0[A-D]h|\w+h$/i.test(str))
-{
-    var str2=str.replace(/^0x|h$/i,"").toUpperCase();
-    return parseInt(str2,16);
+  //convert a string number to number
+ function convertP(str)
+ {
+ if(/^0x|0[A-D]h|\w+h$/i.test(str))
+ {
+     var str2=str.replace(/^0x|h$/i,"").toUpperCase();
+     return parseInt(str2,16);
+ }
+ else if(/^0b/i.test(str))
+ {
+   var str2=str.replace(/^0b/i,""); 
+     return parseInt(str2,2);
+ }
+ else if(/^0o/i.test(str))
+ {
+   var str2=str.replace(/^0o/i,"").toUpperCase();
+     return parseInt(str2,8);
+ }
+ else{
+     return parseInt(str,10);
+ }}
+ function convert(str)
+ {
+     if(/\-/.test(str)){
+     var str2=str.replace(/\-/,""); 
+     return (convertP(str2)>128)?65535-convertP(str2):convertP(str2);
+ }else{return convertP(str);}
 }
-else if(/^0b/i.test(str))
-{
-  var str2=str.replace(/^0b/i,"");
-    return parseInt(str2,2);
-}
-else if(/^0o/i.test(str))
-{
-  var str2=str.replace(/^0o/i,"").toUpperCase();
-    return parseInt(str2,8);
-}
-else{
-    return parseInt(str,10)
-}     
-}
+
 // -----------function return register id by passing it name as a parameter----------------------
 
 function regToId(regname){
@@ -645,6 +624,4 @@ function regToId(regname){
   }
 }
 
-var ops = getOps("mov bx, ax");
-
-console.log(toBcode("xor bx, ax"));
+console.log(toBcode("POP [BX+3]"));
