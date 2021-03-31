@@ -342,7 +342,7 @@ class Processor{
 
         }
     }
-    decodeMul(instruction)
+      decodeMul(instruction)
     {
         var current_ip = this.register.readReg(IP_REG),
         current_code_segement = this.register.readReg(CS_REG);
@@ -368,16 +368,16 @@ class Processor{
                     {
                         
                         let val = this.RAM.readWord(operandes.addr);
-                        let ax = this.readWordReg(AX_REG);//ax
+                        let ax = this.register.readWordReg(AX_REG);//ax
                         ax*=val;
                     if(ax>>16==0)
                     {
-                        this.writeWordReg(AX_REG,ax);
+                        this.register.writeWordReg(AX_REG,ax);
                     }
                     else 
                     {
-                        this.writeWordReg(AX_REG,ax&0x0000ffff);
-                        this.writeWordReg(DX_REG,ax&0xffff0000);
+                        this.register.writeWordReg(AX_REG,ax&0x0000ffff);
+                        this.register.writeWordReg(DX_REG,ax&0xffff0000);
                     }
 
                     
@@ -388,17 +388,17 @@ class Processor{
                     {
 
                         let val = this.RAM.readByte(operandes.addr);
-                        let al = this.readByteReg(0);//al
+                        let al = this.register.readByteReg(0);//al
                         al*=val;
                         if(al>>8==0)
                         {
-                            this.writeByteReg(0,al);
+                            this.register.writeByteReg(0,al);
                         }
                         else 
                         {
                     
-                            this.writeWordReg(0,al>>8);//ah
-                            this.writeByteReg(0,al%256);//al
+                            this.register.writeWordReg(0,al>>8);//ah
+                            this.register.writeByteReg(0,al%256);//al
                         }
                     
                     }
@@ -437,9 +437,9 @@ class Processor{
                     {
                         
                         let val = this.RAM.readWord(operandes.addr);
-                        let ax = this.readWordReg(AX_REG);//ax
-                        this.writeWordReg(AX_REG,Math.floor(val/ax));
-                        this.writeWordReg(DX_REG,val%ax);
+                        let ax = this.register.readWordReg(AX_REG);//ax
+                        this.register.writeWordReg(AX_REG,Math.floor(val/ax));
+                        this.register.writeWordReg(DX_REG,val%ax);
 
                     
                     
@@ -449,9 +449,9 @@ class Processor{
                     {
 
                         let val = this.RAM.readByte(operandes.addr);
-                        let al = this.readByteReg(0);//al
-                        this.writeByteReg(0,Math.floor(val/al));//al
-                        this.writeByteReg(0,math.floor(val%al));//ah
+                        let al = this.register.readByteReg(0);//al
+                        this.register.writeByteReg(0,Math.floor(val/al));//al
+                        this.register.writeByteReg(0,math.floor(val%al));//ah
 
                     }
                 }
