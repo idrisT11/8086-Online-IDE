@@ -197,35 +197,42 @@ class Registers{
     extractFlag(flagName)
     {
         let val=this.R[FLAG_REG];//123456789
+
         switch(flagName)
         {
-            case 'C':  //most segnificant bit
-                val=val>>8;
-                break
-            case 'C':
-                val=val>>7%2;;
-                break
-            case 'C':
+            case 'O':  
+                val=val>>11;
+                break;
+
+            case 'D': 
+                val=val>>10%2;
+                break;
+
+            case 'I':  
+                val=val>>9%2;
+                break;
+
+            case 'T':  
+                val=val>>8%2;
+                break;
+            case 'S':
+                val=val>>7%2;
+                break;
+            case 'Z':
                 val=val>>6%2;
-                break
-            case 'C':
-                val=val>>5%2;
-                break
-            case 'C':
+                break;
+            
+            case 'A':
                 val=val>>4%2;
-                break
-            case 'C':
-                val=val>>3%2;
-                break
-            case 'C':
+                break;
+            
+            case 'P':
                 val=val>>2%2;
-                break
-            case 'C':
-                val=val>>1%2;
-                break
+                break;
+            
             case 'C': //less significant bit
                 val=val%2;
-                break
+                break;
           
         }
        return val;
@@ -239,39 +246,45 @@ class Registers{
             case 'C':  //most segnificant bit
                if(bit) val|=0b100000000;
                else val &=0b011111111;
-                break
+                break;
+
             case 'C':
                 if(bit) val|=0b010000000;
                else val &=0b101111111;
-                break
+                break;
+
             case 'C':
                 if(bit) val|=0b001000000;
                 else val &=0b110111111;
-                break
+                break;
+
             case 'C':
                 if(bit) val|=0b000100000;
                 else val &=0b111011111;
-                break
+                break;
+
             case 'C':
                 if(bit) val|=0b000010000;
                 else val &=0b111101111;
-                break
+                break;
+
             case 'C':
                 if(bit) val|=0b000001000;
                 else val &=0b111110111;
-                break
-            case 'C':
+                break;
+
+            case 'P':
                 if(bit) val|=0b000000100;
                 else val &=0b111111011;
-                break
-            case 'C':
-                if(bit) val|=0b000000010;
-                else val &=0b111111101;
-                break
+                break;
+
+            
+
             case 'C': //less significant bit
             if(bit) val|=0b000000001;
             else val &=0b111111110;
-                break
+                break;
+
           
         }
        return val;
