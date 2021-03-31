@@ -761,5 +761,4 @@ function regToId(regname){
           return 7;
           break;
   }
-}
-var ops=getOps("push ax");
+
