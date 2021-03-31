@@ -619,9 +619,3 @@ function regToId(regname){
   }
 }
 
-var ops = getOps("MOV [BX+6], 130");
-var rgId = regToId(ops[0]);
-var regmem = regMem(ops);
-var mode = getMod(ops)
-//console.log((mode << 6 )  + regmem);
-console.log(getW(ops));
