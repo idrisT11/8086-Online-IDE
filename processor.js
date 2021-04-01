@@ -1887,7 +1887,7 @@ class Processor{
             return -1;
     }
 
-   extractOperand(addrModeByte, segmentEnabled=true){
+extractOperand(addrModeByte, segmentEnabled=true){
 		        /*
 		            |m|m|r|r|r|/|/|/|
 		            m: mode byte
@@ -1897,7 +1897,7 @@ class Processor{
 		        var mode = (addrModeByte & 0xC0) >> 6,
 		            reg  = (addrModeByte & 0x38) >> 3,
 		            rm   = (addrModeByte & 0x07);
-
+		            
 		        var addr = null,        //addr de l'un des operandes
 		            dispSize = 0,      //Si l'adressage prend un disp, cela tiendra compte de sa taille
 		            opRegister = [reg, null];
@@ -1905,7 +1905,7 @@ class Processor{
 		        var current_ip = this.register.readReg(IP_REG),
 		            current_code_seg = this.register.readReg(CS_REG),
 		            act_seg = this.register.readSegReg(this.activeSegment);
-
+		        
 		        switch (mode) {
 		            case NO_DISP:      //No displacement
 
@@ -1948,7 +1948,7 @@ class Processor{
 
 	}
 
-	getAddrIndir(rm){   //mazel la segmentation a gérer
+	getAddrIndir(rm){  
 		        switch (rm) {
 		            case 0x00:
 		                return this.register.readReg(BX_REG) + this.register.readReg(SI_REG);
