@@ -46,7 +46,7 @@ function splitNum(num){
   var disp=[];
     if(num>255)
    {
-       disp.push(num & 0b0000000011111111);
+       disp.push(num & (0b0000000011111111));
        num>>=8;
      disp.push(num );
    }
@@ -78,131 +78,104 @@ mode = getMod(operands),
 result = 0,
 regmem=regMem(operands);
 if(justNumbers) mode=0;
-console.log("wwwwwwwww "+ w);
 //match instruction
 switch(instruction[0].toUpperCase())
 {
-case "MOV":
+    case "MOV":
 
-      // Register/Memory to/from Register
-    if (/R|M/.test(operands[2])  && /R|M/.test(operands[3])) {
-
-      opcode = 0b100010;
-        // register to memory
-        if (/M/.test(operands[2]) && /R/.test(operands[3])) {
-            arr.push(encodeMov(opcode, 0, w));
-            result = (mode << 6) + (regToId(operands[1]) << 3) +  regmem;
-            arr.push(result);
-         
-  
-        }
-        // memory to register+register to register 
-        else if (/R/.test(operands[2])) {
-  
-            arr.push(encodeMov(opcode, 1, w ));
-            console.log(opcode)
-            result = (mode << 6) + ((regToId(operands[0])) << 3) +  regmem;
-            arr.push(result);
-           
-        }
-        console.log("before" +arr);
-        arr=byteConcat(str,arr);
-        console.log("sfter" +arr);
-         // Immediate to Register/Memory
-    } 
-    else if(/M|R/.test(operands[2])  && /I/.test(operands[3])) 
-    {
-        arr.push(encodeMov(0b110001 , 1, w));
-        arr.push((mode<<6)+regmem);
-        arr=byteConcat(str,arr);  
-        
-        if(w===1){
-  
-            let byte=splitNum(convert(operands[1]));
-            arr.push(byte[0]);
-            if (byte.length===1) {
-            /\-/.test(operands[1])?byte.push(255):byte.push(0);
-            }
-            console.log("hello wooo " + byte)
-            arr.push(byte[1]);
-           }
-           else {
-               arr.push(convert(operands[1]));
-           }
-    }
-    //segemnt register to memory/register
-    else if(/M|R/.test(operands[2])  && /RS/.test(operands[3]))
-    {
-        arr.push(0b10001100);
-        arr.push((mode<<6)+(regToId(operands[0])<<3)+regmem);
-        arr=byteConcat(str,arr);  
-    }
-    // memory/register to segment register
-    else if(/RS/.test(operands[2])  && /R|M/.test(operands[3]))
-    {
-        arr.push(0b10001110);
-        arr.push((mode<<6)+(regToId(operands[0])<<3)+regmem);
-        arr=byteConcat(str,arr);  
-    }
-  //concatenation of the bytes in an array deplacement           
-    
-  break;
-  
-  case "PUSH":
-
-    if(/RS/.test(operands[1]))
-
-    {
-        arr.push((((regToId(operands[0]))<<3)+0b110));
-    }
-
-    else if(/R|M/.test(operands[1]))
-    {
+        // Register/Memory to/from Register
+        if (/R|M/.test(operands[2])  && /R|M/.test(operands[3])) {
       
-        arr.push(0b11111111);
-        arr.push(((getMod(operands))<<6)+0b110000+regmem);
-
-
-        if(/M/.test(operands[1]))
-          arr=byteConcat(str,arr);  
-    }
+            opcode = 0b100010;
+            // register to memory
+            if (/M/.test(operands[2]) && /R/.test(operands[3])) {
+                arr.push(encodeMov(opcode, 0, w));
+                result = (mode << 6) + (regToId(operands[1]) << 3) +  regmem;
+                arr.push(result);
+             
+      
+            }
+            // memory to register+register to register 
+            else if (/R/.test(operands[2])) {
+      
+                arr.push(encodeMov(opcode, 1, w ));
+                console.log(opcode)
+                result = (mode << 6) + ((regToId(operands[0])) << 3) +  regmem;
+                arr.push(result);
+               
+            }
+            console.log("before" +arr);
+            arr=byteConcat(str,arr);
+            console.log("sfter" +arr);
+             // Immediate to Register/Memory
+        } else if(/M|R/.test(operands[2])  && /I/.test(operands[3])) 
+        {
+            arr.push(encodeMov((0b110001) , 1, w));
+            arr.push((mode<<6)+regmem);
+            arr=byteConcat(str,arr);  
+            
+            if(w===1){
+      
+                let byte=splitNum(convert(operands[1]));
+                arr.push(byte[0]);
+                if (byte.length===1) {
+                /\-/.test(operands[1])?byte.push(255):byte.push(0);
+                }
+                console.log("hello wooo " + byte)
+                arr.push(byte[1]);
+               }
+               else {
+                   arr.push(convert(operands[1]));
+               }
+        }
+        //segemnt register to memory/register
+        else if(/M|R/.test(operands[2])  && /RS/.test(operands[3]))
+        {
+            arr.push(0b10001100);
+            arr.push((mode<<6)+(regToId(operands[0])<<3)+regmem);
+            arr=byteConcat(str,arr);  
+        }
+        // memory/register to segment register
+        else if(/RS/.test(operands[2])  && /R|M/.test(operands[3]))
+        {
+            arr.push(0b10001110);
+            arr.push((mode<<6)+(regToId(operands[0])<<3)+regmem);
+            arr=byteConcat(str,arr);  
+        }
+      //concatenation of the bytes in an array deplacement           
+        
+        break;
+      
+  case "PUSH":
+      if(/RS/.test(operands[1]))
+      {
+          arr.push((((regToId(operands[0]))<<3)+0b110));
+      }
+      else if(/R|M/.test(operands[1]))
+      {
+          arr.push(0b11111111);
+          arr.push(((getMod(operands))<<6)+(0b110000)+regmem);
+          if(/M/.test(operands[1]))arr=byteConcat(str,arr);  
+      }
   break;
-
-  case "POP" :
-
-    if(/RS/.test(operands[1]))
-
-    {
-        arr.push((((regToId(operands[0]))<<3)+0b111));
-    }
-
-    else if(/R|M/.test(operands[1]))
-
-    {
-        arr.push(0b10001111);
-        arr.push((Mode<<6)+regmem);
-        if(/M/.test(operands[1]))arr=byteConcat(str,arr);  
-    }
-
-  break;
-
+case "POP" :
+      if(/RS/.test(operands[1]))
+      {
+          arr.push((((regToId(operands[0]))<<3)+0b111));
+      }
+      else if(/R|M/.test(operands[1]))
+      {
+          arr.push(0b10001111);
+          arr.push((Mode<<6)+regmem);
+          if(/M/.test(operands[1]))arr=byteConcat(str,arr);  
+      }
+ break;
   case "XCHG" :
-      arr.push(0b10000110+getW(operands));
+      arr.push((0b10000110)+w);
       arr.push((mode<<6)+(regToId(operands[0]))<<2+regmem);
       arr=byteConcat(str,arr);       
   break;
-
-  case "LEA":
-
-      if (/RX/.test(operands[2]) && /M/.test(operands[3])) {
-
-        arr.push(0b10001101); 
-        arr.push((mode << 6) + (regToId(operands[0]) << 3) + regmem);
-        
-        arr = byteConcat(str, arr);
-      }
-
-    
+  case "LEA" :
   break;
 
   case "LAHF":
@@ -221,10 +194,8 @@ case "MOV":
       
     //Reg./Memory with Register to Either
     if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
-          console.log("this is  d  "+( d << 1) +"  d   "+ w);
-            console.log(( 1 << 1) + 1);
             arr.push( ( 1 << 1) + 1); 
-            arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+            arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])<<3+ regmem);
                 arr=byteConcat(str,arr);
             
 
@@ -250,14 +221,14 @@ case "MOV":
   arr.push(0b00110111);
   break;             
   case "INC": 
-  arr.push(0b11111110+w);
+  arr.push((0b11111110)+w);
   arr.push((mode<<6)+regmem);
   break;
   case "SUB": 
     //Reg./Memory with Register to Either
     if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
           arr.push( ( 0b01010<< 2) + (getD(operands)<<1)+w); 
-          arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+          arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])<<3+ regmem);
               arr=byteConcat(str,arr);
   }
   //Immediate to Register/Memory 
@@ -277,8 +248,8 @@ case "MOV":
   case "SSB": 
   //r/m to r/m
   if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
-    arr.push( ( 0b000110<< 2) + (getD(operands)<<1)+w); 
-    arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+    arr.push( ( 0b000110<< 2) + (d<<1)+w); 
+    arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])<<3+ regmem);
         arr=byteConcat(str,arr);
 }
 //Immediate to Register/Memory 
@@ -288,22 +259,22 @@ let s=(convert((/I/.test(operands[2]))?operands[0]:operands[1])<0)?1:0;
 arr.push((opcode<<2)+(s<<1)+w);
 arr.push((mode<<6)+regmem);
 arr=byteConcat(str,arr);
-arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & 0x0ff);
+arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & (0x0ff));
 if(w===1)
 {
-    arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1])>>8);
+    arr.push((convert((/I/.test(operands[2]))?operands[0]:operands[1]))>>8);
 }
 }
   break;
   case "DEC": 
-  arr.push(0b11111110+w);
+  arr.push((0b11111110)+w);
   arr.push((mode<<6)+(0b1000)+regmem);
   break;
   case "CMP":
         //Reg./Memory with Register to Either
     if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
         arr.push( ( 0b01110<< 2) + (getD(operands)<<1)+w); 
-        arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+        arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])<<2+ regmem);
             arr=byteConcat(str,arr);
 }
 //Immediate to Register/Memory 
@@ -313,16 +284,16 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
     arr.push((opcode<<2)+(s<<1)+w);
     arr.push((mode<<6)+regmem);
     arr=byteConcat(str,arr);
-    arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & 0x0ff);
+    arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & (0x0ff));
     if(w===1)
     {
-        arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1])>>8);
+        arr.push((convert((/I/.test(operands[2]))?operands[0]:operands[1]))>>8);
     }
 }
   break;
   case "MUL": 
   arr.push(0b11110110+w);
-  arr.push((mode)<<6+0b100000+regmem);
+  arr.push((mode)<<6+(0b100000)+regmem);
   if(/M/.operands[1])
   {
       arr=byteConcat(str,arr);
@@ -330,7 +301,7 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
   break;
   case "IMUL": 
   arr.push(0b11110110+w);
-  arr.push((mode)<<6+0b101000+regmem);
+  arr.push((mode)<<6+(0b101000)+regmem);
   if(/M/.operands[1])
   {
       arr=byteConcat(str,arr);
@@ -338,15 +309,15 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
   break;
   case "DIV":
     arr.push(0b11110110+w);
-    arr.push((mode)<<6+0b110000+regmem);
+    arr.push((mode)<<6+(0b110000)+regmem);
     if(/M/.operands[1])
     {
         arr=byteConcat(str,arr);
     }   
    break;
    case "IDIV":
-        arr.push(0b11110110+w);
-        arr.push((mode)<<6+0b111000+regmem);
+        arr.push((0b11110110)+w);
+        arr.push((mode)<<6+(0b111000)+regmem);
         if(/M/.operands[1])
         {
             arr=byteConcat(str,arr);
@@ -360,15 +331,15 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
   break;
   case "NOT" : 
   arr.push(0b11110110+w);
-  arr.push((mode)<<6+0b010000+regmem);
+  arr.push((mode)<<6+(0b010000)+regmem);
   if(/M/.operands[1])
   {
       arr=byteConcat(str,arr);
   }  
   break;
   case "SHL" :case "SAL" :
-    arr.push(0b11010000+v+w);
-    arr.push((mode)<<6+0b100000+regmem);
+    arr.push((0b11010000)+(v<<1)+w);
+    arr.push((mode)<<6+(0b100000)+regmem);
     if(/M/.test(operands[2]))
     {
         arr=byteConcat(str,arr);
@@ -379,8 +350,8 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
     }   
       break;
   case "SHR" :
-    arr.push(0b11010000+v+w);
-    arr.push((mode)<<6+0b101000+regmem);
+    arr.push((0b11010000)+(v<<1)+w);
+    arr.push( (mode<<6) +(0b101000) +regmem);
     if(/M/.test(operands[2]))
     {
         arr=byteConcat(str,arr);
@@ -391,8 +362,8 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
     }   
       break;
   case "SAR" :
-    arr.push(0b11010000+v+w);
-    arr.push((mode)<<6+0b111000+regmem);
+    arr.push((0b11010000)+(v<<1)+w);
+    arr.push((mode)<<6+(0b111000)+regmem);
     if(/M/.test(operands[2]))
     {
         arr=byteConcat(str,arr);
@@ -403,8 +374,8 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
     }   
       break;
   case "ROL" :
-    arr.push(0b11010000+v+w);
-    arr.push((mode)<<6+0b000000+regmem);
+    arr.push((0b11010000)+(v<<1)+w);
+    arr.push((mode)<<6+(0b000000)+regmem);
     if(/M/.test(operands[2]))
     {
         arr=byteConcat(str,arr);
@@ -415,8 +386,8 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
     }   
       break;
   case "ROR" :
-    arr.push(0b11010000+v+w);
-    arr.push((mode)<<6+0b001000+regmem);
+    arr.push((0b11010000)+(v<<1)+w);
+    arr.push((mode)<<6+(0b001000)+regmem);
     if(/M/.test(operands[2]))
     {
         arr=byteConcat(str,arr);
@@ -427,8 +398,8 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
     }   
       break;
   case "RCL" :
-    arr.push(0b11010000+v+w);
-    arr.push((mode)<<6+0b010000+regmem);
+    arr.push((0b11010000)+(v<<1)+w);
+    arr.push((mode)<<6+(0b010000)+regmem);
     if(/M/.test(operands[2]))
     {
         arr=byteConcat(str,arr);
@@ -439,8 +410,8 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
     }   
       break; 
   case "RCR" :
-    arr.push(0b11010000+v+w);
-    arr.push((mode)<<6+0b011000+regmem);
+    arr.push((0b11010000)+(v<<1)+w);
+    arr.push((mode)<<6+(0b011000)+regmem);
     if(/M/.test(operands[2]))
     {
         arr=byteConcat(str,arr);
@@ -454,14 +425,14 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
           //Reg./Memory with Register to Either
       if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
           arr.push( ( 0b01000<< 2) + (getD(operands)<<1)+w); 
-          arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+          arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])<<2+ regmem);
               arr=byteConcat(str,arr);
   }
   //Immediate to Register/Memory 
   else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
       opcode = 0b10000000;
       arr.push(opcode+w);
-      arr.push((mode<<6)+0b100000+regmem);
+      arr.push((mode<<6)+(0b100000)+regmem);
       arr=byteConcat(str,arr);
       arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & 0x0ff);
       if(w===1)
@@ -474,14 +445,14 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
        //Reg./Memory with Register to Either
        if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
         arr.push( ( 0b0110000) + (getD(operands)<<1)+w); 
-        arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+        arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])<<2+ regmem);
             arr=byteConcat(str,arr);
 }
 //Immediate to Register/Memory 
 else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
     opcode = 0b10000000;
     arr.push(opcode+w);
-    arr.push((mode<<6)+0b110000+regmem);
+    arr.push((mode<<6)+(0b110000)+regmem);
     arr=byteConcat(str,arr);
     arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & 0x0ff);
     if(w===1)
@@ -495,14 +466,14 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
        //Reg./Memory with Register to Either
        if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
         arr.push( ( 0b010<< 2) + (getD(operands)<<1)+w); 
-        arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+        arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])<<2+ regmem);
             arr=byteConcat(str,arr);
 }
 //Immediate to Register/Memory 
 else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
     opcode = 0b10000000;
     arr.push(opcode+w);
-    arr.push((mode<<6)+0b001000+regmem);
+    arr.push((mode<<6)+(0b001000)+regmem);
     arr=byteConcat(str,arr);
     arr.push(convert((/I/.test(operands[2]))?operands[0]:operands[1]) & 0x0ff);
     if(w===1)
@@ -514,8 +485,8 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
   case "TEST": 
          //Reg./Memory with Register to Either
          if (/R|M/.test(operands[2]) &&  /M|R/.test(operands[3])) {
-            arr.push( 0b10000100+w); 
-            arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])+ regmem);
+            arr.push((0b10000100)+w); 
+            arr.push((mode << 6) +regToId((/R/.test(operands[2]))?operands[0]:operands[1])<<2+ regmem);
                 arr=byteConcat(str,arr);
     }
     //Immediate to Register/Memory 
@@ -531,176 +502,219 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
         }
     }
   break;
-  case "CALL" :break;
-  case "JUMP" :break;
+  case "CALL" :
+    if(operands.length===4)
+    {
+        arr.push(0b11111111);
+        arr.push((mode<<6)+(0b011000)+regmem);
+        if(/\[/.test(operands[0]))
+        {
+         arr=byteConcat(str,arr);
+        }
+    }
+    else{
+        if(/I/.operands[1])
+        {
+            arr.push(0b11101000);
+            if(splitNum(convert(operands[0])).length===1)
+            {
+                arr.push(convert(aperands[0]));
+            }
+            else{
+                arr.push([...splitNum(convert(operands[0]))]);
+            }
+        }
+        else if(/R|M/.operands[1])
+        {
+            arr.push(0b11111111);
+            arr.push((Mode<<6)+(0b010000)+regmem);
+            if(/M/.operands[1])
+            {
+              arr=byteConcat(str,arr);
+            }
+        }
+        else if(!/(?<!([A-D][XLH]|[CDES]S|[SB]P|[SD]I))\s*:\s*(?!([A-D][XLH]|[CDES]S|[SB]P|[SD]I))/i.test(operands[0]))
+        {
+            arr.push(0b10011010);
+            if(convert(/(?=:\s*)\w+(?=\s)/i.match(operands[0]))>255)
+            {
+                arr.push(...splitNum(convert(/(?=:\s*)\w+(?=\s)/i.match(operands[0]))));
+            }
+            else{
+                arr.push(convert(/(?=:\s*)\w+(?=\s)/i.match(operands[0])));
+                arr.push(0);
+            }
+            if(convert(/\w+(?=\s*:)/i.match(operands[0]))>255)
+            {
+                arr.push(...splitNum(convert(/(?=:\s*)\w+(?=\s)/i.match(operands[0]))));
+            }
+            else{
+                arr.push(convert(/\w+(?=\s*:)/i.match(operands[0])));
+                arr.push(0);
+            }
+        }
+    }
+      break;
+  case "JMP" :
+      if(operands.length===4)
+      {
+          arr.push(0b11111111);
+          arr.push((mode<<6)+(0b101000)+regmem);
+          if(/\[/.test(operands[0]))
+          {
+           arr=byteConcat(str,arr);
+          }
+
+      }
+      else{
+          if(/I/.operands[1])
+          {
+              if(splitNum(convert(operands[0])).length===1)
+              {
+                  arr.push(0b11101011);
+                  arr.push(convert(aperands[0]));
+              }
+              else{
+                  arr.push(0b11101001);
+                  arr.push([...splitNum(convert(operands[0]))]);
+              }
+          }
+          else if(/R|M/.operands[1])
+          {
+              arr.push(0b11111111);
+              arr.push((Mode<<6)+(0b100000)+regmem);
+              if(/M/.operands[1])
+              {
+                arr=byteConcat(str,arr);
+              }
+          }
+          else if(!/(?<!([A-D][XLH]|[CDES]S|[SB]P|[SD]I))\s*:\s*(?!([A-D][XLH]|[CDES]S|[SB]P|[SD]I))/i.test(operands[0]))
+          {
+              arr.push(0b11101010);
+              if(convert(/(?=:\s*)\w+(?=\s)/i.match(operands[0]))>255)
+              {
+                  arr.push(...splitNum(convert(/(?=:\s*)\w+(?=\s)/i.match(operands[0]))));
+              }
+              else{
+                  arr.push(convert(/(?=:\s*)\w+(?=\s)/i.match(operands[0])));
+                  arr.push(0);
+              }
+              if(convert(/\w+(?=\s*:)/i.match(operands[0]))>255)
+              {
+                  arr.push(...splitNum(convert(/(?=:\s*)\w+(?=\s)/i.match(operands[0]))));
+              }
+              else{
+                  arr.push(convert(/\w+(?=\s*:)/i.match(operands[0])));
+                  arr.push(0);
+              }
+
+          }
+      }
+     
+      break;
   case "RET" :break;
-  case "REP" :break; 
-  case "MOVS":
-    
-    arr.push(0b10100100 + w);
-    break; 
-
-  case "CMPS" :
-    
-    arr.push(0b10100110 + w);
-
-    break; 
-  case "SCAS" :
-
-    arr.push(0b10101110 + w);
-    break;
-
-  case "LODS" :
-
-    arr.push(0b10101100 + w);
-    break;
-
-  case "STOS" :
-
-    arr.push(0b10101010 + w);
-    break;
-
-  case "JE": 
-  case "JZ":
-
-    arr.push(0b01110100); 
-    arr.push(convert(operands[0]));
-
-    break;
-  
-  case "JL" :
-  case "JNGE": 
-
-    arr.push(0b01111100);
-    arr.push(convert(operands[0]));
-
-    reak;
-
-  case"JLE" :
-  case "JNG" :
-
-    arr.push(0b01111110);
-    arr.push(convert(operands[0]));
-
-    break; 
-    
-  case"JB" :
-  case "JNAE" :
-
-    arr.push(0b01110010);
-    arr.push(convert(operands[0]));
-    break; 
-
-  case"JBE": 
-  case "JNA": 
-
-    arr.push(0b01110110);
-    arr.push(convert(operands[0]));
-
-    break; 
-
-  case "JP" :
-  case "JPE":
-
-    arr.push(0b01111010);
-    arr.push(convert(operands[0]));
-
-    break;
-
+  case "REP" :case "REPE":
+      arr.push(0b11110011);
+      switch(operands[0].toUpperCase())
+      {
+        case "MOVSB": arr.push(0b10100100);break; 
+        case "MOVSW":arr.push(0b10100101);break;
+        case "CMPSB" :arr.push(0b10100110);break;
+        case "CMPSW" :arr.push(0b10100111);break;  
+        case "SCASB" :arr.push(0b10101110);break;
+        case "SCASW" :arr.push(0b10101111);break;
+        case "LODSB" :arr.push(0b10101100);break;
+        case "LODSW" :arr.push(0b10101101);break;
+        case "STOSB" :arr.push(0b10101010);break;
+        case "STOSW" :arr.push(0b10101011);break;
+      }
+      break; 
+      case "REPNE" :
+      arr.push(0b11110010);
+      switch(operands[0].toUpperCase())
+      {
+            case "MOVSB": arr.push(0b10100100);break; 
+            case "MOVSW":arr.push(0b10100101);break;
+            case "CMPSB" :arr.push(0b10100110);break;
+            case "CMPSW" :arr.push(0b10100111);break;  
+            case "SCASB" :arr.push(0b10101110);break;
+            case "SCASW" :arr.push(0b10101111);break;
+            case "LODSB" :arr.push(0b10101100);break;
+            case "LODSW" :arr.push(0b10101101);break;
+            case "STOSB" :arr.push(0b10101010);break;
+            case "STOSW" :arr.push(0b10101011);break;
+      }
+      break; 
+  case "MOVSB": arr.push(0b10100100);break; 
+  case "MOVSW":arr.push(0b10100101);break;
+  case "CMPSB" :arr.push(0b10100110);break;
+  case "CMPSW" :arr.push(0b10100111);break;  
+  case "SCASB" :arr.push(0b10101110);break;
+  case "SCASW" :arr.push(0b10101111);break;
+  case "LODSB" :arr.push(0b10101100);break;
+  case "LODSW" :arr.push(0b10101101);break;
+  case "STOSB" :arr.push(0b10101010);break;
+  case "STOSW" :arr.push(0b10101011);break;
+  case "JE": case"JZ": 
+  arr.push(0b01110100);
+  break;
+  case "JL" :case "JNGE": 
+  arr.push(0b01111100);
+  break;
+  case"JLE" :case "JNG" :
+  arr.push(0b01111110);
+  break; 
+  case"JB" :case "JNAE" :
+  arr.push(0b01110010);
+  break; 
+  case"JBE": case "JNA": 
+  arr.push(0b01110110);
+  break; 
+  case "JP" :case "JPE":
+  arr.push(0b01111010); 
+  break;
   case "JO": 
-
-    arr.push(0b01110000);
-    arr.push(convert(operands[0])); 
-
-    break; 
-
+  arr.push(0b01110000);
+  break; 
   case "JS":
-
-    arr.push(0b01111000);
-    arr.push(convert(operands[0]));
-
-    break; 
-
-  case "JNE" :
-  case "JNZ":
-
-    arr.push(0b01110101);
-    arr.push(convert(operands[0]));
-    break;
-
-  case "JNL" :
-  case "JGE":
-
-    arr.push(0b01111101);
-    arr.push(convert(operands[0]));
-    break; 
-
-  case "JNLE":
-  case "JG":
-
-    arr.push(0b01111111);
-    arr.push(convert(operands[0]));
-    break; 
-
-  case "JNB": 
-  case "JAE":
-
-    arr.push(0b01110011);
-    arr.push(convert(operands[0]));
-    break; 
-
-  case "JNBE":
-  case "JA":
-
-    arr.push(0b01110111);
-    arr.push(convert(operands[0]));
-    break; 
-
-  case "JNP": 
-  case "JPO":
-
-    arr.push(0b01111011);
-    arr.push(convert(operands[0]));
-    break; 
-
+  arr.push(0b01111000);
+  break; 
+  case "JNE" :case "JNZ":
+  arr.push(0b01110101); 
+  break; 
+  case "JNL" :case "JGE":
+  arr.push(0b01111101); 
+  break; 
+  case "JNLE" :case "JG":
+  arr.push(0b01111111);
+  break; 
+  case "JNB": case "JAE":
+  arr.push(0b01110011);
+  break; 
+  case "JNBE":case "JA":
+  arr.push(0b01110111);
+  break; 
+  case "JNP": case "JPO":
+  arr.push(0b01111011);
+  break; 
   case "JNO":
-
-    arr.push(0b01110001);
-    arr.push(convert(operands[0]));
-    break; 
-
+  arr.push(0b01110001);
+  break; 
   case "JNS":
-
-    arr.push(0b01111001);
-    arr.push(convert(operands[0]));
-    break; 
-
+  arr.push(0b01111001);
+  break; 
   case "LOOP":
-
-    arr.push(0b11100010);
-    arr.push(convert(operands[0]));
-    break;
-
-  case "LOOPZ":
-  case "LOOPE":
-
-    arr.push(0b11100001);
-    arr.push(convert(operands[0]));
-    break;
-
-  case "LOOPNZ":
-  case "LOOPNE":
-
-    arr.push(0b11100000);
-    arr.push(convert(operands[0]));
-    break; 
-
+  arr.push(0b11100010);
+  break;
+  case "LOOPZ":case "LOOPE":
+  arr.push(0b11100001);
+  break; 
+  case "LOOPNZ":case "LOOPNE":
+  arr.push(0b11100000);
+  break; 
   case "JCXZ" :
-
-    arr.push(0b11100011);
-    arr.push(convert(operands[0]));
-    break; 
-
+  arr.push(0b11100011);
+  break; 
   case "INT" :
   arr.push();
   break; 
@@ -728,41 +742,10 @@ else if (/I|M/.test(operands[2]) && /I|M/.test(operands[3])) {
   case "HLT":
   arr.push(0b11110100);
   break; 
-  
-  case "RET":
 
-    // within segment 
-    if (convert(operands[0]) == 0) 
-
-      arr.push(0b11000011);
-
-    // Within Seg Adding Immed to SP
-    else if (convert(operands[0]) == 1) {
-
-      arr.push(0b11000010);
-      console.log("Not finished yet");
-
-    }
-    // Intersegment
-    else if (convert(operands[0]) == 2) {
-
-      arr.push(0b11001011);
-      console.log("Not finished yet");
-    }
-
-    //Intersegment Adding Immediate to SP
-    else if(convert(operands[0]) == 3) {
-
-      arr.push(0b11001010);
-      console.log("Not finished yet");
-
-    }
-    
-    break;
   
   }
-
-  console.log(arr);
+  return arr;
 }
 //get value of d
 function getD(operands) {
@@ -888,7 +871,7 @@ function getMod(arr){
   {
       if(/\-/.test(str)){
       var str2=str.replace(/\-/,""); 
-      return (convertP(str2)>128)?65535-convertP(str2):convertP(str2);
+      return (convertP(str2)>127)?65535-convertP(str2):convertP(str2);
   }else{return convertP(str);}}
 
 // -----------function return register id by passing it name as a parameter----------------------
@@ -933,13 +916,6 @@ function regToId(regname){
           return 7;
           break;
   }
+  return arr;
 }
-
-var op = getOps("POP AX"); 
-// var mode = getMod(op);
-// var rgId = regToId(op[0]); 
-// var regmem = regMem(op);
-
-//console.log((mode << 6) + (rgId << 3) +regmem);
-console.log(op);
-//toBcode("PUSH 15");
+console.log(toBcode());
