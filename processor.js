@@ -19,191 +19,193 @@ class Processor{
     }
 
     decodeMov(instruction){
-        var current_ip = this.register.readReg(IP_REG),
-            current_code_seg = this.register.readReg(CS_REG),
-            current_data_segement = this.register.readReg(DS_REG);
+		        var current_ip = this.register.readReg(IP_REG),
+		            current_code_seg = this.register.readReg(CS_REG),
+		            current_data_segement = this.register.readReg(DS_REG);
 
-        //======================================================================================
-        // -------Register/Memory to/from Register----------------------------------------------
-        //======================================================================================
-        if (instruction & 0b11111100 == MOV_RM_RM ) 
-        {
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip+1));
+		        //================================================================================
+		        // -------Register/Memory to/from Register----------------------------------------
+		        //================================================================================
+		        if ((instruction & 0b11111100) == MOV_RM_RM ) 
+		        {
+		        	
+		            var operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip+1));
 
-            if (operandes.addr == null) 
-            {   // R to R
-                let R1 = operandes.opRegister[0],
-                    R2 = operandes.opRegister[1];
+		            if (operandes.addr == null) 
+		            {   // R to R
+		                let R1 = operandes.opRegister[0],
+		                    R2 = operandes.opRegister[1];
+		                   
+		                if ( instruction % 2 == 1 ) 
+		                {
+		                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+		                        this.register.writeWordReg(R1, this.register.readWordReg(R2) );
+		                    
+		                    else
+		                        this.register.writeWordReg(R2, this.register.readWordReg(R1) );
+		                    
+		                }
+		                else
+		                {
+		                    if ((instruction >> 1) % 2) // On extrait le dif
+		                        this.register.writeByteReg(R1, this.register.readByteReg(R2) );
+		                    
+		                    else
+		                        this.register.writeByteReg(R2, this.register.readByteReg(R1) );
+		                    
+		                } 
+		            }
+		            else
+		            {   // MEM TO/FROM R
+		                let R = operandes.opRegister[0],
+		                    addr = operandes.addr;
 
-                if ( instruction % 2 == 1 ) 
-                {
-                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
-                        this.register.writeWordReg(R2, this.register.readWordReg(R1) );
-                    
-                    else
-                        this.register.writeWordReg(R1, this.register.readWordReg(R2));
-                    
-                }
-                else
-                {
-                    if ((instruction >> 1) % 2) // On extrait le dif
-                        this.register.writeByteReg(R2, this.register.readByteReg(R1));
-                    
-                    else
-                        this.register.writeByteReg(R1, this.register.readByteReg(R2));
-                    
-                } 
-            }
-            else
-            {   // MEM TO/FROM R
-                let R = operandes.opRegister[0],
-                    addr = operandes.addr;
+		                console.log('amek', instruction);
+		                if ( instruction % 2 == 1 ) //16bits
+		                {
+		                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+		                        this.register.writeWordReg(R, this.RAM.readWord(addr));
+		                    
+		                    else
+		                        this.RAM.writeWord(addr, this.register.readWordReg(R));// d=0 => from reg
+		                    
+		                }
+		                else    //8bits
+		                {
+		                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+		                        this.register.writeByteReg(R, this.RAM.readByte(addr) );
+		                    
+		                    else // d=0 => from reg
+		                        this.RAM.writeByte(addr, this.register.readByteReg(R));
+		                    
+		                } 
+		            }
 
-                if ( instruction % 2 == 1 ) //16bits
-                {
-                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
-                        this.register.writeWordReg(R, this.RAM.readWord(addr));
-                    
-                    else
-                        this.RAM.writeWord(addr, this.register.readWordReg(R));// d=0 => from reg
-                    
-                }
-                else    //8bits
-                {
-                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
-                        this.register.writeByteReg(R, this.RAM.readByte(addr) );
-                    
-                    else // d=0 => from reg
-                        this.RAM.writeByte(addr, this.register.readByteReg(R));
-                    
-                } 
-            }
+		            this.register.incIP(operandes.dispSize + 2);//2 étant la taille de base de l'instruction
+		        }
+		        //=================================================================================
+		        // -------Immediate to Register/Memory--------------------------------------------
+		        //=================================================================================
+		        else if ((instruction & 0b11111110) == MOV_IMMEDIATE_TO_RM) 
+		        {
+		            var operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip+1)),//On extrait le w
+		                immediateAddr = (current_code_seg<<4) + current_ip + 2 + operandes.dispSize ;
 
-            this.register.incIP(operandes.dispSize + 2);//2 étant la taille de base de l'instruction
-        }
-        //======================================================================================
-        // -------Immediate to Register/Memory--------------------------------------------------
-        //======================================================================================
-        else if (instruction & 0b11111110 == MOV_IMMEDIATE_TO_RM) 
-        {
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip+1)),//On extrait le w
-                immediateAddr = current_code_seg<<4 + current_ip + 2 + operandes.dispSize ;
+		            var R = operandes.opRegister[0],
+		                addr = operandes.addr;
 
-            var R = operandes.opRegister[0],
-                addr = operandes.addr;
+		            if (instruction % 2 == 1)  // High Byte selected
+		            {
+		                let immediatVal = this.RAM.readWord(immediateAddr);
+		                console.log(operandes);
+		                if (addr == null) 
+		                    this.register.writeWordReg( R, immediatVal); 
+		                else
+		                    this.RAM.writeWord(addr, immediatVal);
+		            }
+		            else
+		            {
+		                let immediatVal = this.RAM.readByte(immediateAddr);
 
-            if (instruction % 2 == 1)  // High Byte selected
-            {
-                let immediatVal = this.RAM.readWord(immediateAddr);
+		                if (addr == null) 
+		                    this.register.writeByteReg( R, immediatVal); 
+		                else
+		                    this.RAM.writeByte(addr, immediatVal);
+		            }
 
-                if (addr == null) 
-                    this.register.writeWordReg( R, immediatVal); 
-                else
-                    this.RAM.writeWord(immediatVal);
-            }
-            else
-            {
-                let immediatVal = this.RAM.readByte(immediateAddr);
+		            this.register.incIP(operandes.dispSize + (instruction % 2) + 3);
+		        }
+		        //=================================================================================
+		        // -------Immediate to Register----------------------------------------------------
+		        //=================================================================================
+		        else if ((instruction & 0b11110000) == MOV_IMMEDIATE_TO_R) 
+		        {
+		            var R = instruction & 0x07,
+		                immediateAddr = (current_code_seg<<4) + current_ip + 1;  
 
-                if (addr == null) 
-                    this.register.writeByteReg( R, immediatVal); 
-                else
-                    this.RAM.writeByte(immediatVal);
-            }
+		            if ((instruction>>3) % 2 == 1)  // High Byte selected
+		            {
+		                let immediatVal = this.RAM.readWord(immediateAddr);
 
-            this.register.incIP(operandes.dispSize + (instruction % 2) + 3);
-        }
-        //======================================================================================
-        // -------Immediate to Register---------------------------------------------------------
-        //======================================================================================
-        else if (instruction & 0b11110000 == MOV_IMMEDIATE_TO_R) 
-        {
-            var R = instruction & 0x07;
-                immediatVal = current_code_seg<<4 + current_ip + 1;  //On pourrait faire ++this.Register[IP] pour chaque appelle
+		                this.register.writeWordReg( R, immediatVal); 
+		            }
+		            else
+		            {
+		                let immediatVal = this.RAM.readByte(immediateAddr);
 
-            if ((instruction>>3) % 2 == 1)  // High Byte selected
-            {
-                let immediatVal = this.RAM.readWord(immediateAddr);
+		                this.register.writeByteReg( R, immediatVal); 
+		            }
 
-                this.register.writeWordReg( R, immediatVal); 
-            }
-            else
-            {
-                let immediatVal = this.RAM.readByte(immediateAddr);
+		            this.register.incIP(((instruction>>3) % 2) + 2);
+		        }
+		        //=================================================================================
+		        // -------Memory to/from Accumulator-----------------------------------------------
+		        //=================================================================================
+		        else if ((instruction & 0b11111100) == MOV_ACCUMULATOR_MEMORY) 
+		        {
+		            var addr = current_data_segement<<4 +this.RAM.readWord((current_code_seg << 4) + current_ip+1);
 
-                this.register.writeByteReg( R, immediatVal); 
-            }
+		            if((instruction >> 1) % 2 == 0) // d=0 => from reg
+		            {
+		                if (instruction%2 == 1) //w=1
+		                    this.RAM.writeWord(addr, this.register.readRegWord(AX_REG) );
+		                
+		                else
+		                    this.RAM.writeByte(addr, this.register.readRegByte(AX_REG));
+		                
+		            }
+		            else
+		            {
+		                if (instruction%2 == 1) //w=1
+		                    this.register.writeRegWord(AX_REG, this.RAM.readWord(addr));
+		                
+		                else
+		                    this.register.writeRegByte(AX_REG, this.RAM.readByte(addr));
+		                
+		            }
 
-            this.register.incIP(((instruction>>3) % 2) + 2);
-        }
-        //======================================================================================
-        // -------Memory to/from Accumulator---------------------------------------------------------
-        //======================================================================================
-        else if (instruction & 0b11111100 == MOV_ACCUMULATOR_MEMORY) 
-        {
-            var addr = current_data_segement<<4 +this.RAM.readWord(current_code_seg << 4 + current_ip+1);
+		            this.register.incIP(3);
+		        }   
+		        //=================================================================================
+		        // -------Segment Register to Register/Memory--------------------------------------
+		        //=================================================================================
+		        else if ((instruction & 0b11111101) == MOV_RM_SEGEMENT) 
+		        {
+		            var operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip+1));
 
-            if((instruction >> 1) % 2 == 0) // d=0 => from reg
-            {
-                if (instruction%2 == 1) //w=1
-                    this.RAM.writeWord(addr, this.register.readRegWord(AX_REG) );
-                
-                else
-                    this.RAM.writeByte(addr, this.register.readRegByte(AX_REG));
-                
-            }
-            else
-            {
-                if (instruction%2 == 1) //w=1
-                    this.register.writeRegWord(AX_REG, this.RAM.readWord(addr));
-                
-                else
-                    this.register.writeRegByte(AX_REG, this.RAM.readByte(addr));
-                
-            }
+		            if (operandes.addr == null) 
+		            {   // R to R
+		                let R1 = operandes.opRegister[0],
+		                    R2 = operandes.opRegister[1];
 
-            this.register.incIP(3);
-        }   
-        //======================================================================================
-        // -------Segment Register to Register/Memory-------------------------------------------
-        //======================================================================================
-        else if (instruction & 0b11111101 == MOV_RM_SEGEMENT) 
-        {
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip+1));
-
-            if (operandes.addr == null) 
-            {   // R to R
-                let R1 = operandes.opRegister[0],
-                    R2 = operandes.opRegister[1];
-
-                if ((instruction >> 1) % 2) // On extrait le d || d = 1 to reg
-                    this.register.writeSegReg(R1, this.register.readWordReg(R2) );
-                
-                else
-                    this.register.writeSegReg(R2, this.register.readWordReg(R1) );    
-                
-            }
-            else
-            {   // MEM TO/FROM R
-                let R = operandes.opRegister[0],
-                    addr = operandes.addr;
+		                if ((instruction >> 1) % 2) // On extrait le d || d = 1 to reg
+		                    this.register.writeSegReg(R1, this.register.readWordReg(R2) );
+		                
+		                else
+		                    this.register.writeWordReg(R2, this.register.readSegReg(R1) );    
+		                
+		            }
+		            else
+		            {   // MEM TO/FROM R
+		                let R = operandes.opRegister[0],
+		                    addr = operandes.addr;
 
 
-                if ((instruction >> 1) % 2) // On extrait le d || d = 1 to reg
-                    this.register.writeSegReg(R, this.RAM.readWord(addr) );
-                
-                else
-                    this.RAM.writeWord(addr, this.register.readSegReg(R));    
-                
-            }
+		                if ((instruction >> 1) % 2) // On extrait le d || d = 1 to reg
+		                    this.register.writeSegReg(R, this.RAM.readWord(addr) );
+		                
+		                else
+		                    this.RAM.writeWord(addr, this.register.readSegReg(R));    
+		                
+		            }
+		            console.log(operandes, 'dispu');
+		            this.register.incIP(operandes.dispSize + 2);
+		        }
+		        else
+		            return -1;
 
-            this.register.incIP(operandes.dispSize + 2);
-        }
-        else
-            return -1;
-
-        return 0;
-    }
+		        return 0;
+	}
 
 
     decodeAdd(instruction){
