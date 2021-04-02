@@ -973,33 +973,43 @@ function getMod(arr){
 }
 }
 //convert a string number to number
-function convertP(str)
-{
-if(/^0x|0[A-D]h|\w+h$/i.test(str))
-{
-    var str2=str.replace(/^0x|h$/i,"").toUpperCase();
-    return parseInt(str2,16);
-}
-else if(/^0b/i.test(str))
-{
-  var str2=str.replace(/^0b/i,""); 
-    return parseInt(str2,2);
-}
-else if(/^0o/i.test(str))
-{
-  var str2=str.replace(/^0o/i,"").toUpperCase();
-    return parseInt(str2,8);
-}
-else{
-    return parseInt(str,10);
-}}
-function convert(str)
-{
-    if(/\-/.test(str)){
-    var str2=str.replace(/\-/,""); 
-    return (convertP(str2)>127)?65536-convertP(str2):256-convertP(str2);
-}else{return convertP(str);}
-}
+  //convert a string number to number
+  function convertP(str)
+  {
+  if(/^0x|0[A-D]h|\w+h$/i.test(str))
+  {
+      var str2=str.replace(/^0x|h$/i,"");str2=str2.toUpperCase();
+      return parseInt(str2,16);
+  }
+  else if(/^0b/i.test(str))
+  {
+    var str2=str.replace(/^0b/i,""); 
+      return parseInt(str2,2);
+  }
+  else if(/^0o/i.test(str))
+  {
+    var str2=str.replace(/^0o/i,"");str2=str2.toUpperCase();
+      return parseInt(str2,8);
+  }
+  else{
+      return parseInt(str,10);
+  }}
+  function convert(str)
+  {
+      if(/\-/.test(str)){
+      var str3=str.replace(/\-/,""); 
+      var binary=convertP(str3);
+      if(binary<128)
+      {
+          binary+=0b10000000;
+          return binary-((~binary)&0xff)+1;
+      }
+      else
+      {
+          binary+=0b1000000000000000;
+          return binary-((~binary)&0xffff)+1;
+      }
+   }else{return convertP(str);}}
 
 // -----------function return register id by passing it name as a parameter----------------------
 
