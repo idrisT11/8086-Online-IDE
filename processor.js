@@ -205,145 +205,202 @@ class Processor{
 		            return -1;
 
 		        return 0;
-	}
+		}
 
 
-    decodeAdd(instruction){
-        var current_ip = this.register.readReg(IP_REG),
-            current_code_seg = this.register.readReg(CS_REG),
-            current_data_segement = this.register.readReg(DS_REG);
+			decodeAdd(instruction){
+		        var current_ip = this.register.readReg(IP_REG),
+		            current_code_seg = this.register.readReg(CS_REG),
+		            current_data_segement = this.register.readReg(DS_REG);
 
 
-        //======================================================================================
-        // -------Register/Memory with Register----------------------------------------------
-        //======================================================================================
-        if ( instruction & 0b00000000 == ADD_REG_MEM || instruction & 0b00010000 == ADC_REG_MEM ) {
+		        //=================================================================================
+		        // -------Register/Memory with Register------------------------------------------
+		        //=================================================================================
+		        if ( (instruction & 0b11111100) == ADD_REG_MEM || (instruction & 0b11111100) == ADC_REG_MEM ) {
 
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip));
+		            var operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip + 1));
 
-            var carry = (instruction & 0x10 == ADC_REG_MEM) ? this.registerExtract('C') : 0;
+		            var carry = (instruction & 0x10 == ADC_REG_MEM) ? this.register.extractFlag('C') : 0;
+		            
+		            
 
-            if (operandes.addr == null) 
-            {   // R to R
-                let R1 = operandes.opRegister[0],
-                    R2 = operandes.opRegister[1];
+		            if (operandes.addr == null) 
+		            {   // R to R
+		                let R1 = operandes.opRegister[0],
+		                    R2 = operandes.opRegister[1];
 
-                if ( instruction % 2 == 1 ) 
-                {
-                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
-                    {
-                        let tmp = this.register.readWordReg(R2);
-                        tmp += this.register.readWordReg(R2);
-                        this.register.writeWordReg(R1, tmp + carry);
-                    }
-                    else
-                    {
-                        let tmp = this.register.readWordReg(R1);
-                        tmp += this.register.readWordReg(R1);
-                        this.register.writeWordReg(R2, tmp + carry);
-                    }
-                }
-                else
-                {
-                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
-                    {
-                        let tmp = this.register.readByteReg(R2);
-                        tmp += this.register.readByteReg(R2);
-                        this.register.writeByteReg(R1, tmp + carry);
-                    }
-                    else
-                    {
-                        let tmp = this.register.readByteReg(R1);
-                        tmp += this.register.readByteReg(R1);
-                        this.register.writeByteReg(R2, tmp + carry);
-                    }
-                } 
-            }
-            else
-            {   // MEM TO/FROM R
-                let R = operandes.opRegister[0],
-                    addr = operandes.addr;
+		                if ( instruction % 2 == 1 ) 
+		                {
+		                	let value = this.register.readWordReg(R2);
+		                    value += this.register.readWordReg(R1) + carry;
 
-                if ( instruction % 2 == 1 ) //16bits
-                {
-                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
-                    {
-                        let tmp = this.RAM.readWord(addr);
-                        tmp += this.register.readWordReg(R);
-                        this.register.writeWordReg(R, tmp + carry);
-                    }
-                    else
-                    {
-                        let tmp = this.register.readWordReg(R); // d=0 => from reg
-                        tmp += this.RAM.readWord(addr);
-                        this.RAM.writeWord(addr, tmp + carry);
-                    }
-                }
-                else    //8bits
-                {
-                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
-                    {
-                        let tmp = this.RAM.readByte(addr);
-                        tmp += this.register.readByteReg(R);
-                        this.register.writeByteReg(R, tmp + carry);
-                    }
-                    else
-                    {
-                        let tmp = this.register.readByteReg(R); // d=0 => from reg
-                        tmp += this.RAM.readByte(addr);
-                        this.RAM.writeByte(addr, tmp + carry);
-                    }
-                } 
-            }
+		                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+		                        this.register.writeWordReg(R1, (value & 0xFFFF) + carry);
+		                    
+		                    else
+		                        this.register.writeWordReg(R2, (value & 0xFFFF) + carry);
+		                    
+		                }
+		                else	//W = 0
+		                {
+		                	let value = this.register.readByteReg(R2);
+		                    value += this.register.readByteReg(R1) + carry;
 
-        }
-        //======================================================================================
-        // -------Register/Memory with Immediat----------------------------------------------
-        //======================================================================================
-        else if ( instruction & 0b10000000 == ADD_IMM) {//De même pour ADC
+		                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg		
+		                        this.register.writeByteReg(R1, value & 0xFF);
+		                    
+		                    else
+		                        this.register.writeByteReg(R2, value & 0xFF);
+		                    
+		                } 
+		            }
+		            else
+		            {   // MEM TO/FROM R
+		                let R = operandes.opRegister[0],
+		                    addr = operandes.addr;
 
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip+1)),
-                immediateAddr = current_code_seg<<4 + current_ip + 2 + operandes.dispSize ;
+		                if ( instruction % 2 == 1 ) //16bits
+		                {
+		                	let value = this.RAM.readWord(addr);
+		                    value += this.register.readWordReg(R) + carry;
 
-            var carry = operandes.opRegister[0] == 0b010 ? this.extractFlag('C') : 0;
+		                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+		                    	this.register.writeWordReg(R, value & 0xFFFF);
+		                    
+		                    else	// d=0 => from reg
+		                        this.RAM.writeWord(addr, value & 0xFFFF);
+		                    
+		                }
+		                else    //8bits
+		                {
+		                	let value = this.RAM.readByte(addr);
+		                    value += this.register.readByteReg(R) + carry;
 
-            if (operandes.addr == null) 
-            {   // immediat to R
-                let R = operandes.opRegister[0];
+		                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+		                        this.register.writeByteReg(R, value & 0xFF);
 
-                if ( instruction % 2 == 1 ) 
-                {
-                    let tmp = this.register.readWordReg(R);
-                    tmp += this.RAM.readWord(immediateAddr);
-                    this.register.writeWordReg(R, tmp + carry);
-                }
-                else
-                {
-                    let tmp = this.register.readByteReg(R);
-                    tmp += this.RAM.readByte(immediateAddr);
-                    this.register.writeByteReg(R, tmp + carry);
-                } 
-            }
-            else
-            {   // immediat to Mem
-                let addr = operandes.addr;
+		                    else
+		                        this.RAM.writeByte(addr, value & 0xFF);
+		                    
+		                } 
+		            }
+		            this.register.incIP(operandes.dispSize + 2);
+		        }
+		        //================================================================================
+		        // -------Register/Memory with Immediat------------------------------------------
+		        //=================================================================================
+		        else if ( (instruction & 0b11111100) == ADDC_IMM) {//De même pour ADC
 
-                if ( instruction % 2 == 1 ) //16bits
-                {
-                    let tmp = this.RAM.readWord(addr);
-                    tmp += this.RAM.readWord(immediateAddr);
-                    this.RAM.writeWord(R, tmp + carry); 
-                }
-                else    //8bits
-                {
-                    let tmp = this.RAM.readByte(addr);
-                    tmp += this.RAM.readByte(immediateAddr);
-                    this.RAM.writeByte(R, tmp + carry);
-                } 
-            }
+		            var operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip + 1)),
+		                immediateAddr = (current_code_seg<<4) + current_ip + 2 + operandes.dispSize ;
+		            let operandeSize = 2;
+		            
+		            var carry = operandes.opRegister[0] == 0b010 ? this.register.extractFlag('C') : 0;
+		            
+		            if (operandes.addr == null) 
+		            {   // immediat to R
+		                let R = operandes.opRegister[1];
 
-        }
-    }
+		                if ( instruction % 2 == 1 ) 
+		                {
+		                	let value = this.register.readWordReg(R);
+
+		                	if ( (instruction>>1) % 2 == 0 ) //operande sur 1 octet
+			                    value += this.RAM.readWord(immediateAddr) + carry;
+		                	
+		                	else
+		                	{
+		                		//Ici on vérifie le signe, s'il est positif, on fout rien
+		                		//Sinon on étend
+		                		value += (this.RAM.readByte(immediateAddr) >> 7) == 1 ?
+		                				(this.RAM.readByte(immediateAddr) || 0xFF00):
+		                				this.RAM.readByte(immediateAddr);
+		                		operandeSize--;
+
+			                    value += carry;
+		                	}
+		                    this.register.writeWordReg(R, value & 0xFFFF);
+		                }
+		                else
+		                {
+		                    let value = this.register.readByteReg(R);
+		                    value += this.RAM.readByte(immediateAddr) + carry;
+		                    this.register.writeByteReg(R, value & 0xFF);
+		                    operandeSize--;
+		                } 
+		            }
+		            else
+		            {   // immediat to Mem
+		                let addr = operandes.addr;
+
+		                if ( instruction % 2 == 1 ) 
+		                {
+		                	let value = this.RAM.readWord(addr);
+
+		                	if ( (instruction>>1) % 2 == 0 ) //operande sur 1 octet
+			                    value += this.RAM.readWord(immediateAddr) + carry;
+		                	
+		                	else
+		                	{
+		                		//Ici on vérifie le signe, s'il est positif, on fout rien
+		                		//Sinon on étend
+		                		value += (this.RAM.readByte(immediateAddr) >> 7) == 1 ?
+		                				(this.RAM.readByte(immediateAddr) || 0xFF00):
+		                				this.RAM.readByte(immediateAddr);
+
+		                		operandeSize--;
+			                    value += carry;
+		                	}
+		                    this.RAM.writeWord(addr, value & 0xFFFF);
+		                }
+		                else
+		                {
+		                    let value = this.RAM.readByte(addr);
+		                    value += this.RAM.readByte(immediateAddr) + carry;
+		                    this.RAM.writeByte(addr, value & 0xFF);
+
+		                    operandeSize--;
+		                } 
+		            }
+
+		            this.register.incIP(2 + operandeSize);
+		        }
+		        //================================================================================
+		        // -------Accumulator with Immediat------------------------------------------
+		        //=================================================================================
+		        else if ( (instruction & 0b11111110) == ADD_ACC_IMM || 
+		        		(instruction & 0b11111110) == ADC_ACC_IMM) {
+
+		            var immediateAddr = (current_code_seg<<4) + current_ip + 1;
+		            var carry = 0;
+
+		            if ( (instruction & 0b11111110) == ADC_ACC_IMM )
+		            	carry = this.register.extractFlag('C');
+		           console.log(carry)
+	                if ( instruction % 2 == 1 )//W = 1 
+		            {
+	                	let value = this.register.readWordReg(AX_REG);
+			            value += this.RAM.readWord(immediateAddr) + carry;
+		                this.register.writeWordReg(AX_REG, value & 0xFFFF);
+		            }
+		            else
+		            {
+	                    let value = this.register.readByteReg(AX_REG);//Ici on est sur AL
+		                value += this.RAM.readByte(immediateAddr) + carry;
+		                this.register.writeByteReg(AX_REG, value & 0xFF);
+		            } 
+		           
+
+		            this.register.incIP(2 + (instruction%2));
+		        }
+
+		        else
+		        	return -1;
+
+		        return 0;
+			}
+
       decodeMul(instruction)
     {
         var current_ip = this.register.readReg(IP_REG),
