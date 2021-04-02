@@ -2031,6 +2031,35 @@ extractOperand(addrModeByte, segmentEnabled=true){
 		                return -1;
 		        }
 	}
+					
+	_executeArthLogic(instructionMode, op1, op2){
+		    	switch(instructionMode)
+		    	{
+		    		case ADD_MODE:
+		    			return (op1 + op2);
+		    		case ADC_MODE:
+		    			return (op1 + op2) + this.register.extractFlag('C');
+		    		case SUB_MODE:
+		    			return (op1 - op2);
+		    		case SUB_MODE:
+		    			return (op1 - op2) - this.register.extractFlag('C');
+
+		    		case AND_MODE:
+		    			return (op1 & op2);
+		    		case OR_MODE:
+		    			return (op1 | op2);
+		    		case XOR_MODE:
+		    			return (op1 ^ op2);
+		    		case CMP_MODE:
+		    			return (op1 - op2);
+		    	}
+	}
+					
+	_convertByteToWord(val){
+		return  (val >> 7) == 1 ?
+		         (val | 0xFF00): val;
+	}
+
 }
 
 
