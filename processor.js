@@ -553,6 +553,30 @@ class Processor{
 	}
 	
 	
+	decodeByteToWord(instruction){
+		   if ( instruction == CBW ) {
+		    	let value = this.register.readReg(AX_REG);
+		    	this.register.writeReg(AX_REG, this._convertByteToWord(value & 0xFF));
+		   }
+	 	else
+			return -1;
+
+		return 0;
+	}
+
+	decodeWordToDouble(instruction){
+		    	if ( instruction == CWD ) {
+		    		let value = this.register.readReg(AX_REG) ;
+		    		dxValue = (value >> 15) == 1 ? 0xFFFF : 0; 
+		    		this.register.writeReg(DX_REG, dxValue);
+		    	}
+		    	else
+		    		return -1;
+
+		    	return 0;
+	}
+	
+	
       decodeMul(instruction)
     {
         var current_ip = this.register.readReg(IP_REG),
