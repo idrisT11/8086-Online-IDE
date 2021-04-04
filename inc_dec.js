@@ -1,4 +1,110 @@
 
+		    decodeINC(instruction) {
+				var currentIp = this.register.readReg(IP_REG),
+					currentCodeSegment = this.register.readReg(CS_REG);
+
+					if ((instruction & 0b11111000) == INC_REG) 
+					{
+						// register
+						let dataRgister = this.register.readWordReg(instruction % 8);
+					
+						this.register.writeWordReg(instruction % 8, dataRgister +1);
+						this.register.incIP(1);
+					
+					}	
+
+					else if((instruction & 0b11111110) == INC_REG_MEM){
+						var operandes = this.extractOperand(this.RAM.readByte((currentCodeSegment<<4) + currentIp + 1)),
+							addr = operandes.addr;
+
+						
+						if( operandes.opRegister[0] == 0){
+							
+							if (addr){
+							
+								if (instruction % 2) 
+									this.RAM.writeWord(addr, this.RAM.readWord(addr)+1);
+
+								else  
+									this.RAM.writeByte(addr, this.RAM.readByte(addr)+1);
+							}
+							else
+							{
+								let R = operandes.opRegister[1];
+								if (instruction % 2) 
+									this.register.writeWordReg(R, this.register.readWordReg(R)+1);
+
+								else  
+									this.register.writeByteReg(R, this.register.readByteReg(R)+1);
+							}
+						
+							this.register.incIP(2 + operandes.dispSize);
+					
+						}
+						else
+							return -1;
+					}
+					else
+						return -1
+					
+					
+					return 0;	
+			}
+
+			decodeDEC(instruction) {
+				var currentIp = this.register.readReg(IP_REG),
+					currentCodeSegment = this.register.readReg(CS_REG);
+
+					if ((instruction & 0b11111000) == DEC_REG) 
+					{
+						// register
+						let dataRgister = this.register.readWordReg(instruction % 8);
+					
+						this.register.writeWordReg(instruction % 8, dataRgister +1);
+						this.register.incIP(1);
+					
+					}	
+
+					else if((instruction & 0b11111110) == DEC_REG_MEM){
+						var operandes = this.extractOperand(this.RAM.readByte((currentCodeSegment<<4) + currentIp + 1)),
+							addr = operandes.addr;
+
+						
+						if( operandes.opRegister[0] == 0){
+							
+							if (addr){
+							
+								if (instruction % 2) 
+									this.RAM.writeWord(addr, this.RAM.readWord(addr)-1);
+
+								else  
+									this.RAM.writeByte(addr, this.RAM.readByte(addr)-1);
+							}
+							else
+							{
+								let R = operandes.opRegister[1];
+								if (instruction % 2) 
+									this.register.writeWordReg(R, this.register.readWordReg(R)-1);
+
+								else  
+									this.register.writeByteReg(R, this.register.readByteReg(R)-1);
+							}
+						
+							this.register.incIP(2 + operandes.dispSize);
+					
+						}
+						else
+							return -1;
+					}
+					else
+						return -1
+					
+					
+					return 0;	
+			}
+
+
+
 function decodeINC() {
 
 	var currentIp = register.readReg(IP_REG),
