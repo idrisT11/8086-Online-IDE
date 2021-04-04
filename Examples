@@ -28,3 +28,15 @@
 51,94,0             xor  bx,[Bp]
 50,110,0             xor  ch,[Bp]
 51,8             xor cx,[BX+si]
+//moooooooh 2n1
+mul DX             247,226
+mul BL             246,227
+mul [BX+5h]             246,103,5
+mul [BX+11111111b]             246,167,255,0
+mul [BX+0BH]             246,103,11
+mul [bp]             246,102,0
+mul [BP]             246,102,0
+mul [BX+DI+5]             246,97,5
+mul [BX+SI-5]             247,96,251
+mul [BX+300]             246,167,44,1
+mul [BX+DI-300]             247,161,212,254
