@@ -1,21 +1,30 @@
-Dayi i nhwaj les examples-nni
-wach bi rabk takteb bl kabye 5ayi fuckkkkkkkkk u
-mov [bx],cl
-[ 136, 15 ]
-mov [bx+di],cx
-[ 137, 9 ]
-mov [di+125h],0x215
-[ 199, 133, 37, 1, 21, 2 ]
-mov [bp],-2153
-[ 199, 6, 150, 247 ]
-mov al,b.[sp]
-[ 138, 6 ]
-mov w.[bx],05
-[ 199, 7, 5, 0 ]
-mov ax,b.[si+bp]
-[ 139, 2 ]
-mov es,ax
-[ 139, 192 ]
-mov es,[bx]
-[ 139, 7 ]
-
+129,195,5             or BX, 5
+129,195,251             or BX, -5
+129,195,18,1             or BX, 274
+129,195,9,255             or BX, -247
+129,195,71,2             or BX, 0x247
+129,195,229,0             or BX, 11100101b
+129,195,NaN             or BX, AFFh
+11,209             or DX, CX
+10,217             or BL, CL
+9,95,5             or [BX+5h], bx
+8,47             or [BX+0b11111111], ch
+9,79,11             or [BX+0BH], cx
+11,94,0             or  bx,[Bp]
+10,110,0             or  ch,[Bp]
+11,8             or cx,[BX+si]
+129,195,5             xor BX, 5
+129,195,251             xor BX, -5
+129,195,18,1             xor BX, 274
+129,195,9,255             xor BX, -247
+129,195,71,2             xor BX, 0x247
+129,195,229,0             xor BX, 11100101b
+129,195,NaN             xor BX, AFFh
+51,209             xor DX, CX
+50,217             xor BL, CL
+49,95,5             xor [BX+5h], bx
+48,47             xor [BX+0b11111111], ch
+49,79,11             xor [BX+0BH], cx
+51,94,0             xor  bx,[Bp]
+50,110,0             xor  ch,[Bp]
+51,8             xor cx,[BX+si]
