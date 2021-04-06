@@ -644,20 +644,23 @@ class Processor{
         this.register.incIP(operandes.dispSize + 2);
     }
     //
-    decodeDiv(instruction)
+  decodeDiv(instruction)
     {
         var current_ip = this.register.readReg(IP_REG),
         current_code_segement = this.register.readReg(CS_REG);
-        if(instruction &0b1111011==0b1111011 &&(this.RAM.readByte(current_code_segement<<4 + current_ip+1)<<2)>>3==b110)
+		var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+        if(instruction>>1==DIV &&(operandes.opRegister[0]==0b110))
         {
                     
 
-                var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
+               
                 if(operandes.addr==null)
                 {
-                    R2 = operandes.opRegister[1];
+                   let  R2 = operandes.opRegister[1];
+				  
                     if(instruction%2==1)//16 bit
                     {
+						
                         this.register.divReg(R2,WORD_NS_REGISTER);
                     }
                     else 
@@ -672,30 +675,32 @@ class Processor{
                     {
                         
                         let val = this.RAM.readWord(operandes.addr);
-                        let ax = this.register.readWordReg(AX_REG);//ax
-                        this.register.writeWordReg(AX_REG,Math.floor(val/ax));
-                        this.register.writeWordReg(DX_REG,val%ax);
-
+                        let ax = this.register.readReg(AX_REG);//ax
+                        this.register.writeReg(AX_REG,Math.floor(val/ax));
+                        this.register.writeReg(DX_REG,val%ax);
+						
+                        
                     
                     
                         
                     }
                     else 
                     {
-
+						
                         let val = this.RAM.readByte(operandes.addr);
                         let al = this.register.readByteReg(0);//al
-                        this.register.writeByteReg(0,Math.floor(val/al));//al
-                        this.register.writeByteReg(0,math.floor(val%al));//ah
+                        this.register.writeReg(AX_REG,(Math.floor(val%al)<<8)+Math.floor(val/al));
+                     
 
                     }
                 }
-           
-        }
+		     this.register.incIP(operandes.dispSize + 2);
+           return 0;
+        }else return -1;
+		
 
-        this.register.incIP(operandes.dispSize + 2);
+      
     }
-
       //and
    decodeAnd(instruction)
    {
@@ -2595,13 +2600,14 @@ class Processor{
             return -1;
     }
 
-extractOperand(addrModeByte, segmentEnabled=true){
-		        /*
+  extractOperand(addrModeByte, segmentEnabled=true){
+      		        /*
 		            |m|m|r|r|r|/|/|/|
 		            m: mode byte
 		            r: register byte
 		            /: r/m byte
-		        */
+		        */console.log(addrModeByte, 'lll');
+
 		        var mode = (addrModeByte & 0xC0) >> 6,
 		            reg  = (addrModeByte & 0x38) >> 3,
 		            rm   = (addrModeByte & 0x07);
@@ -2643,6 +2649,7 @@ extractOperand(addrModeByte, segmentEnabled=true){
 
 		        }
 
+				addr &= 0xFFFF;
 		        if ( addr != null && segmentEnabled ) {
 		        	let current_segment = act_seg;
 		            addr += (current_segment<<4);
@@ -2654,7 +2661,7 @@ extractOperand(addrModeByte, segmentEnabled=true){
 		            opRegister: opRegister,//array
 		        };
 
-	}
+		    }
 
 	getAddrIndir(rm){  
 		        switch (rm) {
