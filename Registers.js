@@ -144,23 +144,27 @@ class Registers{
             }
             else 
             {
-                this.writeWordReg(0,al>>8);//ah
-                this.writeByteReg(0,al%256);//al
+                this.writeReg(AX_REG,al);
+             
             }
         }
         else 
         {
             let val = this.readWordReg(registerId);
-            let ax = this.readWordReg(AX_REG);//ax
+            let ax = this.readReg(AX_REG);//ax
             ax*=val;
             if(ax>>16==0)
             {
-                this.writeWordReg(AX_REG,ax);
+                this.writeReg(AX_REG,ax);
             }
             else 
             {
-                this.writeWordReg(AX_REG,ax&0x0000ffff);
-                this.writeWordReg(DX_REG,ax&0xffff0000);
+               
+               
+                let dx=(((ax&0xffff0000)>>16)&0xffff);
+               // console.log(ax.toString(16),'   ',dx.toString(16))
+                this.writeReg(AX_REG,ax&0x0000ffff);
+                this.writeReg(DX_REG,dx);
             }
 
 
