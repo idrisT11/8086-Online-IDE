@@ -577,72 +577,94 @@ class Processor{
 	}
 	
 	
-      decodeMul(instruction)
-    {
-        var current_ip = this.register.readReg(IP_REG),
-        current_code_segement = this.register.readReg(CS_REG);
-       
-        if(instruction &0b11111100==0b1111011 &&(this.RAM.readByte(current_code_segement<<4 + current_ip+1)<<2)>>3==0b100)
-        {   
-                var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
-                
-                if(operandes.addr==null)
-                {
-                    var R2 = operandes.opRegister[1];
-                    if(instruction%2==1)//16 bit
-                        this.register.mulReg(R2,WORD_NS_REGISTER);
-                    
-                    else 
-                        this.register.mulReg(R2,BYTE_REGISTER);
-                    
-                }
-                else 
-                {
-                
-                    if(instruction%2==1)//16 bit
-                    {
-                        
-                        let val = this.RAM.readWord(operandes.addr);
-                        let ax = this.register.readWordReg(AX_REG);//ax
-                        ax*=val;
-                    if(ax>>16==0)
-                    {
-                        this.register.writeWordReg(AX_REG,ax);
-                    }
-                    else 
-                    {
-                        this.register.writeWordReg(AX_REG,ax&0x0000ffff);
-                        this.register.writeWordReg(DX_REG,ax&0xffff0000);
-                    }
+     decodeMul(instruction)
+			{
+				var current_ip = this.register.readReg(IP_REG),
+				current_code_segement = this.register.readReg(CS_REG);
+				var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+				if((instruction>>1)==MUL &&(operandes.opRegister[0]==0b100))
+				{   
+						 console.log(operandes);
+						
+						if(operandes.addr==null)
+						{
+							
+							
+							var R2 = operandes.opRegister[1];
+							if(instruction%2==1)//16 bit
+							{
+								
+								this.register.mulReg(R2,WORD_NS_REGISTER);
+							}
+								
+							
+							else 
+							{
+							
+								this.register.mulReg(R2,BYTE_REGISTER);
 
-                    
-                    
-                        
-                    }
-                    else 
-                    {
-
-                        let val = this.RAM.readByte(operandes.addr);
-                        let al = this.register.readByteReg(0);//al
-                        al*=val;
-                        if(al>>8==0)
-                        {
-                            this.register.writeByteReg(0,al);
-                        }
-                        else 
-                        {
-                    
-                            this.register.writeWordReg(0,al>>8);//ah
-                            this.register.writeByteReg(0,al%256);//al
-                        }
-                    
-                    }
-                }
-           
-        }
-
-        this.register.incIP(operandes.dispSize + 2);
-    }
+							}
+								
+							
+						}
+						else 
+						{
+						
+						
+							if(instruction%2==1)//16 bit
+							{
+								
+								
+								let val = this.RAM.readWord(operandes.addr);
+								let ax = this.register.readReg(AX_REG);//ax
+								ax*=val;
+								
+								
+							if(ax>>16==0)
+							{
+								
+								this.register.writeReg(AX_REG,ax);
+								
+							}
+							else 
+							{
+								
+								let dx=(((ax&0xffff0000)>>16)&0xffff);
+								
+								this.register.writeReg(AX_REG,ax&0x0000ffff);
+								this.register.writeReg(DX_REG,dx);
+							}
+		
+							
+							
+								
+							}
+							else 
+							{
+								
+								let val = this.RAM.readByte(operandes.addr);
+								let al = this.register.readByteReg(0);//al
+								al*=val;
+								if(al>>8==0)
+								{
+									this.register.writeByteReg(0,al);
+								}
+								else 
+								{
+							
+									this.register.writeReg(AX_REG,al);//ah   
+								
+								}
+							
+							}
+						}
+						return 0;
+						this.register.incIP(operandes.dispSize + 2);
+				}	
+				else return -1;
+		
+				
+			}
     //
     decodeDiv(instruction)
     {
