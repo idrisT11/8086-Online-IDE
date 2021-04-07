@@ -526,7 +526,7 @@ function toBcode(str) // original function to be class later
             break;
         case "SHL": case "SAL":
             arr.push((0b11010000) + (v << 1) + w);
-            arr.push(((mode << 6)) + (0b100000) + regToId(operands[0]));
+            arr.push(((mode << 6)) + (0b100000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
                 arr = byteConcat(str, arr);
             }
@@ -535,7 +535,9 @@ function toBcode(str) // original function to be class later
             break;
         case "SHR":
             arr.push((0b11010000) + (v << 1) + w);
-            arr.push((mode << 6) + (0b101000) + regToId(operands[0]));
+           // console.log(regToId(operands[0]));
+            //console.log();
+            arr.push((mode << 6) + (0b101000) +(/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
                 arr = byteConcat(str, arr);
             }
@@ -543,7 +545,7 @@ function toBcode(str) // original function to be class later
             break;
         case "SAR":
             arr.push((0b11010000) + (v << 1) + w);
-            arr.push(((mode << 6)) + (0b111000) + regToId(operands[0]));
+            arr.push(((mode << 6)) + (0b111000) +(/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
                 arr = byteConcat(str, arr);
             }
@@ -551,7 +553,7 @@ function toBcode(str) // original function to be class later
             break;
         case "ROL":
             arr.push((0b11010000) + (v << 1) + w);
-            arr.push(((mode << 6)) + (0b000000) + regToId(operands[0]));
+            arr.push(((mode << 6)) + (0b000000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
                 arr = byteConcat(str, arr);
             }
@@ -559,7 +561,7 @@ function toBcode(str) // original function to be class later
             break;
         case "ROR":
             arr.push((0b11010000) + (v << 1) + w);
-            arr.push(((mode << 6)) + (0b001000) + regToId(operands[0]));
+            arr.push(((mode << 6)) + (0b001000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
                 arr = byteConcat(str, arr);
             }
@@ -567,7 +569,7 @@ function toBcode(str) // original function to be class later
             break;
         case "RCL":
             arr.push((0b11010000) + (v << 1) + w);
-            arr.push(((mode << 6)) + (0b010000) + regToId(operands[0]));
+            arr.push(((mode << 6)) + (0b010000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
                 arr = byteConcat(str, arr);
             }
@@ -575,7 +577,7 @@ function toBcode(str) // original function to be class later
             break;
         case "RCR":
             arr.push((0b11010000) + (v << 1) + w);
-            arr.push(((mode << 6)) + (0b011000) + regToId(operands[0]));
+            arr.push(((mode << 6)) + (0b011000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
                 arr = byteConcat(str, arr);
             }
@@ -1032,28 +1034,33 @@ function regToId(regname) {
     }
 }
 
-var inst = "dec";
+var inst = "shr";
 let testing = toBcode;
-console.log(toBcode("shr bx,cl"));
-console.log(toBcode("shr dx,cl"));
+
 //case mov
-console.log(testing(inst + " " + "DX"));
-//console.log(testing(inst + " " + "Ds"));
+/*console.log(testing(inst + " " + "DX"));
+console.log(testing(inst + " " + "Ds"));
 console.log(testing(inst + " " + "[bx]"));
 console.log(testing(inst + " " + "[100H+di]"));
 console.log(testing(inst + " " + "[bp]"));
 console.log(testing(inst + " " + "es:[bx-300]"));
 console.log(testing(inst + " " + "[5h]"));
 console.log(testing(inst + " " + "[0affh]" ));
-/*console.log(testing(inst+" "+"cl"+",bl"));
-console.log(testing(inst+" "+"dx"+",bx"));
-console.log(testing(inst+" "+"bx"+",01ffh"));
-console.log(testing(inst+" "+"bh"+",5h"));
+console.log(testing(inst+" "+"cl"+",bl"));
+console.log(testing(inst+" "+"dx"+",bx"));*/
+//console.log(testing(inst+" "+"bx"+",01ffh"));
+console.log(testing(inst+" "+"bx"+",cl"));
 console.log(testing(inst+" "+"[bx]"+",1001b"));
 console.log(testing(inst+" "+"[bp]"+",-23"));
 console.log(testing(inst+" "+"es:[bx-300]"+"   ,0ffh"));
-console.log(testing(inst+" "+"[5h]"+",0ffh"));
-console.log(testing(inst+" "+"[bx]"+",bx"));
+console.log(testing(inst + " " + "[5h]" + ",0ffh"));
+console.log(testing(inst+" "+"bx"+",cl"));
+console.log(testing(inst+" "+"bh"+",cl"));
+console.log(testing(inst+" "+"[bx]"+",cl"));
+console.log(testing(inst+" "+"[bp]"+",cl"));
+console.log(testing(inst+" "+"es:[bx-300]"+"   ,cl"));
+console.log(testing(inst+" "+"[5h]"+",cl"));
+/*console.log(testing(inst+" "+"[bx]"+",bx"));
 console.log(testing(inst+" "+"[100H+di]"+",bh"));
 console.log(testing(inst+" "+"[bp]"+",dx"));
 console.log(testing(inst + " " + "bx" + ",[100H+di]"));
