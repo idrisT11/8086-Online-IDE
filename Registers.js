@@ -172,6 +172,7 @@ class Registers{
 
     }
     //division
+   //division
     divReg(registerId,type)
     {
         if(type==SEGMENT_REGISTER )
@@ -182,16 +183,16 @@ class Registers{
         {   
             let val = this.readByteReg(registerId);
             let al = this.readByteReg(0);//al
-            this.writeByteReg(0,Math.floor(val/al));//al
-            this.writeByteReg(0,math.floor(val%al));//ah
-            
+            this.writeReg(AX_REG,(Math.floor(val%al)<<8)+Math.floor(val/al));//ah  
+             
         }
         else 
         {
+           
             let val = this.readWordReg(registerId);
-            let ax = this.readWordReg(AX_REG);//ax
-            this.writeWordReg(AX,Math.floor(val/ax));
-            this.writeWordReg(DX,val%ax);
+            let ax = this.readReg(AX_REG);//ax'
+            this.writeReg(AX_REG,Math.floor(val/ax));
+            this.writeReg(DX_REG,val%ax);
           
 
 
