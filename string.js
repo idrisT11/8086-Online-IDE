@@ -272,8 +272,13 @@ function toBcode(str) // original function to be class later
 
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                    if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -349,8 +354,13 @@ function toBcode(str) // original function to be class later
                 if (w === 1) {
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                    if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -376,8 +386,13 @@ function toBcode(str) // original function to be class later
                 if (w === 1) {
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                   if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -412,8 +427,13 @@ function toBcode(str) // original function to be class later
                 if (w === 1) {
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                 if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -439,8 +459,13 @@ function toBcode(str) // original function to be class later
                 if (w === 1) {
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                   if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -473,8 +498,13 @@ function toBcode(str) // original function to be class later
                 if (w === 1) {
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                    if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -525,6 +555,7 @@ function toBcode(str) // original function to be class later
             }
             break;
         case "SHL": case "SAL":
+            w = /CL/.test(operands[1]) ? getW(operands.filter((x, i) => i % 2 == 0)) : w;
             arr.push((0b11010000) + (v << 1) + w);
             arr.push(((mode << 6)) + (0b100000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
@@ -534,6 +565,7 @@ function toBcode(str) // original function to be class later
 
             break;
         case "SHR":
+            w = /CL/.test(operands[1]) ? getW(operands.filter((x, i) => i % 2 == 0)) : w;
             arr.push((0b11010000) + (v << 1) + w);
            // console.log(regToId(operands[0]));
             //console.log();
@@ -544,6 +576,7 @@ function toBcode(str) // original function to be class later
 
             break;
         case "SAR":
+            w = /CL/.test(operands[1]) ? getW(operands.filter((x, i) => i % 2 == 0)) : w;
             arr.push((0b11010000) + (v << 1) + w);
             arr.push(((mode << 6)) + (0b111000) +(/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
@@ -552,6 +585,7 @@ function toBcode(str) // original function to be class later
 
             break;
         case "ROL":
+            w = /CL/.test(operands[1]) ? getW(operands.filter((x, i) => i % 2 == 0)) : w;
             arr.push((0b11010000) + (v << 1) + w);
             arr.push(((mode << 6)) + (0b000000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
@@ -560,6 +594,7 @@ function toBcode(str) // original function to be class later
 
             break;
         case "ROR":
+            w = /CL/.test(operands[1]) ? getW(operands.filter((x, i) => i % 2 == 0)) : w;
             arr.push((0b11010000) + (v << 1) + w);
             arr.push(((mode << 6)) + (0b001000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
@@ -568,6 +603,7 @@ function toBcode(str) // original function to be class later
 
             break;
         case "RCL":
+            w = /CL/.test(operands[1]) ? getW(operands.filter((x, i) => i % 2 == 0)) : w;
             arr.push((0b11010000) + (v << 1) + w);
             arr.push(((mode << 6)) + (0b010000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
@@ -576,6 +612,7 @@ function toBcode(str) // original function to be class later
 
             break;
         case "RCR":
+            w = /CL/.test(operands[1]) ? getW(operands.filter((x, i) => i % 2 == 0)) : w;
             arr.push((0b11010000) + (v << 1) + w);
             arr.push(((mode << 6)) + (0b011000) + (/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
@@ -600,8 +637,13 @@ function toBcode(str) // original function to be class later
                 if (w === 1) {
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                   if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -629,8 +671,13 @@ function toBcode(str) // original function to be class later
                 if (w === 1) {
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                   if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -659,8 +706,13 @@ function toBcode(str) // original function to be class later
                 if (w === 1) {
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                  if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -672,24 +724,29 @@ function toBcode(str) // original function to be class later
         case "TEST":
             //Reg./Memory with Register to Either
             if (/R|M/.test(operands[2]) && /M|R/.test(operands[3])) {
-                arr.push((0b100) + w);
+                arr.push((0b10000100) + w);
 
                 arr.push((mode << 6) + (regToId((/R/.test(operands[2])) ? operands[0] : operands[1]) << 3) + regmem);
                 arr = byteConcat(str, arr);
             }
             //Immediate to Register/Memory 
             else if (/M|R/.test(operands[2]) && /I/.test(operands[3])) {
-                opcode = (0b100000);
+                opcode = (0b11110110 );
                 if (w == 0) { s = 0 };
-                arr.push((opcode << 2) + w);
+                arr.push(opcode  + w);
                 arr.push((mode << 6) + regmem);
                 arr = byteConcat(str, arr);
 
                 if (w === 1) {
                     let byte = splitNum(convert(operands[1]), getS(operands[1], 1));
                     arr.push(byte[0]);
-                    if (byte.length === 2) {
+                if (byte.length === 2)
                         arr.push(byte[1]);
+                    else {
+                        if ((byte[0] & 0x80) !== 0)
+                            arr.push(255)
+                        else
+                            arr.push(0);
                     }
                 }
                 else {
@@ -794,8 +851,13 @@ function toBcode(str) // original function to be class later
                         let byte = splitNum(convert(operands[0]), getS(operands[0], 1));
 
                         arr.push(byte[0]);
-                        if (byte.length === 2) {
+                        if (byte.length === 2)
                             arr.push(byte[1]);
+                        else {
+                            if ((byte[0] & 0x80) !== 0)
+                                arr.push(255)
+                            else
+                                arr.push(0);
                         }
                     }
                     else {
@@ -1034,7 +1096,7 @@ function regToId(regname) {
     }
 }
 
-var inst = "shr";
+var inst = "shl";
 let testing = toBcode;
 
 //case mov
@@ -1044,24 +1106,23 @@ console.log(testing(inst + " " + "[bx]"));
 console.log(testing(inst + " " + "[100H+di]"));
 console.log(testing(inst + " " + "[bp]"));
 console.log(testing(inst + " " + "es:[bx-300]"));
-console.log(testing(inst + " " + "[5h]"));
-console.log(testing(inst + " " + "[0affh]" ));
-console.log(testing(inst+" "+"cl"+",bl"));
-console.log(testing(inst+" "+"dx"+",bx"));*/
-//console.log(testing(inst+" "+"bx"+",01ffh"));
-console.log(testing(inst+" "+"bx"+",cl"));
+console.log(testing(inst + " " + "[5h]"));*/
+console.log(testing(inst + " " +"w.[bx-300]"+ ",cl" ));
+console.log(testing(inst+" "+"b.[bx-300]"+",cl"));
+console.log(testing(inst+" "+"bx"+",01ffh"));
+console.log(testing(inst+" "+"bx"+",cx"));
 console.log(testing(inst+" "+"[bx]"+",1001b"));
 console.log(testing(inst+" "+"[bp]"+",-23"));
 console.log(testing(inst+" "+"es:[bx-300]"+"   ,0ffh"));
 console.log(testing(inst + " " + "[5h]" + ",0ffh"));
-console.log(testing(inst+" "+"bx"+",cl"));
-console.log(testing(inst+" "+"bh"+",cl"));
-console.log(testing(inst+" "+"[bx]"+",cl"));
-console.log(testing(inst+" "+"[bp]"+",cl"));
-console.log(testing(inst+" "+"es:[bx-300]"+"   ,cl"));
-console.log(testing(inst+" "+"[5h]"+",cl"));
-/*console.log(testing(inst+" "+"[bx]"+",bx"));
-console.log(testing(inst+" "+"[100H+di]"+",bh"));
+console.log(testing(inst+" "+"bx"+",cx"));
+console.log(testing(inst+" "+"bx"+",cx"));
+console.log(testing(inst+" "+"[bx]"+",cx"));
+console.log(testing(inst+" "+"[bp]"+",cx"));
+console.log(testing(inst+" "+"es:[bx-300]"+"   ,cx"));
+console.log(testing(inst+" "+"[5h]"+",cx"));
+console.log(testing(inst+" "+"[bx]"+",bx"));
+console.log(testing(inst+" "+"[100H+di]"+",bx"));
 console.log(testing(inst+" "+"[bp]"+",dx"));
 console.log(testing(inst + " " + "bx" + ",[100H+di]"));
 console.log(testing(inst + " " + "dx" + ",[bp]"));
@@ -1070,5 +1131,5 @@ console.log(testing(inst + " " + "cx" + ",[100H+di]"));
 console.log(testing(inst + " " + "cx" + ",[100H+di+bx]"));
 console.log(testing(inst + " " + "dx" + ",[bp]"));
 console.log(testing(inst + " " + "cx" + ",es:[bx-300]"));
-console.log(testing(inst + " " + "dx" + ",[bx-300]"));*/
+console.log(testing(inst + " " + "dx" + ",[bx-300]"));
 
