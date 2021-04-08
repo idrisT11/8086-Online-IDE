@@ -7,16 +7,16 @@
 
 function decodeCLC () {
 
-	var currentIp = this.Register.readReg(IP_REG),
-	currentCodeSegment = this.Register.readReg(CS_REG),
+	var currentIp = this.register.readReg(IP_REG),
+	currentCodeSegment = this.register.readReg(CS_REG),
 	instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp);
 
 
 	if(instruction & 0b11111111 == CLS_INS){
  
-		this.Register.setFlag('C', 0);
+		this.register.setFlag('C', 0);
 		
-		this.Register.incIP(1);
+		this.register.incIP(1);
 
 		return 0;
 	 }
@@ -37,16 +37,16 @@ function decodeCLC () {
 
 function decodeSTD () {
 
-	var currentIp = this.Register.readReg(IP_REG),
-	currentCodeSegment = this.Register.readReg(CS_REG),
+	var currentIp = this.register.readReg(IP_REG),
+	currentCodeSegment = this.register.readReg(CS_REG),
 	instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp);
 
 
 	if(instruction & 0b11111111 == STD_INS){
  
-		this.Register.setFlag('D', 1);
+		this.register.setFlag('D', 1);
 		
-		this.Register.incIP(1);
+		this.register.incIP(1);
 
 		return 0;
 	 }
@@ -65,16 +65,16 @@ function decodeSTD () {
 
 function decodeCLD () {
 
-	var currentIp = this.Register.readReg(IP_REG),
-	currentCodeSegment = this.Register.readReg(CS_REG),
+	var currentIp = this.register.readReg(IP_REG),
+	currentCodeSegment = this.register.readReg(CS_REG),
 	instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp);
 
 
 	if(instruction & 0b11111111 == CLD_INS){
  
-		this.Register.setFlag('D', 0);
+		this.register.setFlag('D', 0);
 		
-		this.Register.incIP(1);
+		this.register.incIP(1);
 
 		return 0;
 	 }
@@ -94,23 +94,23 @@ function decodeCLD () {
 
 function decodeCMC () {
 
-	var currentIp = this.Register.readReg(IP_REG),
-	currentCodeSegment = this.Register.readReg(CS_REG),
+	var currentIp = this.register.readReg(IP_REG),
+	currentCodeSegment = this.register.readReg(CS_REG),
 	instruction = this.RAM.reaByte(currentCodeSegment << 4 + currentIp);
 
 	if((instruction & 0b111111111) == CMC_INS){
  
 
-		if(this.Register.exctractFlag('C'))
+		if(this.register.exctractFlag('C'))
 
-			 this.Register.setFlag('C', 1);
+			 this.register.setFlag('C', 1);
 
-		 else if (!(this.Register.exctractFlag('C')))
+		 else if (!(this.register.exctractFlag('C')))
 
-			 this.Register.setFlag('C', 0 );
+			 this.register.setFlag('C', 0 );
 
 		
-		this.Register.incIP(1);
+		this.register.incIP(1);
 
 
 		 return 0;
@@ -136,16 +136,16 @@ function decodeCMC () {
 
 function decodeSTC()  {
 
-var currentIp = this.Register.readReg(IP_REG),
-currentCodeSegment = this.Register.readReg(CS_REG),
+var currentIp = this.register.readReg(IP_REG),
+currentCodeSegment = this.register.readReg(CS_REG),
 instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp);
 
 if(instruction & 0b11111111 == STC_INS){
 
 
-	this.Register.setFlag('C', 1);
+	this.register.setFlag('C', 1);
 
-	this.Register.incIP(1);
+	this.register.incIP(1);
 
 	 return 0;
  }
@@ -165,28 +165,27 @@ if(instruction & 0b11111111 == STC_INS){
 
 
 
-
-function decodeMOVS(given = false){
-	var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG),
+decodeMOVS(given = false){
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG),
 		instruction = this.RAM.readByte((currentCodeSegment << 4) + currentIp),
 		value = (currentCodeSegment << 4) + currentIp ;
 
 		if(given == true)
 		value += 1
 	
-		instruction = memory.readByte(value);
+		instruction = this.RAM.readByte(value);
 
 
-		if((instruction & 0b11111110) == MOVC_INS){
+		if((instruction & 0b11111110) == MOVS_INS){
 	
 		
 			if (instruction % 2){
 				
-			let offset1 = this.Register.readReg(DI_REG),
-				offset2 = this.Register.readReg(SI_REG),
-				segment1 = this.Register.readReg(ES_REG),
-				segment2 = this.Register.readReg(DS_REG);
+			let offset1 = this.register.readReg(DI_REG),
+				offset2 = this.register.readReg(SI_REG),
+				segment1 = this.register.readReg(ES_REG),
+				segment2 = this.register.readReg(DS_REG);
 	
 			let effictiveAdress1 = (segment1 << 4) + offset1,
 				effictiveAdress2 = (segment2 << 4) + offset2;
@@ -194,45 +193,53 @@ function decodeMOVS(given = false){
 	
 			this.RAM.writeWord(effictiveAdress2, this.RAM.readWord(effictiveAdress1));
 	
-			if(Register.extractFlag('D')){
-				this.Register.writeWord(DI_REG, offset1 + 1);
-				Register.writeWord(SI_REG, offset2 + 1);
+			if(this.register.extractFlag('D')){
+				this.register.writeReg(DI_REG, offset1 + 2);
+				this.register.writeReg(SI_REG, offset2 + 2);
 			}else{
-				this.Register.writeWordReg(DI_REG, offset1 - 1);
-				this.Register.writeWordReg(SI_REG, offset2 - 1);
+				this.register.writeReg(DI_REG, offset1 - 2);
+				this.register.writeReg(SI_REG, offset2 - 2);
 			}
 	
 		}
+
+		if (!(instruction % 2)){
+				
+			let offset1 = this.register.readReg(DI_REG),
+				offset2 = this.register.readReg(SI_REG),
+				segment1 = this.register.readReg(ES_REG),
+				segment2 = this.register.readReg(DS_REG);
+	
+			let effictiveAdress1 = (segment1 << 4) + offset1,
+				effictiveAdress2 = (segment2 << 4) + offset2;
+	
+	
+			this.RAM.writeByte(effictiveAdress2, this.RAM.readByte(effictiveAdress1));
+	
+			if(this.register.extractFlag('D')){
+				this.register.writeReg(DI_REG, offset1 + 1);
+				this.register.writeReg(SI_REG, offset2 + 1);
+			}else{
+				this.register.writeReg(DI_REG, offset1 - 1);
+				this.register.writeReg(SI_REG, offset2 - 1);
+			}
+	
+		}
+
+
+
+
+		}
+	}
 	
 	
 		
 	
 	
-		if (!(instruction % 2)){
-			console.log("hello")
-			let offset1 = this.Register.readReg(DI_REG),
-				offset2 = this.Register.readReg(SI_REG),
-				segment1 = this.Register.readReg(ES_REG),
-				segment2 = this.Register.readReg(DS_REG);
-	
-			let effictiveAdress1 = (segment1 << 4 )+ offset1,
-				effictiveAdress2 = (segment2 << 4) + offset2;
-				console.log(this.RAM.readWord(effictiveAdress1))
-				 console.log(this.RAM.readWord(effictiveAdress2))
-	
-	
-			this.RAM.writeByte(effictiveAdress2, this.RAM.readByte(effictiveAdress1));
-	
-				if(this.Register.extractFlag('D')){
-					this.Register.writeWordReg(DI_REG, offset1 + 2);
-					this.Register.writeWordReg(SI_REG, offset2 + 2);
-				}else{
-					this.Register.writeWordReg(DI_REG, offset1 - 2);
-					this.Register.writeWordReg(SI_REG, offset2 - 2);
-				}
+		
 	
 		}
-		this.Register.incIP(1);
+		this.register.incIP(1);
 		return 0;
 	
 	
@@ -240,6 +247,88 @@ function decodeMOVS(given = false){
 	return -1;
 	
 }
+
+
+
+
+function decodeCMPS(given = false){
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG),
+		instruction = this.RAM.readByte((currentCodeSegment << 4) + currentIp),
+		value = (currentCodeSegment << 4) + currentIp ;
+
+		if(given == true)
+		value += 1
+	
+		instruction = this.RAM.readByte(value);
+
+
+		if((instruction & 0b11111110) == CMPS_INS){
+	
+		
+			if (instruction % 2){
+				
+			let offset1 = this.register.readReg(DI_REG),
+				offset2 = this.register.readReg(SI_REG),
+				segment1 = this.register.readReg(ES_REG),
+				segment2 = this.register.readReg(DS_REG);
+	
+			let effictiveAdress1 = (segment1 << 4) + offset1,
+				effictiveAdress2 = (segment2 << 4) + offset2;
+	
+	
+			let data = this.RAM.readWord(effictiveAdress2)-  this.RAM.readWord(effictiveAdress1);
+	
+			if(this.register.extractFlag('D')){
+				this.register.writeReg(DI_REG, offset1 + 2);
+				this.register.writeReg(SI_REG, offset2 + 2);
+			}else{
+				this.register.writeReg(DI_REG, offset1 - 2);
+				this.register.writeReg(SI_REG, offset2 - 2);
+			}
+	
+		}
+
+		else if (!(instruction % 2)){
+				
+			let offset1 = this.register.readReg(DI_REG),
+				offset2 = this.register.readReg(SI_REG),
+				segment1 = this.register.readReg(ES_REG),
+				segment2 = this.register.readReg(DS_REG);
+	
+			let effictiveAdress1 = (segment1 << 4) + offset1,
+				effictiveAdress2 = (segment2 << 4) + offset2;
+	
+	
+			let data = this.RAM.readByte(effictiveAdress2) -  this.RAM.readByte(effictiveAdress1);
+	
+			if(this.register.extractFlag('D')){
+				this.register.writeReg(DI_REG, offset1 + 1);
+				this.register.writeReg(SI_REG, offset2 + 1);
+			}else{
+				this.register.writeReg(DI_REG, offset1 - 1);
+				this.register.writeReg(SI_REG, offset2 - 1);
+			}
+	
+		}
+
+
+
+
+		}
+	
+	
+		this.register.incIP(1);
+		return 0;
+	
+	
+	}
+	return -1;
+	
+}
+
+
+
 
 
 /********************************************** */
@@ -250,59 +339,58 @@ function decodeMOVS(given = false){
 
 // lods
 
-
 function decodeLODS(given = false){
-	var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG),
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG),
 		instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp),
 		value = (currentCodeSegment << 4) + currentIp;
 
 		if(given == true)
 		value += 1
 
-		instruction = memory.readByte(value);
+		instruction = this.RAM.readByte(value);
 
 	if((instruction & 0b11111110) == LODS_INS){
 	
 		if(instruction % 2 ){
 		
-		let offset1 = this.Register.readReg(SI_REG),
-			segment1 = this.Register.readReg(DS_REG);
+		let offset1 = this.register.readReg(SI_REG),
+			segment1 = this.register.readReg(DS_REG);
 
 			var data = this.RAM.readWord(segment1 << 4 + offset1);
 
-			this.Register.writeReg(AX_REG,data);
+			this.register.writeReg(AX_REG,data);
 
-			if(this.Register.extractFlag('D')){
-				this.Register.writeReg(SI_REG, offset1 + 2);
+			if(this.register.extractFlag('D')){
+				this.register.writeReg(SI_REG, offset1 + 2);
 			}else{
-				this.Register.writeReg(SI_REG, offset1 - 2);
+				this.register.writeReg(SI_REG, offset1 - 2);
 			}
 		
 
 		}
 		else if(!(instruction % 2)) {
-			let offset1 = this.Register.readReg(SI_REG),
-			segment1 = this.Register.readReg(DS_REG);
+			let offset1 = this.register.readReg(SI_REG),
+			segment1 = this.register.readReg(DS_REG);
 
 			
 
 			let data = this.RAM.readByte((segment1 << 4) + offset1);
-			console.log(data)
 
-			this.Register.writeByteReg(AX_REG,data);
 
-			if(this.Register.extractFlag('D')){
-				this.Register.writeReg(SI_REG, offset1 + 1);
+			this.register.writeByteReg(AX_REG,data);
+
+			if(this.register.extractFlag('D')){
+				this.register.writeReg(SI_REG, offset1 + 1);
 			}else{
-				this.Register.writeReg(SI_REG, offset1 - 1);
+				this.register.writeReg(SI_REG, offset1 - 1);
 			}
 		
 
 		}	
 
 
-		this.Register.incIP(1)
+		this.register.incIP(1)
 			
 			return 0;
 	}
@@ -320,8 +408,8 @@ function decodeLODS(given = false){
 
 
 function decodeSCAS(given = false){
-	var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG),
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG),
 		instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp),
 		value = (currentCodeSegment << 4) + currentIp;
 
@@ -330,7 +418,7 @@ function decodeSCAS(given = false){
 		if(given == true)
 		value += 1
 
-		instruction = memory.readByte(value);
+		instruction = this.RAM.readByte(value);
 
 	
 	if((instruction & 0b11111110) == SCAS_INS){
@@ -338,43 +426,43 @@ function decodeSCAS(given = false){
 		if(!(instruction % 2) ){
 
 			console.log("hitler")
-			let offset1 =this.Register.readReg(DI_REG),
-			segment1 = this.Register.readReg(ES_REG);
+			let offset1 =this.register.readReg(DI_REG),
+			segment1 = this.register.readReg(ES_REG);
 
 			var data = this.RAM.readByte((segment1 << 4) + offset1);
-			data -= this.Register.readByteReg(AX_REG);
+			data -= this.register.readByteReg(AX_REG);
 
 			console.log(data)
 
-			if(this.Register.extractFlag('D')){
-				this.Register.writeReg(DI_REG, offset1 + 1);
+			if(this.register.extractFlag('D')){
+				this.register.writeReg(DI_REG, offset1 + 1);
 			}else{
-				this.Register.writeReg(DI_REG, offset1 - 1);
+				this.register.writeReg(DI_REG, offset1 - 1);
 			}
 			console.log(instruction)
 		}
 		if(instruction % 2){
 			console.log("hellow")
 
-				let offset1 = this.Register.readReg(DI_REG),
-				segment1 = this.Register.readReg(ES_REG);
+				let offset1 = this.register.readReg(DI_REG),
+				segment1 = this.register.readReg(ES_REG);
 	
 				var data = this.RAM.readWord(segment1 << 4 + offset1);
 	
-				data -= this.Register.readReg(AX_REG);
+				data -= this.register.readReg(AX_REG);
 				console.log(data)
 	
-				if(this.Register.extractFlag('D')){
+				if(this.register.extractFlag('D')){
 					
-					this.Register.writeReg(DI_REG, offset1 + 2);
+					this.register.writeReg(DI_REG, offset1 + 2);
 				}else{
-					console.log(this.Register.extractFlag('D'))
-					this.Register.writeReg(DI_REG, offset1 - 2);
+					console.log(this.register.extractFlag('D'))
+					this.register.writeReg(DI_REG, offset1 - 2);
 				}
 
 			}
 		
-				 this.Register.incIP(1)
+				 this.register.incIP(1)
 				 
 				return data > 0 ? 1 : 0;
 			
@@ -394,56 +482,75 @@ function decodeSCAS(given = false){
 
 
 
-function decodeSTOS(){
-	var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG),
+decodeSTOS(given){
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG),
 		instruction = this.RAM.readByte((currentCodeSegment << 4) + currentIp),
 		value = (currentCodeSegment << 4) + currentIp;
 
 		if(given == true)
 		value += 1
 
-		instruction = memory.readByte(value);
+		instruction = this.RAM.readByte(value);
 
 	if((instruction & 0b11111110) == STOS_INS){
 		
 		if(instruction % 2){
-			let offset1 = this.Register.readReg(DI_REG),
-			segment1 = this.Register.readReg(ES_REG);
+			let offset1 = this.register.readReg(DI_REG),
+			segment1 = this.register.readReg(ES_REG);
 
 			
 
-			this.RAM.writeWord((segment1 << 4) + offset1,this.Register.readReg(AX_REG));
+			this.RAM.writeWord((segment1 << 4) + offset1,this.register.readReg(AX_REG));
 
-			if(this.Register.extractFlag('D')){
-				this.Register.writeReg(DI_REG, offset1 + 2);
+			if(this.register.extractFlag('D')){
+				this.register.writeReg(DI_REG, offset1 + 2);
 			}else{
-				this.Register.writeReg(DI_REG, offset1 - 2);
+				this.register.writeReg(DI_REG, offset1 - 2);
 			}
 		}
 
 		else if(!(instruction % 2)){
 
-			let offset1 = this.Register.readReg(DI_REG),
-			segment1 = this.Register.readReg(ES_REG);
+			let offset1 = this.register.readReg(DI_REG),
+			segment1 = this.register.readReg(ES_REG);
 
 			
 		
-			this.RAM.writeByte((segment1 << 4) + offset1, this.Register.readByteReg(AX_REG));
+			this.RAM.writeByte((segment1 << 4) + offset1, this.register.readByteReg(AX_REG));
+			console.log(this.RAM.readByte((segment1 <<4) + offset1))
 
-			if(this.Register.extractFlag('D')){
-				this.Register.writeReg(DI_REG, offset1 + 1);
+			if(this.register.extractFlag('D')){
+				this.register.writeReg(DI_REG, offset1 + 1);
 			}else{
-				this.Register.writeReg(DI_REG, offset1 - 1);
+				this.register.writeReg(DI_REG, offset1 - 1);
 			}
 
 		}
-			this.Register.incIP(1);
+			this.register.incIP(1);
 		return 0;
 	}
 	return -1;
 }
 
+
+/* label
+
+
+
+
+\t loop label
+
+\t instruction , paramater  : color
+
+auto tabulation 
+
+
+|
+|
+|
+
+*/
 
 //****************************** */
 // INC IT WORKS                 /*
@@ -453,16 +560,16 @@ function decodeSTOS(){
 
 function decodeINC() {
 
-	var currentIp = this.Register.readReg(IP_REG),
-		 currentCodeSegment = this.Register.readReg(CS_REG)
+	var currentIp = this.register.readReg(IP_REG),
+		 currentCodeSegment = this.register.readReg(CS_REG)
 		 instruction = this.RAM.readByte((currentCodeSegment << 4 )+ currentIp);
 		 if ((instruction & 0b11111000) == INC_REG) {
-			// this.Register
+			// this.register
 			console.log((instruction & 0b01000000) == INC_REG)
-			let dataRgister = this.Register.readReg(WORD_REGISTERS_TABLE[(instruction % 8)]);
+			let dataRgister = this.register.readReg(WORD_REGISTERS_TABLE[(instruction % 8)]);
 		
-			this.Register.writeReg(WORD_REGISTERS_TABLE[(instruction % 8)], dataRgister +1);
-			this.Register.incIP(1);
+			this.register.writeReg(WORD_REGISTERS_TABLE[(instruction % 8)], dataRgister +1);
+			this.register.incIP(1);
 			 return 0;
 		
 		}	
@@ -479,7 +586,7 @@ function decodeINC() {
 				else  this.RAM.writeByte(operandes.addr, this.RAM.readByte(operandes.addr)+1);
 			}
 		
-			this.Register.incIP(2 + operandes.dispSize);
+			this.register.incIP(2 + operandes.dispSize);
 			 return 0;
 		
 		
@@ -508,17 +615,17 @@ function decodeINC() {
 
 function decodeDEC(){
 
-	var currentIp = this.Register.readReg(IP_REG),
-		 currentCodeSegment = this.Register.readReg(CS_REG)
+	var currentIp = this.register.readReg(IP_REG),
+		 currentCodeSegment = this.register.readReg(CS_REG)
 		 instruction = this.RAM.readByte((currentCodeSegment << 4) + currentIp);
 
 		 if ((instruction & 0b11111000)  == DEC_REG) {
 			
-			// this.Register
+			// this.register
 	
 		
-			this.Register.writeReg( WORD_REGISTERS_TABLE[instruction % 8] , this.Register.readReg(WORD_REGISTERS_TABLE[(instruction % 8)])-1);
-			this.Register.incIP(1);
+			this.register.writeReg( WORD_REGISTERS_TABLE[instruction % 8] , this.register.readReg(WORD_REGISTERS_TABLE[(instruction % 8)])-1);
+			this.register.incIP(1);
 			 return 0;
 		
 			
@@ -541,7 +648,7 @@ function decodeDEC(){
 					this.RAM.writeByte(operandes.addr, this.RAM.readByte(operandes.addr) - 1);
 			}
 		
-			this.Register.incIP(operandes.dispSize + 2);
+			this.register.incIP(operandes.dispSize + 2);
 			 return 0;
 		}
 		 }
@@ -570,8 +677,8 @@ function decodeDEC(){
 
 function decodeLEA(){
 
-	var currentIp = this.Register.readReg(IP_REG),
-		 currentCodeSegment = this.Register.readReg(CS_REG)
+	var currentIp = this.register.readReg(IP_REG),
+		 currentCodeSegment = this.register.readReg(CS_REG)
 		 instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp);
 		 value = (currentCodeSegment << 4)+ currentIp;
 	
@@ -582,15 +689,15 @@ function decodeLEA(){
 			if((instruction >> 6) != 0){
 			if ((operandes.addr == null)){
 				
-				this.Register.writeReg(this.Register.readWordReg(operandes.opRegister[0]), this.Register.readWordReg(operandes.opRegister[1]));
+				this.register.writeReg(this.register.readWordReg(operandes.opRegister[0]), this.register.readWordReg(operandes.opRegister[1]));
 	
 			}
 			else if(operandes.addr){
 				console.log("hello")
-				this.Register.writeReg(WORD_REGISTERS_TABLE[operandes.opRegister[0]], this.RAM.readWord(operandes.addr));
+				this.register.writeReg(WORD_REGISTERS_TABLE[operandes.opRegister[0]], this.RAM.readWord(operandes.addr));
 			}
 		}
-			this.Register.incIP(2 + operandes.dispSize);
+			this.register.incIP(2 + operandes.dispSize);
 			 return 0;
 	
 		}
@@ -611,13 +718,13 @@ function decodeLEA(){
 
 
 function decodePop(){
-	var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG);
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG);
 		instruction = this.RAM.readByte((currentCodeSegment << 4) + currentIp),
 		value = (currentCodeSegment << 4) + currentIp;
 
-	let currentStackSegment = this.Register.readReg(SS_REG),
-		currentStackPointer = this.Register.readReg(SP_REG),
+	let currentStackSegment = this.register.readReg(SS_REG),
+		currentStackPointer = this.register.readReg(SP_REG),
 		adressStack = 0, contentStack = 0 ,pop = true;
 		adressStack = (currentStackSegment << 4) + currentStackPointer;
 	console.log(adressStack)
@@ -649,8 +756,8 @@ function decodePop(){
 				   
 				 this.RAM.writeWord(operandes.addr, contentStack);
 		
-				 this.Register.writeReg(SP_REG, currentStackPointer+2)
-				 this.Register.incIP(2 + operandes.dispSize);
+				 this.register.writeReg(SP_REG, currentStackPointer+2)
+				 this.register.incIP(2 + operandes.dispSize);
 		}
 	}
 	}
@@ -660,9 +767,9 @@ function decodePop(){
 			let reg = instruction  % 8 ;
 		
 			
-			this.Register.writeReg(WORD_REGISTERS_TABLE[reg], contentStack)
-			this.Register.writeReg(SP_REG, currentStackPointer+2)
-			this.Register.incIP(1);
+			this.register.writeReg(WORD_REGISTERS_TABLE[reg], contentStack)
+			this.register.writeReg(SP_REG, currentStackPointer+2)
+			this.register.incIP(1);
 	   }
 
 		else if ((instruction & 0b11111000) == POP_SEG_REG){
@@ -673,10 +780,10 @@ function decodePop(){
 
 		   //essayer avec emu avec le registre sp
 		   
-				this.Register.writeReg(SEGMENT_REGISTERS_TABLE[reg], contentStack);
+				this.register.writeReg(SEGMENT_REGISTERS_TABLE[reg], contentStack);
 
-				this.Register.writeReg(SP_REG, currentStackPointer+2)
-				this.Register.incIP(1);
+				this.register.writeReg(SP_REG, currentStackPointer+2)
+				this.register.incIP(1);
 		}
 
 		
@@ -697,8 +804,8 @@ function decodePop(){
 
 function decodeNEG() {
 
-	var currentIp = this.Register.readReg(IP_REG),
-	currentCodeSegment = this.Register.readReg(CS_REG),
+	var currentIp = this.register.readReg(IP_REG),
+	currentCodeSegment = this.register.readReg(CS_REG),
 	instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp),
 	value = (currentCodeSegment << 4) + currentIp;
 	
@@ -709,9 +816,9 @@ function decodeNEG() {
 	if(operandes.opRegister[0] == 3){
 	
 		if (operandes.addr == null){
-			if (this.Register.readReg(WORD_REGISTERS_TABLE[operandes.opRegister[0]]) == 0) decodeCLC();
+			if (this.register.readReg(WORD_REGISTERS_TABLE[operandes.opRegister[0]]) == 0) decodeCLC();
 			else decodeCMC();
-			 this.Register.writeReg(WORD_REGISTERS_TABLE[operandes.opRegister[1]], 1+ ~(this.Register.readReg(WORD_REGISTERS_TABLE[operandes.opRegister[1]])));
+			 this.register.writeReg(WORD_REGISTERS_TABLE[operandes.opRegister[1]], 1+ ~(this.register.readReg(WORD_REGISTERS_TABLE[operandes.opRegister[1]])));
 	
 		}
 	
@@ -728,7 +835,7 @@ function decodeNEG() {
 				this.RAM.writeByte(operandes.addr, (1+ (~this.RAM.readByte(operandes.addr))) & 0xFF)
 	}
 	
-	this.Register.incIP(2 + operandes.dispSize);
+	this.register.incIP(2 + operandes.dispSize);
 	return 0;
 	
 	}
@@ -752,15 +859,15 @@ function decodePOP(){
 
 	
 
-	var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG),
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG),
 		instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp),
 		value = (currentCodeSegment << 4) + currentIp;
 	
 	
 	
-	let currentStackSegment = this.Register.readReg(SS_REG),
-		currentStackPointer = this.Register.readReg(SP_REG),
+	let currentStackSegment = this.register.readReg(SS_REG),
+		currentStackPointer = this.register.readReg(SP_REG),
 		adressStack = 0, contentStack = 0;
 		adressStack = (currentStackSegment << 4) + currentStackPointer;
 	
@@ -776,12 +883,12 @@ function decodePOP(){
 	   if((instruction & 0b11111111) == POPF_INS){
 		   console.log(adressStack)
 			   let content_stack =this.RAM.readWord(adressStack);
-			   this.Register.writeReg(FLAG_REG, content_stack);
+			   this.register.writeReg(FLAG_REG, content_stack);
 	
-			   console.log(this.Register.readReg(SP_REG))
-				   this.Register.writeReg(SP_REG, currentStackPointer + 2)
-				   console.log(this.Register.readReg(SP_REG))
-				this.Register.incIP(1);
+			   console.log(this.register.readReg(SP_REG))
+				   this.register.writeReg(SP_REG, currentStackPointer + 2)
+				   console.log(this.register.readReg(SP_REG))
+				this.register.incIP(1);
 				return 0;
 	
 	
@@ -805,14 +912,14 @@ function decodePOP(){
 
 function decodePOPF(){
 
-	var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG),
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG),
 		instruction = this.RAM.readByte(currentCodeSegment << 4 + currentIp);
 	
 	
 	
-	let currentStackSegment = this.Register.readReg(SS_REG),
-		currentStackPointer = this.Register.readReg(SP_REG),
+	let currentStackSegment = this.register.readReg(SS_REG),
+		currentStackPointer = this.register.readReg(SP_REG),
 		adressStack = 0, contentStack = 0;
 		adressStack = (currentStackSegment << 4) + currentStackPointer;
 	
@@ -828,12 +935,12 @@ function decodePOPF(){
 	   if((instruction & 0b10011101) == PUSH_INS){
 
 			   let content_stack =this.RAM.readWord(adressStack);
-			   this.Register.writeReg(content_stack, FLAG_REG);
+			   this.register.writeReg(content_stack, FLAG_REG);
 	
-				   this.Register.writeReg(SP_REG, currentStackPointer + 2)
-				   console.log(this.Register.readReg(SP_REG))
+				   this.register.writeReg(SP_REG, currentStackPointer + 2)
+				   console.log(this.register.readReg(SP_REG))
 
-				this.Register.incIP(1);
+				this.register.incIP(1);
 				return 0;
 	
 	
@@ -858,13 +965,13 @@ function decodePUSH(){
 	// get the current SS:SP position
 
 
-	var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG);
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG);
 		instruction = this.RAM.readByte((currentCodeSegment << 4) + currentIp),
 		value = (currentCodeSegment << 4) + currentIp
 
-	let currentStackSegment = this.Register.readReg(SS_REG),
-		currentStackPointer = this.Register.readReg(SP_REG),
+	let currentStackSegment = this.register.readReg(SS_REG),
+		currentStackPointer = this.register.readReg(SP_REG),
 		adressStack = 0, contentStack = 0;
 		adressStack = (currentStackSegment << 4) + currentStackPointer;
 	  
@@ -882,8 +989,8 @@ function decodePUSH(){
 				   
 				 this.RAM.writeWord(adressStack, operandes.addr);
 		
-				 this.Register.writeReg(SP_REG, currentStackPointer - 2)
-				 this.Register.incIP(2 + operandes.dispSize);
+				 this.register.writeReg(SP_REG, currentStackPointer - 2)
+				 this.register.incIP(2 + operandes.dispSize);
 		}
 	}
 	
@@ -893,9 +1000,9 @@ function decodePUSH(){
 			let reg = instruction  % 8 ;
 		
 			console.log(adressStack)
-			this.Register.writeReg(adressStack, WORD_REGISTERS_TABLE[reg])
-			this.Register.writeReg(SP_REG, currentStackPointer - 2)
-			this.Register.incIP(1);
+			this.register.writeReg(adressStack, WORD_REGISTERS_TABLE[reg])
+			this.register.writeReg(SP_REG, currentStackPointer - 2)
+			this.register.incIP(1);
 	   }
 
 		else if ((instruction & 0b00000110) == PUSH_SEG_REG){
@@ -906,10 +1013,10 @@ function decodePUSH(){
 
 		   //essayer avec emu avec le registre sp
 		   
-				this.Register.writeReg(adressStack, SEGMENT_REGISTERS_TABLE[reg]);
+				this.register.writeReg(adressStack, SEGMENT_REGISTERS_TABLE[reg]);
 
-				this.Register.writeReg(SP_REG, currentStackPointer - 2)
-				this.Register.incIP(1);
+				this.register.writeReg(SP_REG, currentStackPointer - 2)
+				this.register.incIP(1);
 		}
 
 		
@@ -932,8 +1039,8 @@ function decodePUSH(){
 
 function decodeXCHG(){
 	
-	var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG);
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG);
 		instruction = this.RAM.readByte((currentCodeSegment << 4) + currentIp),
 		value = (currentCodeSegment << 4) + currentIp
 
@@ -942,17 +1049,17 @@ function decodeXCHG(){
 	if((instruction & 0b11111110) == XCHG_REG_ACC){
 		//R / ACC
 	
-		let R1 = this.Register.readReg(AX_REG),
-			R2 = this.Register.readReg(WORD_REGISTERS_TABLE[(instruction % 8)]), tmp = R1;
+		let R1 = this.register.readReg(AX_REG),
+			R2 = this.register.readReg(WORD_REGISTERS_TABLE[(instruction % 8)]), tmp = R1;
 	
 			R1 = R2;
 			R2 = tmp;
 		
 	
-			this.Register.writeReg(AX_REG, R1);
-			this.Register.writeReg(WORD_REGISTERS_TABLE[instruction % 8], R2);
+			this.register.writeReg(AX_REG, R1);
+			this.register.writeReg(WORD_REGISTERS_TABLE[instruction % 8], R2);
 	
-			this.Register.incIP(1);
+			this.register.incIP(1);
 			return 0;
 	}
 		
@@ -969,28 +1076,28 @@ function decodeXCHG(){
 	
 				if (instruction << 7){ // Word;
 	
-				let data1 = this.Register.readReg(WORD_REGISTERS_TABLE[R1]),
-					data2 = this.Register.readReg(WORD_REGISTERS_TABLE[R2]), tmp = data1;
+				let data1 = this.register.readReg(WORD_REGISTERS_TABLE[R1]),
+					data2 = this.register.readReg(WORD_REGISTERS_TABLE[R2]), tmp = data1;
 	
 					data1 = data2;
 	
 					data2 = tmp;
 	
-					this.Register.writeReg(WORD_REGISTERS_TABLE[R1], data1);
-					this.Register.writeReg(WORD_REGISTERS_TABLE[R2], data2);
+					this.register.writeReg(WORD_REGISTERS_TABLE[R1], data1);
+					this.register.writeReg(WORD_REGISTERS_TABLE[R2], data2);
 	
 		   } //Byte
 			else{
 				
-				let data1 = this.Register.readByte(R1),
-					data2 = this.Register.readByte(R2), data_tmp = data1;
+				let data1 = this.register.readByte(R1),
+					data2 = this.register.readByte(R2), data_tmp = data1;
 	
 					data1 = data2;
 	
 					data2 = tmp;
 	
-					this.Register.writeByte(R1, data1);
-					this.Register.writeByte(R2, data2);
+					this.register.writeByte(R1, data1);
+					this.register.writeByte(R2, data2);
 	
 			}
 		}
@@ -999,13 +1106,13 @@ function decodeXCHG(){
 	
 		   if (instruction << 7){
 			
-				let data1 = this.Register.readReg(WORD_REGISTERS_TABLE[operandes.opRegister[0]]),
+				let data1 = this.register.readReg(WORD_REGISTERS_TABLE[operandes.opRegister[0]]),
 					data2 = this.RAM.readWord(operandes.addr), tmp = data1
 					data1 = data2;
 	
 					data2 = tmp;
 	
-					this.Register.writeReg(WORD_REGISTERS_TABLE[operandes.opRegister[0]], data1);
+					this.register.writeReg(WORD_REGISTERS_TABLE[operandes.opRegister[0]], data1);
 					this.RAM.writeWord(operandes.addr, data2);
 	
 	
@@ -1014,21 +1121,21 @@ function decodeXCHG(){
 			} //Byte
 			else{
 					console.log("hello")
-				let data1 = this.Register.readByte(WORD_REGISTERS_TABLE[operandes.opRegister[0]]),
-					data2 = this.Register.readByte(operandes.addr), data_tmp = data1;
+				let data1 = this.register.readByte(WORD_REGISTERS_TABLE[operandes.opRegister[0]]),
+					data2 = this.register.readByte(operandes.addr), data_tmp = data1;
 	
 					data1 = data2;
 	
 					data2 = tmp;
 	
-					this.Register.writeByte(R1, data1);
+					this.register.writeByte(R1, data1);
 					this.RAM.writeByte(operandes.addr, data2);
 	
 			}
 	
 	   }
 	
-			this.Register.incIP(2);
+			this.register.incIP(2);
 			return 0;
 	
 	}
@@ -1046,28 +1153,30 @@ function decodeXCHG(){
 	
 function decodeREP(){
 
-	var currentIp = register.readReg(IP_REG),
-		currentCodeSegment = register.readReg(CS_REG),
-		instruction = memory.readByte((currentCodeSegment << 4) + currentIp),
-		counter = register.readReg(CX_REG);
+	var currentIp = this.register.readReg(IP_REG),
+		currentCodeSegment = this.register.readReg(CS_REG),
+		instruction = this.RAM.readByte((currentCodeSegment << 4) + currentIp),
+		counter = this.register.readReg(CX_REG);
 
 		let value = (currentCodeSegment << 4) + currentIp
-		if(counter != 0) register.writeReg(IP_REG, currentIp - 1)
-
-		//console.log(value,instruction)
-
-	if (instruction & 0b11111111 == REP_INS){
 		
-		if (instruction % 2  == 0 || counter == 00) return 0;
-		else{
 
-			decode(memory.readByte(value + 1))
+		
+		
+		
+	if ((instruction & 0b11111110) == REP_INS){
+		
+		if (instruction % 2  == 0 || counter == 0) return 0;
+		else{
+			this.decodeInstruction(this.RAM.readByte(value + 1))
+			this.register.writeReg(IP_REG, this.register.readReg(IP_REG) -1)
 			counter -=1;
-			register.writeReg(CX_REG,counter);
+			console.log(this.register.readReg(AX_REG))
+			this.register.writeReg(CX_REG,counter);
 			if(counter == 0 ) instruction -= 1;
-			else if(counter != 0) decodeREP();
+			else if(counter != 0) this.decodeREP();
 		}
-		register.incIP(1);
+		this.register.incIP(1);
 		return 0;
 	}
 	return -1;
@@ -1075,27 +1184,31 @@ function decodeREP(){
 
 
 
-function decode(instruction){
+ function  decodeInstruction(instruction){
 	switch(instruction){
-		case (instruction & 0b11111111) == 0b10100100:
-			decodeMOVC();
+		case (0b10100100 || 0b10100101):
+			
+			this.decodeMOVS(true);
 			break;
-		case (instruction & 0b11111111) == 0b10100110:
-			decodeCMPS();
+		case -0b10100110 || 0b10100101):
+			this.decodeCMPS(true);
 			break;
-		case (instruction & 0b11111111)== 0b10101110:
-			decodeSCAS();
+		case (0b10101110 || 0b10101111):
+			this.decodeSCAS(true);
 			break;
-		case (instruction & 0b11111111) == 0b10101100:
-			decodeLODS();
+		case  (0b10101101 || 0b10101100) :
+			this.decodeLODS(true);
 			break;
-		case (instruction & 0b11111111) == 0b10101010:
-			decodeSTOS();
+		case  (0b10101010 ||0b10101011):
+			this.decodeSTOS(true);
 			break;
 	}
 
 	return 0;
 }
+
+
+
 
 
 
