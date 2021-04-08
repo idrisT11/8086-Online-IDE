@@ -1,3 +1,9 @@
 
 shl word ptr [bx-300],cl      ;     210,167,212,254
 shl byte ptr [bx-300],cl      ;     210,167,212,254
+
+sar byte ptr [bx],cl      ;     210,63
+sar word ptr [bx],cl      ;     210,63
+sar  [bx],cl      ;     210,63
+
+
