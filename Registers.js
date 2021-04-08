@@ -248,40 +248,45 @@ class Registers{
         let val=this.R[FLAG_REG];//123456789
         switch(flagName)
         {
-            case 'C':  //most segnificant bit
+            case 'O':  //most segnificant bit
                if(bit) val|=0b100000000;
                else val &=0b011111111;
                 break;
 
-            case 'C':
+            case 'D':
                 if(bit) val|=0b010000000;
                else val &=0b101111111;
                 break;
 
-            case 'C':
+            case 'I':
                 if(bit) val|=0b001000000;
                 else val &=0b110111111;
                 break;
 
-            case 'C':
+            case 'T':
                 if(bit) val|=0b000100000;
                 else val &=0b111011111;
                 break;
 
-            case 'C':
+            case 'S':
                 if(bit) val|=0b000010000;
                 else val &=0b111101111;
                 break;
 
-            case 'C':
+            case 'Z':
                 if(bit) val|=0b000001000;
                 else val &=0b111110111;
                 break;
 
-            case 'P':
+            case 'A':
                 if(bit) val|=0b000000100;
                 else val &=0b111111011;
                 break;
+            
+            case 'P':
+                if(bit) val|=0b000000010;
+                  else val &=0b111111101;
+                  break;
 
             
 
@@ -292,7 +297,7 @@ class Registers{
 
           
         }
-       return val;
+       this.writeReg(FLAG_REG,val);
        
     }
         //
