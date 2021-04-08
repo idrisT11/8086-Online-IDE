@@ -205,7 +205,7 @@ class Processor{
 		            return -1;
 
 		        return 0;
-		}
+	}
 
 	decodeAdd(instruction){
 		        var current_ip = this.register.readReg(IP_REG),
@@ -323,8 +323,6 @@ class Processor{
 		        return 0;
 	}
 	
-	
-	
 	decodeSub(instruction){
 		        var current_ip = this.register.readReg(IP_REG),
 		            current_code_seg = this.register.readReg(CS_REG),
@@ -441,7 +439,6 @@ class Processor{
 		        return 0;
 	}
 
-	
 	decodeImmARIT(instruction){//instruction arithmetic a parametre immediat
 		    	var current_ip = this.register.readReg(IP_REG),
 		            current_code_seg = this.register.readReg(CS_REG),
@@ -554,10 +551,10 @@ class Processor{
 	
 	
 	decodeByteToWord(instruction){
-		   if ( instruction == CBW ) {
-		    	let value = this.register.readReg(AX_REG);
-		    	this.register.writeReg(AX_REG, this._convertByteToWord(value & 0xFF));
-		   }
+		if ( instruction == CBW ) {
+		   	let value = this.register.readReg(AX_REG);
+		   	this.register.writeReg(AX_REG, this._convertByteToWord(value & 0xFF));
+		}
 	 	else
 			return -1;
 
@@ -565,20 +562,19 @@ class Processor{
 	}
 
 	decodeWordToDouble(instruction){
-		    	if ( instruction == CWD ) {
-		    		let value = this.register.readReg(AX_REG) ;
-		    		dxValue = (value >> 15) == 1 ? 0xFFFF : 0; 
-		    		this.register.writeReg(DX_REG, dxValue);
-		    	}
-		    	else
-		    		return -1;
+		if ( instruction == CWD ) {
+			let value = this.register.readReg(AX_REG) ;
+			dxValue = (value >> 15) == 1 ? 0xFFFF : 0; 
+			this.register.writeReg(DX_REG, dxValue);
+		}
+		else
+			return -1;
 
-		    	return 0;
+		return 0;
 	}
 	
 	
-     decodeMul(instruction)
-			{
+    decodeMul(instruction) {
 				var current_ip = this.register.readReg(IP_REG),
 				current_code_segement = this.register.readReg(CS_REG);
 				var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
@@ -647,15 +643,13 @@ class Processor{
 						this.register.incIP(operandes.dispSize + 2);
 				}	
 				else return -1;
-		
-				
-			}
+	}
     //
-  decodeDiv(instruction)
-    {
+  	decodeDiv(instruction) {
         var current_ip = this.register.readReg(IP_REG),
         current_code_segement = this.register.readReg(CS_REG);
 		var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+        
         if(instruction>>1==DIV &&(operandes.opRegister[0]==0b110))
         {
                     
@@ -703,24 +697,21 @@ class Processor{
                 }
 		     this.register.incIP(operandes.dispSize + 2);
            return 0;
-        }else return -1;
-		
-
-      
+        }else return -1;  
     }
-      //and
-   decodeAnd(instruction)
-   {
-      
-            var current_ip = this.register.readReg(IP_REG),
-            current_code_segement = this.register.readReg(CS_REG);
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
+    
+    //and
+    decodeAnd(instruction) {
+        var current_ip = this.register.readReg(IP_REG),
+        	current_code_segement = this.register.readReg(CS_REG);
+        var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+        
         if (instruction & 0b11111100 == AND_RM_RM ) 
         {
                 var current_ip = this.register.readReg(IP_REG),
                     current_code_segement = this.register.readReg(CS_REG);
 
-                var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
+                var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
 
                 if (operandes.addr == null) 
                 {   // R to R-----------------------------------------------------
@@ -791,8 +782,8 @@ class Processor{
         //======================================================================================
         else if (instruction & 0b11111110 == AND_IMMEDIATE_TO_RM) 
         {
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip+1)),//On extrait le w
-                immediateAddr = current_code_seg<<4 + current_ip + 2 + operandes.dispSize ;
+            var operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip+1)),//On extrait le w
+                immediateAddr = (current_code_seg<<4) + current_ip + 2 + operandes.dispSize ;
 
             var R = operandes.opRegister[0],
                 addr = operandes.addr;
@@ -824,8 +815,8 @@ class Processor{
         //======================================================================================
         else if (instruction & 0b11111110 == AND_IMMEDIATE_TO_Acc) 
         {
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_seg<<4 + current_ip+1)),//On extrait le w
-                immediateAddr = current_code_seg<<4 + current_ip + 2 + operandes.dispSize ;
+            var operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip+1)),//On extrait le w
+                immediateAddr = (current_code_seg<<4) + current_ip + 2 + operandes.dispSize ;
 
             
 
@@ -845,21 +836,18 @@ class Processor{
             }
 
             this.register.incIP(operandes.dispSize + (instruction % 2) + 3);
-        }
-       
-       
-   }
+        }    
+   	}
 
 
-//decodeNot
-   decodeNot(instruction)
-   {
-    let current_ip=this.register.readWordReg(IP_REG);
-    let current_code_segement=this.register(CS_REG);
+	//decodeNot
+    decodeNot(instruction) {
+    	let current_ip=this.register.readWordReg(IP_REG);
+    	let current_code_segement=this.register(CS_REG);
     
-       if(instruction&b11111110==NOT&&(this.RAM.readRegByte(current_code_segement<4<+current_ip+1)<<2)>>3)
+       if(instruction&0b11111110==NOT&&(this.RAM.readRegByte((current_code_segement<<4)+current_ip+1)<<2)>>3)
        {
-        let operandes=this.extractOperand(this.RAM.readRegByte(current_code_segement<<4+current_ip+1));
+        let operandes=this.extractOperand(this.RAM.readRegByte((current_code_segement<<4)+current_ip+1));
         if(operandes.addr==null) // not reg
         {
             let R=operandes.opRegister[1];
@@ -898,19 +886,17 @@ class Processor{
         this.register.incIP(operandes.dispSize + (instruction % 2) + 3);
        }
        
-   }
+   	}
    //
 
    
      
     //Test
-   decodeTest(instruction)
-   {
-      
-            var current_ip = this.register.readReg(IP_REG),
-            current_code_segement = this.register.readReg(CS_REG);
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
-            let test=0;
+    decodeTest(instruction) {  
+        var current_ip = this.register.readReg(IP_REG),
+        current_code_segement = this.register.readReg(CS_REG);
+        var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
+        let test=0;
         if (instruction & 0b11111100 == TEST_RM_RM ) 
         {
                 var current_ip = this.register.readReg(IP_REG),
@@ -1047,22 +1033,22 @@ class Processor{
        switch(test)
        {
            //...
-       }
-       
-   }
+       }    
+    }
+
      //or
-   decodeOr(instruction)
-   {
-      
-            var current_ip = this.register.readReg(IP_REG),
-            current_code_segement = this.register.readReg(CS_REG);
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
+    decodeOr(instruction)
+    {
+        var current_ip = this.register.readReg(IP_REG),
+        	current_code_segement = this.register.readReg(CS_REG);
+
+        var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
         if (instruction & 0b11111100 == OR_RM_RM ) 
         {
                 var current_ip = this.register.readReg(IP_REG),
                     current_code_segement = this.register.readReg(CS_REG);
 
-                var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
+                var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
 
                 if (operandes.addr == null) 
                 {   // R to R-----------------------------------------------------
@@ -1187,17 +1173,16 @@ class Processor{
             }
 
             this.register.incIP(operandes.dispSize + (instruction % 2) + 3);
-        }
-       
-       
-   }
+        }    
+   	}
    //xor
-   decodeXor(instruction)
-   {
-      
-            var current_ip = this.register.readReg(IP_REG),
-            current_code_segement = this.register.readReg(CS_REG);
-            var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
+    decodeXor(instruction)
+    {
+        var current_ip = this.register.readReg(IP_REG),
+        	current_code_segement = this.register.readReg(CS_REG);
+
+        var operandes = this.extractOperand(this.RAM.readByte(current_code_segement<<4 + current_ip+1));
+        
         if (instruction & 0b11111100 == XOR_RM_RM ) 
         {
                 var current_ip = this.register.readReg(IP_REG),
@@ -1331,7 +1316,7 @@ class Processor{
         }
        
        
-   }
+    }
  
 	decodeRol(instruction)
     {
