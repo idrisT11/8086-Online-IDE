@@ -1120,166 +1120,181 @@ class Processor{
        
        
        
-   }
-	decodeRol(instruction)
-    {
-        let current_ip=this.register.readByte(IP_REG);
-        let current_code_segement=this.register.readByte(CS_REG);
-        if(instruction & 0b11111100==ROL &((this.RAM.readByte(current_code_segement<<4+current_ip+1))<<2)>>3==0b000)
-        {
-            let operandes=this.extractOperand(this.RAM.readByte(current_code_seg<<4+current_ip+1));
-            if(operandes.addr==null)
-            {
-                let R=operandes.opRegister[1];
-                let v=(instruction>>1)%2;
-                if(instruction%2==1)//the w bit ==1
-                {
-                    let val=this.register.readWord(R);
-                    if(v)//the number of iteration is stored in  cx register
-                    {
-                        
-                        let cx=this.register.readWord(CX_RG);
+   }  decodeRol(instruction)
+   {
+       let current_ip=this.register.readReg(IP_REG);
+       let current_code_segement=this.register.readReg(CS_REG);
+       var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+       if(instruction >>2==ROL &(operandes.opRegister[0]==0b000))
+       {
+          console.log(operandes)
+           if(operandes.addr==null)
+           {
+               let R=operandes.opRegister[1];
+               let v=(instruction>>1)%2;
+               if(instruction%2==1)//the w bit ==1
+               {
+                   let val=this.register.readWordReg(R);
+                   if(v)//the number of iteration is stored in  cx register
+                   {
+                       
+                       let cx=this.register.readReg(CX_REG)&0x00fff;
+                      for(let i=0;i<cx;i++)
+                      {
+                         
+                          let msb=(val&0b1000000000000000)>>15;
+
+                           val=val<<1;
+                           if(msb)val=val|0b0000000000000001;
+                           else val= val & 0b1111111111111110;
+                           val&=0xffff;
+                           
+                      }
+                      this.register.writeWordReg(R,val);
+                      this.register.writeReg(CX_REG,cx&0xff00);
+
+
+                   }
+                   else //the op code of the instruction is repeated many times in memory
+                   {
+                       let msb=(val&0b1000000000000000)>>15;
+                       val=val<<1;
+                       if(msb)val=val|0b0000000000000001;
+                       else val= val & 0b1111111111111110;
+                       val&=0xffff;
+                       this.register.writeWordReg(R,val);
+
+                   }
+
+               }else  //the w bit ==0
+               {
+                   if(v)//the number of iteration is stored in  cx register
+                   {
+                       let val=this.register.readByteReg(R);
+                       let cx=this.register.readReg(CX_REG)&0x00ff;
+                      for(let i=0;i<cx;i++)
+                      {
+                       
+                       let msb=(val&0b10000000)>>7;
+                       val=val<<1;
+                       if(msb)val=val|0b00000001;
+                       else val= val & 0b11111110;
+                       val&=0xff;
+                       
+                      }
+                      this.register.writeByteReg(R,val);
+                      this.register.writeReg(CX_REG,cx&0xff00);
+
+
+                   }
+                   else //the op code of the instruction is repeated many times in memory
+                   {
+                       let val=this.register.readByteReg(R);
+                       let msb=(val&0b10000000)>>7;
+                       val=val<<1;
+                       if(msb)val=val|0b00000001;
+                       else val= val & 0b11111110;
+                       val&=0xff;
+                       this.register.writeByteReg(R,val);
+
+                   }
+
+               }
+
+
+           }else //the operandes.addr is not null 
+           {
+               let v=(instruction>>1)%2;
+               if(instruction%2==1)//16 bits
+               {
+                   let val = this.RAM.readWord(operandes.addr);
+                   if(v)
+                   {
+                       
+                       let cx=this.register.readReg(CX_REG)&0x00ff;
+                   
                        for(let i=0;i<cx;i++)
                        {
-                          
-                           let msb=val&0b1000000000000000;
+                           let msb=(val&0b1000000000000000)>>15;
                             val=val<<1;
                             if(msb)val=val|0b0000000000000001;
                             else val= val & 0b1111111111111110;
-                            
-                            
+                            val&=0xffff;
+                           
                        }
-                       this.register.writeWord(R,val);
-                       this.register.writeWord(CX_REG,0);
+                       console.log(val.toString(16));
+                       this.RAM.writeWord(operandes.addr,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
+                   }
+                   else
+                   {
+                       let msb=(val&0b1000000000000000)>>15;
+                       val=val<<1;
+                       if(msb)val=val|0b0000000000000001;
+                       else val= val & 0b1111111111111110;
+                       val&=0xffff;
+                       this.RAM.writeWord(operandes.addr,val);
 
+                   }
 
-                    }
-                    else //the op code of the instruction is repeated many times in memory
-                    {
-                        let msb=val&0b1000000000000000;
-                        val=val<<1;
-                        if(msb)val=val|0b0000000000000001;
-                        else val= val & 0b1111111111111110;
-                        this.register.writeWord(R,val);
-
-                    }
-
-                }else  //the w bit ==0
-                {
-                    if(v)//the number of iteration is stored in  cx register
-                    {
-                        let val=this.register.readByte(R);
-                        let cx=this.register.readByte(CX_RG);
+               }
+               else //8bits
+               {
+                   let val = this.RAM.readByte(operandes.addr);
+                   if(v)
+                   {
+                       let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
-                        
-                        let msb=val&0b10000000;
-                        val=val<<1;
-                        if(msb)val=val|0b00000001;
-                        else val= val & 0b11111110;
-                        
+                           let msb=(val&0b10000000)>>7;
+                            val=val<<1;
+                            if(msb)val=val|0b00000001;
+                           else val= val & 0b11111110;
+                           val&=0xff;
                        }
-                       this.register.writeByte(R,val);
-                       this.register.writeByte(CX_REG,0);
+                       this.register.writeByteReg(operandes.addr,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
+                   }
+                   else
+                   {
+                       let msb=(val&0b10000000)>>7;
+                       val=val<<1;
+                       if(msb)val=val|0b00000001;
+                       else val= val & 0b11111110;
+                       val&=0xff;
+                       this.RAM.writeByte(operandes.addr,val);
 
+                   }
 
-                    }
-                    else //the op code of the instruction is repeated many times in memory
-                    {
-                        let val=this.register.readByte(R);
-                        let msb=val&0b10000000;
-                        val=val<<1;
-                        if(msb)val=val|0b00000001;
-                        else val= val & 0b11111110;
-                        this.register.writeByte(R,val);
-
-                    }
-
-                }
-
-
-            }else //the operandes.addr is not null 
-            {
-                let v=(instruction>>1)%2;
-                if(instruction%2==1)//16 bits
-                {
-                    let val = this.RAM.readWord(operandes.addr);
-                    if(v)
-                    {
-                        let cx=this.register.readWord(CX_RG);
-                        for(let i=0;i<cx;i++)
-                        {
-                            let msb=val&0b1000000000000000;
-                             val=val<<1;
-                             if(msb)val=val|0b0000000000000001;
-                             else val= val & 0b1111111111111110;
-                        }
-                        this.register.writeWord(operandes.addr,val);
-                        this.register.writeWord(CX_REG,0);
-                    }
-                    else
-                    {
-                        let msb=val&0b1000000000000000;
-                        val=val<<1;
-                        if(msb)val=val|0b0000000000000001;
-                        else val= val & 0b1111111111111110;
-                        this.register.writeWord(operandes.addr,val);
-
-                    }
-
-                }
-                else //8bits
-                {
-                    let val = this.RAM.readByte(operandes.addr);
-                    if(v)
-                    {
-                        let cx=this.register.readByte(CX_RG);
-                        for(let i=0;i<cx;i++)
-                        {
-                            let msb=val&0b10000000;
-                             val=val<<1;
-                             if(msb)val=val|0b00000001;
-                            else val= val & 0b11111110;
-                        }
-                        this.register.writeByte(operandes.addr,val);
-                        this.register.writeByte(CX_REG,0);
-                    }
-                    else
-                    {
-                        let msb=val&0b10000000;
-                        val=val<<1;
-                        if(msb)val=val|0b00000001;
-                        else val= val & 0b11111110;
-                        this.register.writeByte(operandes.addr,val);
-
-                    }
-
-        
-            }
-            
-        }
-        //
-    }
-    }
+       
+           }
+           
+       }
+       //
+       return 0;
+   }
+   else return -1;
+   }
     //
-    decodeRor(instruction)
+   decodeRor(instruction)
     {
-        let current_ip=this.register.readByte(IP_REG);
-        let current_code_segement=this.register.readByte(CS_REG);
-        if(instruction & 0b11111100==ROR &((this.RAM.readByte(current_code_segement<<4+current_ip+1))<<2)>>3==0b001)
+        let current_ip=this.register.readReg(IP_REG);
+        let current_code_segement=this.register.readReg(CS_REG);
+        let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
+        if(instruction >>2==ROR &(operandes.opRegister[0]==0b001))
         {
-            let operandes=this.extractOperand(this.RAM.readByte(current_code_seg<<4+current_ip+1));
+           
             if(operandes.addr==null)
             {
                 let R=operandes.opRegister[1];
                 let v=(instruction>>1)%2;
                 if(instruction%2==1)//the w bit ==1
                 {
-                    let val=this.register.readWord(R);
+                    let val=this.register.readWordReg(R);
                     if(v)//the number of iteration is stored in  cx register
                     {
                         
-                        let cx=this.register.readWord(CX_RG);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
                             
@@ -1287,11 +1302,11 @@ class Processor{
                             val=val>>1;
                             if(lsb)val=val|0b1000000000000000;
                             else val= val & 0b0111111111111111;
-                            
+                            val&=0xffff;
                             
                        }
-                       this.register.writeWord(R,val);
-                       this.register.writeWord(CX_REG,0);
+                       this.register.writeWordReg(R,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
 
 
                     }
@@ -1301,7 +1316,8 @@ class Processor{
                         val=val>>1;
                         if(lsb)val=val|0b1000000000000000;
                             else val= val & 0b0111111111111111;
-                        this.register.writeWord(R,val);
+                            val&=0xffff;
+                        this.register.writeWordReg(R,val);
 
                     }
 
@@ -1309,29 +1325,31 @@ class Processor{
                 {
                     if(v)//the number of iteration is stored in  cx register
                     {
-                        let val=this.register.readByte(R);
-                        let cx=this.register.readByte(CX_RG);
+                        let val=this.register.readByteReg(R);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
                         let lsb=val&0b00000001;
                         val=val>>1;
                         if(lsb)val=val|0b10000000;
                         else val= val & 0b01111111;
+                        val&=0xff;
                         
                        }
-                       this.register.writeByte(R,val);
-                       this.register.writeByte(CX_REG,0);
+                       this.register.writeByteReg(R,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
 
 
                     }
                     else //the op code of the instruction is repeated many times in memory
                     {
-                        let val=this.register.readByte(R);
+                        let val=this.register.readByteReg(R);
                         let lsb=val&0b00000001;
                         val=val>>1;
                         if(lsb)val=val|0b10000000;
                         else val= val & 0b01111111;
-                        this.register.writeByte(R,val);
+                        val&=0xff;
+                        this.register.writeByteReg(R,val);
 
                     }
 
@@ -1346,16 +1364,17 @@ class Processor{
                     let val = this.RAM.readWord(operandes.addr);
                     if(v)
                     {
-                        let cx=this.register.readWord(CX_RG);
+                        let cx=this.register.readReg(CX_REG);
                         for(let i=0;i<cx;i++)
                         {
                             let lsb=val&0b0000000000000001;
                              val=val>>1;
                              if(lsb)val=val|0b1000000000000000;
                             else val= val & 0b0111111111111111;
+                            val&=0xffff;
                         }
-                        this.register.writeWord(operandes.addr,val);
-                        this.register.writeWord(CX_REG,0);
+                        this.RAM.writeWord(operandes.addr,val);
+                        this.register.writeReg(CX_REG,0);
                     }
                     else
                     {
@@ -1363,7 +1382,8 @@ class Processor{
                         val=val>>1;
                         if(lsb)val=val|0b1000000000000000;
                             else val= val & 0b0111111111111111;
-                        this.register.writeWord(operandes.addr,val);
+                            val&=0xffff;
+                        this.RAM.writeWord(operandes.addr,val);
 
                     }
 
@@ -1373,16 +1393,17 @@ class Processor{
                     let val = this.RAM.readByte(operandes.addr);
                     if(v)
                     {
-                        let cx=this.register.readByte(CX_RG);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                         for(let i=0;i<cx;i++)
                         {
                             let lsb=val&0b00000001;
                              val=val>>1;
                              if(lsb)val=val|0b10000000;
                              else val= val & 0b01111111;
+                             val&=0xff;
                         }
-                        this.register.writeByte(operandes.addr,val);
-                        this.register.writeByte(CX_REG,0);
+                        this.RAM.writeByte(operandes.addr,val);
+                        this.register.writeReg(CX_REG,cx&0xff00);
                     }
                     else
                     {
@@ -1390,7 +1411,8 @@ class Processor{
                         val=val>>1;
                         if(lsb)val=val|0b10000000;
                         else val= val & 0b01111111;
-                        this.register.writeByte(operandes.addr,val);
+                        val&=0xff;
+                        this.RAM.writeByte(operandes.addr,val);
 
                     }
 
@@ -1399,199 +1421,214 @@ class Processor{
             
         }
         //
+        return 0;
     }
+    else return -1;
     }
     //////////////////////////////////////////////////////////////////////////////////////
-    //rcl
-    decodeRcl(instruction)
-    {
-        let current_ip=this.register.readByte(IP_REG);
-        let current_code_segement=this.register.readByte(CS_REG);
-        if(instruction & 0b11111100==RCL &((this.RAM.readByte(current_code_segement<<4+current_ip+1))<<2)>>3==0b010)
-        {
-            let operandes=this.extractOperand(this.RAM.readByte(current_code_seg<<4+current_ip+1));
-            if(operandes.addr==null)
-            {
-                let R=operandes.opRegister[1];
-                let v=(instruction>>1)%2;
-                if(instruction%2==1)//the w bit ==1
-                {
-                    let val=this.register.readWord(R);
-                    if(v)//the number of iteration is stored in  cx register
-                    {
-                        
-                        let cx=this.register.readWord(CX_RG);
+   //rcl
+   decodeRcl(instruction)
+   {
+       let current_ip=this.register.readReg(IP_REG);
+       let current_code_segement=this.register.readReg(CS_REG);
+       let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
+       if(instruction>>2==RCL &(operandes.opRegister[0]==0b010))
+       {
+           
+           if(operandes.addr==null)
+           {
+               let R=operandes.opRegister[1];
+               let v=(instruction>>1)%2;
+               if(instruction%2==1)//the w bit ==1
+               {
+                   let val=this.register.readWordReg(R);
+                   if(v)//the number of iteration is stored in  cx register
+                   {
+                       
+                       let cx=this.register.readReg(CX_REG)&0x00ff;
+                      for(let i=0;i<cx;i++)
+                      {
+                         
+                          let msb=(val&0b1000000000000000)>>15;
+                          let pc =this.register.extractFlag('C');//the previous carry
+                          this.register.setFlag('C',msb);
+                           val=val<<1;
+                           if(pc)val=val|0b0000000000000001;
+                           else val= val & 0b1111111111111110;
+                           val&=0xffff;
+                           
+                           
+                      }
+                      this.register.writeWordReg(R,val);
+                      this.register.writeReg(CX_REG,cx&0xff00);
+
+
+                   }
+                   else //the op code of the instruction is repeated many times in memory
+                   {
+                       let msb=val&0b1000000000000000>>15;
+                       let pc =register.extractFlag('C');//the previous carry
+                       this.register.setFlag('C',msb);
+                       val=val<<1;
+                       if(pc)val=val|0b0000000000000001;
+                       else val= val & 0b1111111111111110;
+                       val&=0xffff;
+                       this.register.writeWordReg(R,val);
+
+                   }
+
+               }else  //the w bit ==0
+               {
+                   if(v)//the number of iteration is stored in  cx register
+                   {
+                       let val=this.register.readByteReg(R);
+                       let cx=this.register.readReg(CX_REG)&0x00ff;
+                      for(let i=0;i<cx;i++)
+                      {
+                       
+                       let msb=(val&0b10000000)>>7;
+                       let pc=this.extractFlag('C');//the previous carry
+                       this.register.setFlag('C',msb);
+                       val=val<<1;
+                       if(pc)val=val|0b00000001;
+                       else val= val & 0b11111110;
+                       val&=0xff;
+                       
+                      }
+                      this.register.writeByteReg(R,val);
+                      this.register.writeReg(CX_REG,cx&0xff00);
+
+
+                   }
+                   else //the op code of the instruction is repeated many times in memory
+                   {
+                       let val=this.register.readByteReg(R);
+                       let msb=(val&0b10000000)>>7;
+                       let pc=this.extractFlag('C');
+                       this.register.setFlag('C',msb);
+                       val=val<<1;
+                       if(pc)val=val|0b00000001;
+                       else val= val & 0b11111110;
+                       val&=0xff;
+                       this.register.writeByteReg(R,val);
+
+                   }
+
+               }
+
+
+           }else //the operandes.addr is not null 
+           {
+               let v=(instruction>>1)%2;
+               if(instruction%2==1)//16 bits
+               {
+                   let val = this.RAM.readWord(operandes.addr);
+                   if(v)
+                   {
+                       let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
-                          
-                           let msb=val&0b1000000000000000;
+                           let msb=(val&0b1000000000000000)>>15;
+                           let pc =this.register.extractFlag('C');//the previous carry
+                           this.register.setFlag('C',msb);
+                            val=val<<1;
+                            if(pc)val=val|0b0000000000000001;
+                            else val= val & 0b1111111111111110;
+                            val&=0xffff;
+                       }
+                       this.RAM.writeWord(operandes.addr,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
+                   }
+                   else
+                   {
+                       let msb=(val&0b1000000000000000)>>15;
                            let pc =register.extractFlag('C');//the previous carry
                            this.register.setFlag('C',msb);
                             val=val<<1;
                             if(pc)val=val|0b0000000000000001;
                             else val= val & 0b1111111111111110;
-                            
-                            
-                       }
-                       this.register.writeWord(R,val);
-                       this.register.writeWord(CX_REG,0);
+                            val&=0xffff;
+                       this.RAM.writeWord(operandes.addr,val);
 
+                   }
 
-                    }
-                    else //the op code of the instruction is repeated many times in memory
-                    {
-                        let msb=val&0b1000000000000000;
-                        let pc =register.extractFlag('C');//the previous carry
-                        this.register.setFlag('C',msb);
-                        val=val<<1;
-                        if(pc)val=val|0b0000000000000001;
-                        else val= val & 0b1111111111111110;
-                        this.register.writeWord(R,val);
-
-                    }
-
-                }else  //the w bit ==0
-                {
-                    if(v)//the number of iteration is stored in  cx register
-                    {
-                        let val=this.register.readByte(R);
-                        let cx=this.register.readByte(CX_RG);
+               }
+               else //8bits
+               {
+                   let val = this.RAM.readByte(operandes.addr);
+                   if(v)
+                   {
+                       let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
-                        
-                        let msb=val&0b10000000;
-                        let pc=this.extractFlag('C');//the previous carry
-                        this.setFlag('C',msb);
-                        val=val<<1;
-                        if(pc)val=val|0b00000001;
-                        else val= val & 0b11111110;
-                        
+                           let msb=(val&0b10000000)>>7;
+                           let pc=this.extractFlag('C');//the previous carry
+                           this.register.setFlag('C',msb);
+                           val=val<<1;
+                           if(pc)val=val|0b00000001;
+                           else val= val & 0b11111110;
+                           val&=0xff;
                        }
-                       this.register.writeByte(R,val);
-                       this.register.writeByte(CX_REG,0);
+                       this.RAM.writeByte(operandes.addr,val);
+                       this.register.writeReg(CX_REG,CX&0xff00);
+                   }
+                   else
+                   {
+                       let msb=(val&0b10000000)>>7;
+                       let pc=this.extractFlag('C');//the previous carry
+                       this.register.setFlag('C',msb);
+                       val=val<<1;
+                       if(pc)val=val|0b00000001;
+                       else val= val & 0b11111110;
+                       val&=0xff;
+                       this.RAM.writeByte(operandes.addr,val);
 
+                   }
 
-                    }
-                    else //the op code of the instruction is repeated many times in memory
-                    {
-                        let val=this.register.readByte(R);
-                        let msb=val&0b10000000;
-                        let pc=this.extractFlag('C');
-                        this.register.setFlag('C',msb);
-                        val=val<<1;
-                        if(pc)val=val|0b00000001;
-                        else val= val & 0b11111110;
-                        this.register.writeByte(R,val);
-
-                    }
-
-                }
-
-
-            }else //the operandes.addr is not null 
-            {
-                let v=(instruction>>1)%2;
-                if(instruction%2==1)//16 bits
-                {
-                    let val = this.RAM.readWord(operandes.addr);
-                    if(v)
-                    {
-                        let cx=this.register.readWord(CX_RG);
-                        for(let i=0;i<cx;i++)
-                        {
-                            let msb=val&0b1000000000000000;
-                            let pc =register.extractFlag('C');//the previous carry
-                            this.register.setFlag('C',msb);
-                             val=val<<1;
-                             if(pc)val=val|0b0000000000000001;
-                             else val= val & 0b1111111111111110;
-                        }
-                        this.register.writeWord(operandes.addr,val);
-                        this.register.writeWord(CX_REG,0);
-                    }
-                    else
-                    {
-                        let msb=val&0b1000000000000000;
-                            let pc =register.extractFlag('C');//the previous carry
-                            this.register.setFlag('C',msb);
-                             val=val<<1;
-                             if(pc)val=val|0b0000000000000001;
-                             else val= val & 0b1111111111111110;
-                        this.register.writeWord(operandes.addr,val);
-
-                    }
-
-                }
-                else //8bits
-                {
-                    let val = this.RAM.readByte(operandes.addr);
-                    if(v)
-                    {
-                        let cx=this.register.readByte(CX_RG);
-                        for(let i=0;i<cx;i++)
-                        {
-                            let msb=val&0b10000000;
-                            let pc=this.extractFlag('C');//the previous carry
-                            this.setFlag('C',msb);
-                            val=val<<1;
-                            if(pc)val=val|0b00000001;
-                            else val= val & 0b11111110;
-                        }
-                        this.register.writeByte(operandes.addr,val);
-                        this.register.writeByte(CX_REG,0);
-                    }
-                    else
-                    {
-                        let msb=val&0b10000000;
-                        let pc=this.extractFlag('C');//the previous carry
-                        this.setFlag('C',msb);
-                        val=val<<1;
-                        if(pc)val=val|0b00000001;
-                        else val= val & 0b11111110;
-                        this.register.writeByte(operandes.addr,val);
-
-                    }
-
-        
-            }
-            
-        }
-        //
-    }
-    }
+       
+           }
+           
+       }
+       return 0;
+       //
+   } else return -1;
+   }
+    //rcr
     //rcr
     decodeRcr(instruction)
     {
-        let current_ip=this.register.readByte(IP_REG);
-        let current_code_segement=this.register.readByte(CS_REG);
-        if(instruction & 0b11111100==RCR &((this.RAM.readByte(current_code_segement<<4+current_ip+1))<<2)>>3==0b011)
+        let current_ip=this.register.readReg(IP_REG);
+        let current_code_segement=this.register.readReg(CS_REG);
+        let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
+        if(instruction >>2==RCR  & (operandes.opRegister[0]==0b011))
         {
-            let operandes=this.extractOperand(this.RAM.readByte(current_code_seg<<4+current_ip+1));
+            
             if(operandes.addr==null)
             {
                 let R=operandes.opRegister[1];
                 let v=(instruction>>1)%2;
                 if(instruction%2==1)//the w bit ==1
                 {
-                    let val=this.register.readWord(R);
+                    let val=this.register.readWordReg(R);
                     if(v)//the number of iteration is stored in  cx register
                     {
                         
-                        let cx=this.register.readWord(CX_RG);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
                           
                            let lsb=val&0b0000000000000001;
-                           let pc =register.extractFlag('C');//the previous carry
+                           let pc =this.register.extractFlag('C');//the previous carry
                            this.register.setFlag('C',lsb);
                             val=val>>1;
                             if(pc)val=val|0b1000000000000000;
                             else val= val & 0b0111111111111111;
+                            val&=0xffff;
                             
                             
                        }
-                       this.register.writeWord(R,val);
-                       this.register.writeWord(CX_REG,0);
+                       this.register.writeWordReg(R,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
 
 
                     }
@@ -1603,7 +1640,8 @@ class Processor{
                          val=val>>1;
                          if(pc)val=val|0b1000000000000000;
                          else val= val & 0b0111111111111111;
-                        this.register.writeWord(R,val);
+                         val&=0xffff;
+                        this.register.writeWordReg(R,val);
 
                     }
 
@@ -1611,21 +1649,22 @@ class Processor{
                 {
                     if(v)//the number of iteration is stored in  cx register
                     {
-                        let val=this.register.readByte(R);
-                        let cx=this.register.readByte(CX_RG);
+                        let val=this.register.readByteReg(R);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
                         
                         let lsb=val&0b00000001;
                         let pc=this.register.extractFlag('C');//the previous carry
-                        this.setFlag('C',lsb);
+                        this.register.setFlag('C',lsb);
                         val=val>>1;
                         if(pc)val=val|0b10000000;
                         else val= val & 0b01111111;
+                        val&=0xff;
                         
                        }
-                       this.register.writeByte(R,val);
-                       this.register.writeByte(CX_REG,0);
+                       this.register.writeByteReg(R,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
 
 
                     }
@@ -1633,11 +1672,12 @@ class Processor{
                     {
                         let lsb=val&0b00000001;
                         let pc=this.register.extractFlag('C');//the previous carry
-                        this.setFlag('C',lsb);
+                        this.register.setFlag('C',lsb);
                         val=val>>1;
                         if(pc)val=val|0b10000000;
                         else val= val & 0b01111111;
-                        this.register.writeByte(R,val);
+                        val&=0xff;
+                        this.register.writeByteReg(R,val);
 
                     }
 
@@ -1652,18 +1692,19 @@ class Processor{
                     let val = this.RAM.readWord(operandes.addr);
                     if(v)
                     {
-                        let cx=this.register.readWord(CX_RG);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                         for(let i=0;i<cx;i++)
                         {
                             let lsb=val&0b0000000000000001;
-                            let pc =register.extractFlag('C');//the previous carry
+                            let pc =this.register.extractFlag('C');//the previous carry
                             this.register.setFlag('C',lsb);
                              val=val>>1;
                              if(pc)val=val|0b1000000000000000;
                              else val= val & 0b0111111111111111;
+                             val&=0xffff;
                         }
-                        this.register.writeWord(operandes.addr,val);
-                        this.register.writeWord(CX_REG,0);
+                        this.RAM.writeWord(operandes.addr,val);
+                        this.register.writeReg(CX_REG,cx&0xff00);
                     }
                     else
                     {
@@ -1673,7 +1714,8 @@ class Processor{
                          val=val>>1;
                          if(pc)val=val|0b1000000000000000;
                          else val= val & 0b0111111111111111;
-                        this.register.writeWord(operandes.addr,val);
+                         val&=0xffff;
+                        this.RAM.writeWord(operandes.addr,val);
 
                     }
 
@@ -1683,28 +1725,30 @@ class Processor{
                     let val = this.RAM.readByte(operandes.addr);
                     if(v)
                     {
-                        let cx=this.register.readByte(CX_RG);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                         for(let i=0;i<cx;i++)
                         {
                             let lsb=val&0b00000001;
                             let pc=this.register.extractFlag('C');//the previous carry
-                            this.setFlag('C',lsb);
+                            this.register.setFlag('C',lsb);
                             val=val>>1;
                             if(pc)val=val|0b10000000;
                             else val= val & 0b01111111;
+                            val&=0xff;
                         }
-                        this.register.writeByte(operandes.addr,val);
-                        this.register.writeByte(CX_REG,0);
+                        this.RAM.writeByte(operandes.addr,val);
+                        this.register.writeReg(CX_REG,cx&0xff00);
                     }
                     else
                     {
                         let lsb=val&0b00000001;
                         let pc=this.register.extractFlag('C');//the previous carry
-                        this.setFlag('C',lsb);
+                        this.register.setFlag('C',lsb);
                         val=val>>1;
                         if(pc)val=val|0b10000000;
                         else val= val & 0b01111111;
-                        this.register.writeByte(operandes.addr,val);
+                        val&=0xff;
+                        this.RAM.writeByte(operandes.addr,val);
 
                     }
 
@@ -1713,45 +1757,196 @@ class Processor{
             
         }
         //
+        return 0;
+    }else return -1;
     }
-    }
-    //shl
-    decodeShr(instruction)
+    //shr
+     decodeShr(instruction)
+		 {
+			 let current_ip=this.register.readReg(IP_REG);
+			 let current_code_segement=this.register.readReg(CS_REG);
+			 let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
+			 if(instruction>>2==SHR &(operandes.opRegister[0]==0b101))
+			 {
+				 console.log(operandes)
+			   
+				 if(operandes.addr==null)
+				 {
+					 let R=operandes.opRegister[1];
+					 let v=(instruction>>1)%2;
+					 if(instruction%2==1)//the w bit ==1
+					 {
+						
+						 let val=this.register.readWordReg(R);
+						
+						 if(v)//the number of iteration is stored in  cx register
+						 {
+							
+							 let cx=this.register.readReg(CX_REG)&0x00ff;
+							
+							for(let i=0;i<cx;i++)
+							{
+							 let lsb=val&0b0000000000000001;
+							 this.register.setFlag('C',lsb);
+							 val=val>>1;
+							
+							}
+							
+							this.register.writeWordReg(R,val);
+							this.register.writeReg(CX_REG,cx&0xff00);
+	 
+	 
+						 }
+						 else //the op code of the instruction is repeated many times in memory
+						 {
+							 
+							 let lsb=val&0b0000000000000001;
+							 this.register.setFlag('C',lsb);
+							 val=val>>1;
+							 this.register.writeWordReg(R,val);
+	 
+						 }
+	 
+					 }else  //the w bit ==0
+					 {
+						 if(v)//the number of iteration is stored in  cx register
+						 {
+							 let val=this.register.readByteReg(R);
+							 let cx=this.register.readReg(CX_REG)&0x00ff;
+							for(let i=0;i<cx;i++)
+							{
+								let lsb=val&0b00000001;
+								this.register.setFlag('C',lsb);
+								 val=val>>1;
+							}
+							this.register.writeByteReg(R,val);
+							this.register.writeReg(CX_REG,cx&0xff00);
+	 
+	 
+						 }
+						 else //the op code of the instruction is repeated many times in memory
+						 {
+							 let val=this.register.readByteReg(R);
+							 let lsb=val&0b00000001;
+							 this.register.setFlag('C',lsb);
+							 val=val>>1;
+							 this.register.writeByteReg(R,val);
+	 
+						 }
+	 
+					 }
+	 
+	 
+				 }else //the operandes.addr is not null 
+				 {
+					 let v=(instruction>>1)%2;
+					 if(instruction%2==1)//16 bits
+					 {
+					
+						 let val = this.RAM.readWord(operandes.addr);
+						 if(v)
+						 {
+							 let cx=this.register.readReg(CX_REG)&0x00ff;
+							 for(let i=0;i<cx;i++)
+							 {
+								  let lsb=val&0b0000000000000001;
+								  this.register.setFlag('C',lsb);
+								  val=val>>1;
+							 }
+							 this.RAM.writeWord(operandes.addr,val);
+							 this.register.writeReg(CX_REG,cx&0xff00);
+						 }
+						 else
+						 {
+							
+							
+							 let lsb=val&0b0000000000000001;
+							 this.register.setFlag('C',lsb);
+							 val=val>>1;
+							
+							 this.RAM.writeWord(operandes.addr,val);
+	 
+						 }
+	 
+					 }
+					 else //8bits
+					 {
+						
+						 let val = this.RAM.readByte(operandes.addr);
+                      
+						 if(v)
+						 {
+							 
+							 let cx=this.register.readReg(CX_REG)&0x00ff;
+							 for(let i=0;i<cx;i++)
+							 {
+								 let lsb=val&0b00000001;
+								 this.register.setFlag('C',lsb);
+								  val=val>>1;
+							 }
+							 this.RAM.writeByte(operandes.addr,val);
+							 this.register.writeReg(CX_REG,cx&0xff00);
+						 }
+						 else
+						 {
+							
+							
+							 let lsb=val&0b00000001;
+							 this.register.setFlag('C',lsb);
+							 val=val>>1;
+							 this.RAM.writeByte(operandes.addr,val);
+							
+							
+	 
+						 }
+	 
+			 
+				 }
+				 
+			 }
+			 //
+		      return 0;
+			 }
+			 else return -1;
+		 }
+		 //
+
+  decodeShl(instruction)
     {
-        let current_ip=this.register.readByte(IP_REG);
-        let current_code_segement=this.register.readByte(CS_REG);
-        if(instruction & 0b11111100==SHR &((this.RAM.readByte(current_code_segement<<4+current_ip+1))<<2)>>3==0b101)
+        let current_ip=this.register.readReg(IP_REG);
+             let current_code_segement=this.register.readReg(CS_REG);
+             let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
+     if(instruction>>2==SHL_SAL &(operandes.opRegister[0]==0b100))
         {
-            let operandes=this.extractOperand(this.RAM.readByte(current_code_seg<<4+current_ip+1));
+            console.log(operandes)
             if(operandes.addr==null)
             {
                 let R=operandes.opRegister[1];
                 let v=(instruction>>1)%2;
                 if(instruction%2==1)//the w bit ==1
                 {
-                    let val=this.register.readWord(R);
-                    if(v)//the number of iteration is stored in  cx register
+                    let val=this.register.readWordReg(R);
+                    if(v)//the number of iteration is stored in  cl register
                     {
                         
-                        let cx=this.register.readWord(CX_RG);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
-                        let lsb=val&0b0000000000000001;
-                        this.setFlag('C',lsb);
-                        val=val>>1;
+                           let msb=val&0b1000000000000000>>15;
+                           this.register.setFlag('C',msb);
+                            val=val<<1;
                        }
-                       this.register.writeWord(R,val);
-                       this.register.writeWord(CX_REG,0);
+                       this.register.writeWordReg(R,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
 
 
                     }
                     else //the op code of the instruction is repeated many times in memory
                     {
-                        
-                        let lsb=val&0b0000000000000001;
-                        this.setFlag('C',lsb);
-                        val=val>>1;
-                        this.register.writeWord(R,val);
+                        let msb=val&0b1000000000000000>>15;
+                        this.register.setFlag('C',msb);
+                        val=val<<1;
+                        this.register.writeWordReg(R,val);
 
                     }
 
@@ -1759,26 +1954,26 @@ class Processor{
                 {
                     if(v)//the number of iteration is stored in  cx register
                     {
-                        let val=this.register.readByte(R);
-                        let cx=this.register.readByte(CX_RG);
+                        let val=this.register.readByteReg(R);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
-                           let lsb=val&0b00000001;
-                           this.setFlag('C',lsb);
-                            val=val>>1;
+                        let msb=val&0b10000000>>7;
+                        this.register.setFlag('C',msb);
+                            val=val<<1;
                        }
-                       this.register.writeByte(R,val);
-                       this.register.writeByte(CX_REG,0);
+                       this.register.writeByteReg(R,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
 
 
                     }
                     else //the op code of the instruction is repeated many times in memory
                     {
-                        let val=this.register.readByte(R);
-                        let lsb=val&0b00000001;
-                        this.setFlag('C',lsb);
-                        val=val>>1;
-                        this.register.writeByte(R,val);
+                        let val=this.register.readByteReg(R);
+                        let msb=val&0b10000000>>7;
+                        this.register.setFlag('C',msb);
+                        val=val<<1;
+                        this.register.writeByteReg(R,val);
 
                     }
 
@@ -1793,47 +1988,54 @@ class Processor{
                     let val = this.RAM.readWord(operandes.addr);
                     if(v)
                     {
-                        let cx=this.register.readWord(CX_RG);
+                    
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                         for(let i=0;i<cx;i++)
                         {
-                             let lsb=val&0b0000000000000001;
-                             this.setFlag('C',lsb);
-                             val=val>>1;
+                            let msb=val&0b1000000000000000>>15;
+                            this.register.setFlag('C',msb);
+                             val=val<<1;
                         }
-                        this.register.writeWord(operandes.addr,val);
-                        this.register.writeWord(CX_REG,0);
+                        this.RAM.writeWord(operandes.addr,val);
+                        this.register.writeReg(CX_REG,cx&0xff00);
                     }
                     else
                     {
-                        let lsb=val&0b0000000000000001;
-                        this.setFlag('C',lsb);
-                        val=val>>1;
-                        this.register.writeWord(operandes.addr,val);
+                        
+                        let msb=val&0b1000000000000000>>15;
+                        this.register.setFlag('C',msb);
+                        val=val<<1;
+                        this.RAM.writeWord(operandes.addr,val);
 
                     }
 
                 }
                 else //8bits
                 {
+                    
                     let val = this.RAM.readByte(operandes.addr);
                     if(v)
                     {
-                        let cx=this.register.readByte(CX_RG);
+                    
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
+                        
                         for(let i=0;i<cx;i++)
                         {
-                            let lsb=val&0b00000001;
-                            this.setFlag('C',lsb);
-                             val=val>>1;
+                            let msb=val&0b10000000>>7;
+                            this.register.setFlag('C',msb);
+                             val=val<<1;
+                            
                         }
-                        this.register.writeByte(operandes.addr,val);
-                        this.register.writeByte(CX_REG,0);
+                        
+                        this.RAM.writeByte(operandes.addr,val&0xff);
+                        this.register.writeReg(CX_REG,cx&0xff00);
                     }
                     else
                     {
-                        let lsb=val&0b00000001;
-                        this.setFlag('C',lsb);
-                        val=val>>1;
-                        this.register.writeByte(operandes.addr,val);
+                        let msb=val&0b10000000>>7;
+                        this.register.setFlag('C',msb);
+                        val=val<<1;
+                        this.RAM.writeByte(operandes.addr,val);
 
                     }
 
@@ -1841,172 +2043,51 @@ class Processor{
             }
             
         }
+        return 0;
         //
-	//
-        }
-    }
     //
-    decodeShl(instruction)
-    {
-        let current_ip=this.register.readByte(IP_REG);
-        let current_code_segement=this.register.readByte(CS_REG);
-        if(instruction & 0b11111100==SHL &((this.RAM.readByte(current_code_segement<<4+current_ip+1))<<2)>>3==0b100)
-        {
-            let operandes=this.extractOperand(this.RAM.readByte(current_code_seg<<4+current_ip+1));
-            if(operandes.addr==null)
-            {
-                let R=operandes.opRegister[1];
-                let v=(instruction>>1)%2;
-                if(instruction%2==1)//the w bit ==1
-                {
-                    let val=this.register.readWord(R);
-                    if(v)//the number of iteration is stored in  cx register
-                    {
-                        
-                        let cx=this.register.readWord(CX_RG);
-                       for(let i=0;i<cx;i++)
-                       {
-                           let msb=val&0b1000000000000000;
-                           this.setFlag('C',msb);
-                            val=val<<1;
-                       }
-                       this.register.writeWord(R,val);
-                       this.register.writeWord(CX_REG,0);
-
-
-                    }
-                    else //the op code of the instruction is repeated many times in memory
-                    {
-                        let msb=val&0b1000000000000000;
-                        this.setFlag('C',msb);
-                        val=val<<1;
-                        this.register.writeWord(R,val);
-
-                    }
-
-                }else  //the w bit ==0
-                {
-                    if(v)//the number of iteration is stored in  cx register
-                    {
-                        let val=this.register.readByte(R);
-                        let cx=this.register.readByte(CX_RG);
-                       for(let i=0;i<cx;i++)
-                       {
-                        let msb=val&0b10000000;
-                        this.setFlag('C',msb);
-                            val=val<<1;
-                       }
-                       this.register.writeByte(R,val);
-                       this.register.writeByte(CX_REG,0);
-
-
-                    }
-                    else //the op code of the instruction is repeated many times in memory
-                    {
-                        let val=this.register.readByte(R);
-                        let msb=val&0b10000000;
-                        this.setFlag('C',msb);
-                        val=val<<1;
-                        this.register.writeByte(R,val);
-
-                    }
-
-                }
-
-
-            }else //the operandes.addr is not null 
-            {
-                let v=(instruction>>1)%2;
-                if(instruction%2==1)//16 bits
-                {
-                    let val = this.RAM.readWord(operandes.addr);
-                    if(v)
-                    {
-                        let cx=this.register.readWord(CX_RG);
-                        for(let i=0;i<cx;i++)
-                        {
-                            let msb=val&0b1000000000000000;
-                            this.setFlag('C',msb);
-                             val=val<<1;
-                        }
-                        this.register.writeWord(operandes.addr,val);
-                        this.register.writeWord(CX_REG,0);
-                    }
-                    else
-                    {
-                        let msb=val&0b1000000000000000;
-                        this.setFlag('C',msb);
-                        val=val<<1;
-                        this.register.writeWord(operandes.addr,val);
-
-                    }
-
-                }
-                else //8bits
-                {
-                    let val = this.RAM.readByte(operandes.addr);
-                    if(v)
-                    {
-                        let cx=this.register.readByte(CX_RG);
-                        for(let i=0;i<cx;i++)
-                        {
-                            let msb=val&0b10000000;
-                            this.setFlag('C',msb);
-                             val=val<<1;
-                        }
-                        this.register.writeByte(operandes.addr,val);
-                        this.register.writeByte(CX_REG,0);
-                    }
-                    else
-                    {
-                        let msb=val&0b10000000;
-                        this.setFlag('C',msb);
-                        val=val<<1;
-                        this.register.writeByte(operandes.addr,val);
-
-                    }
-
-        
-            }
-            
         }
-        //
-	//
-        }
+        else return -1;
     }
 
     //
 
     decodeSar(instruction)
     {
-        let current_ip=this.register.readByte(IP_REG);
-        let current_code_segement=this.register.readByte(CS_REG);
-        if(instruction & 0b11111100==SAR &((this.RAM.readByte(current_code_segement<<4+current_ip+1))<<2)>>3==0b111)
+        let current_ip=this.register.readReg(IP_REG);
+        let current_code_segement=this.register.readReg(CS_REG);
+        let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
+        if(instruction >>2==SAR &(operandes.opRegister[0]==0b111))
         {
-            let operandes=this.extractOperand(this.RAM.readByte(current_code_seg<<4+current_ip+1));
+            
             if(operandes.addr==null)
             {
                 let R=operandes.opRegister[1];
                 let v=(instruction>>1)%2;
                 if(instruction%2==1)//the w bit ==1
                 {
-                    let val=this.register.readWord(R);
+                    
+                    let val=this.register.readWordReg(R);
                     if(v)//the number of iteration is stored in  cx register
                     {
                         
-                        let cx=this.register.readWord(CX_RG);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
+                        
                        for(let i=0;i<cx;i++)
                        {
                         let lsb=val&0b0000000000000001;
-                        this.setFlag('C',lsb);
-                        let msb=val&1000000000000000;
+                        this.register.setFlag('C',lsb);
+                        let msb=(val&1000000000000000)>>15;
                         val=val>>1;
-                        if(msb)val=val|1000000000000000;
-                     
                         
-                       }
-                       this.register.writeWord(R,val);
-                       this.register.writeWord(CX_REG,0);
+                        if(msb)val=val|1000000000000000;
+                        val&=0xffff;
+                        
+                       }	
+                     
+                      // console.log(this.register.readReg(AX_REG))
+                       this.register.writeWordReg(R,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
 
 
                     }
@@ -2014,11 +2095,12 @@ class Processor{
                     {
                         
                         let lsb=val&0b0000000000000001;
-                        this.setFlag('C',lsb);
-                        let msb=val&1000000000000000;
+                        this.register.setFlag('C',lsb);
+                        let msb=(val&1000000000000000)>>15;
                         val=val>>1;
                         if(msb)val=val|1000000000000000;
-                        this.register.writeWord(R,val);
+                        val&=0xffff;
+                        this.register.writeWordReg(R,val);
 
                     }
 
@@ -2026,30 +2108,32 @@ class Processor{
                 {
                     if(v)//the number of iteration is stored in  cx register
                     {
-                        let val=this.register.readByte(R);
-                        let cx=this.register.readByte(CX_RG);
+                        let val=this.register.readByteReg(R);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                        for(let i=0;i<cx;i++)
                        {
                            let lsb=val&0b00000001;
-                           this.setFlag('C',lsb);
-                           let msb=val&10000000;
+                           this.register.setFlag('C',lsb);
+                           let msb=(val&10000000)>>7;
                             val=val>>1;
                             if(msb)val=val|10000000;
+                            val&=0xff;
                        }
-                       this.register.writeByte(R,val);
-                       this.register.writeByte(CX_REG,0);
+                       this.register.writeByteReg(R,val);
+                       this.register.writeReg(CX_REG,cx&0xff00);
 
 
                     }
                     else //the op code of the instruction is repeated many times in memory
                     {
-                        let val=this.register.readByte(R);
+                        let val=this.register.readByteReg(R);
                         let lsb=val&0b00000001;
-                        this.setFlag('C',lsb);
-                        let msb=val&10000000;
+                        this.register.setFlag('C',lsb);
+                        let msb=(val&10000000)>>7;
                         val=val>>1;
                         if(msb)val=val|10000000;
-                        this.register.writeByte(R,val);
+                        val&=0xff;
+                        this.register.writeByteReg(R,val);
 
                     }
 
@@ -2064,26 +2148,34 @@ class Processor{
                     let val = this.RAM.readWord(operandes.addr);
                     if(v)
                     {
-                        let cx=this.register.readWord(CX_RG);
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
+                        
                         for(let i=0;i<cx;i++)
                         {
+                            
                              let lsb=val&0b0000000000000001;
-                             this.setFlag('C',lsb);
-                             let msb=val&1000000000000000;
+                             this.register.setFlag('C',lsb);
+                             let msb=(val&1000000000000000)>>15;
                              val=val>>1;
                              if(msb)val=val|1000000000000000;
+                             val&=0xffff;
+                            
+                             
+                             
                         }
-                        this.register.writeWord(operandes.addr,val);
-                        this.register.writeWord(CX_REG,0);
+                        
+                        this.RAM.writeWord(operandes.addr,val);
+                        this.register.writeReg(CX_REG,cx&0xff00);
                     }
                     else
                     {
                         let lsb=val&0b0000000000000001;
-                        this.setFlag('C',lsb);
-                        let msb=val&1000000000000000;
+                        this.register.setFlag('C',lsb);
+                        let msb=(val&1000000000000000)>>15;
                         val=val>>1;
                         if(msb)val=val|1000000000000000;
-                        this.register.writeWord(operandes.addr,val);
+                        val&=0xffff;
+                        this.RAM.writeWord(operandes.addr,val);
 
                     }
 
@@ -2093,26 +2185,29 @@ class Processor{
                     let val = this.RAM.readByte(operandes.addr);
                     if(v)
                     {
-                        let cx=this.register.readByte(CX_RG);
+                        
+                        let cx=this.register.readReg(CX_REG)&0x00ff;
                         for(let i=0;i<cx;i++)
                         {
                             let lsb=val&0b00000001;
-                            this.setFlag('C',lsb);
-                            let msb=val&10000000;
+                            this.register.setFlag('C',lsb);
+                            let msb=(val&10000000)>>7;
                             val=val>>1;
                             if(msb)val=val|10000000;
+                            val&=0xff;
                         }
-                        this.register.writeByte(operandes.addr,val);
-                        this.register.writeByte(CX_REG,0);
+                        this.RAM.writeByte(operandes.addr,val);
+                        this.register.writeReg(CX_REG,cx&0xff00);
                     }
                     else
                     {
                         let lsb=val&0b00000001;
-                        this.setFlag('C',lsb);
-                        let msb=val&10000000;
+                        this.register.setFlag('C',lsb);
+                        let msb=(val&10000000)>>7;
                             val=val>>1;
                             if(msb)val=val|10000000;
-                        this.register.writeByte(operandes.addr,val);
+                            val&=0xff;
+                        this.RAM.writeByte(operandes.addr,val);
 
                     }
 
@@ -2121,8 +2216,9 @@ class Processor{
             
         }
         //
-	//
+     return 0;
         }
+        else return -1;
     }
 	//
     decodeJmpCall(instruction){
