@@ -35,7 +35,8 @@ class PreProcessor {
 
         // replacing in source code 
         opcodes = opcodes.map((item) => {if (item.indexOf(firstValue) != -1) return item.replace(firstValue, secondValue); else return item});
-
+        
+        // it works if only one define exists in code
         return opcodes.join('\n');
     }
 
