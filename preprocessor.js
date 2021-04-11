@@ -215,7 +215,7 @@ var objectsArray = [{
 var testObj = new PreProcessor(); 
 testObj.getVariables(objectsArray);
 
-
+// more testing is needed
 /*var sub = document.getElementById("sub"); 
     text = document.getElementById("code");
     code = "";
