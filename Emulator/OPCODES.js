@@ -21,7 +21,24 @@ const   MOV_RM_RM = 0x88,
         ROL=0b110100,
         ROR=0b110100,
         RCL=0b110100,
-        RCR=0b110100
+        RCR=0b110100,
+        ARITHMETIC_IMM	= 0x80,
+        ADD_ACC_IMM = 0x04,
+        ADC_ACC_IMM = 0x14,
+        SUB_REG_MEM = 0x28,
+        SBB_REG_MEM = 0x18,
+        SUB_ACC_IMM = 0x2C,
+        SBB_ACC_IMM = 0x1C,//ila shek
+        CBW			= 0x98,
+        CWD			= 0x99,
+        INC_REG		= 0x40,
+        INC_REG_MEM = 0xFE,
+        JMP_SEG		= 0b11101001,
+        JMP_SEG_SHORT	= 0b11101011,
+        JMP_IND_SEG 	= 0xFF,
+        JMP_DIR_INTSEG	= 0b11101010,
+        CALL_DIR_SEG	= 0b11101000,
+        CALL_DIR_INTSEG = 0b10011010;
 
       
 const   HIGH_REGISTER = 1,
@@ -31,6 +48,21 @@ const NO_DISP   = 0x00,
       SIN_DISP  = 0x02,
       REG_MODE  = 0x03;
 
+const 	ADD_MODE 	= 0b000,
+		ADC_MODE 	= 0b010,
+		SUB_MODE	= 0b101,
+		SBB_MODE	= 0b011,
+		CMP_MODE	= 0b111,
+		AND_MODE	= 0b100,
+		OR_MODE		= 0b001,
+		XOR_MODE	= 0b110;
 
+		//0b0000ODITSZ0A0P0C
+const	CARRY_FLAG 		= 0b0000000000000001,
+		ZERO_FLAG		= 0b0000000001000000,
+		PARITY_FLAG 	= 0b0000000000000100,
+		SIGN_FLAG		= 0b0000000010000000,
+		AUXILARY_FLAG	= 0b0000000000010000,
+		OVERFLOW_FLAG	= 0b0000100000000000;
         
 
