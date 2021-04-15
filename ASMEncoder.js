@@ -3,7 +3,7 @@ var wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI',
 var byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
 var segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
 var justNumbers = false;//if its a number between brackets its set to true and regmem gives r/m b110 and mod =0
-
+var zero;//modify in last code
 function getOps(str) {
 
     let operands = [];
@@ -110,6 +110,7 @@ function getMod(operands) {
 }
 
 function regMem(ops) {
+    zero=false;
     justNumbers = false;
     if (getMod(ops) == 3) {
         if (ops.length === 2) {
@@ -122,6 +123,7 @@ function regMem(ops) {
     else {
         let i;
         (/\[/.test(ops[0])) ? i = 0 : /\[/.test(ops[1]) ? i = 1 : i = -1;
+        if (i==-1) return;
         if (/(bx|si)+.*(bx|si)/i.test(ops[i])) { return 0 }
         else if (/(bx|di)+.*(bx|di)/i.test(ops[i])) { return 1 }
         else if (/(bp|si)+.*(bp|si)/i.test(ops[i])) { return 2 }
@@ -130,7 +132,13 @@ function regMem(ops) {
         else if (/di/i.test(ops[i])) { return 5 }
         else if (/bp/i.test(ops[i])) { return 6 }
         else if (/bx/i.test(ops[i])) { return 7 }
-        else { justNumbers = true; return 0b110; }
+        else {
+            console.log("hh",ops[i]);
+            console.log(typeof ops[i]);
+            console.log((ops[i]).slice(1,ops[i].length-1));
+             if ((ops[i]).slice(1,ops[i].length-1)==0)  zero=true; 
+             console.log("hh",zero);
+            justNumbers = true; return 0b110; }
     }
 }
 function segSepcification(operands, arr) {
@@ -156,9 +164,13 @@ function byteConcat(str, arr) {
     else { z = 0; }
     let disp = splitNum(convert(getNum(tmp[z])), getS(tmp[z]));
     arr.concat(findBP(getOps(str), arr));
-    if (disp != 0) {
+    console.log("zz",zero);
+    if (disp != 0 || zero) {
         arr = arr.concat(disp);
-        if (justNumbers && getS(tmp[z], 0) === 1) arr.push(0);
+        console.log("zz",zero);
+
+        if (zero ) {arr.push(0)}
+        else if (justNumbers && getS(tmp[z], 0) === 1) arr.push(0);
         return arr;
     } else return arr;
 }
@@ -567,8 +579,6 @@ function toBcode(str) // original function to be class later
         case "SHR":
             w = /CL/.test(operands[1]) ? getW(operands.filter((x, i) => i % 2 == 0)) : w;
             arr.push((0b11010000) + (v << 1) + w);
-           // console.log(regToId(operands[0]));
-            //console.log();
             arr.push((mode << 6) + (0b101000) +(/M/.test(operands[2])?regmem:regToId(operands[0])));
             if (/M/.test(operands[2])) {
                 arr = byteConcat(str, arr);
@@ -835,9 +845,10 @@ function toBcode(str) // original function to be class later
                     str = (operands[0]).match(/\w+(?=\s*:)/gi);
 
                     if (!getS(str, 1)) {
-                        let byte = splitNum(convert(str));
+                        let byte = splitNum(convert(str),0);
                         arr.push(byte[0]);
                         arr.push(byte[1]);
+
                     }
                     else {
                         arr.push(convert(str));
@@ -922,66 +933,86 @@ function toBcode(str) // original function to be class later
         case "STOSW": arr.push(0b10101011); break;
         case "JE": case "JZ":
             arr.push(0b01110100);
+            arr.push(convert(operands[0]));
             break;
         case "JL": case "JNGE":
             arr.push(0b01111100);
+            arr.push(convert(operands[0]));
             break;
         case "JLE": case "JNG":
             arr.push(0b01111110);
+            arr.push(convert(operands[0]));
             break;
         case "JB": case "JNAE":
             arr.push(0b01110010);
+            arr.push(convert(operands[0]));
             break;
         case "JBE": case "JNA":
             arr.push(0b01110110);
+            arr.push(convert(operands[0]));
             break;
         case "JP": case "JPE":
             arr.push(0b01111010);
+            arr.push(convert(operands[0]));
             break;
         case "JO":
             arr.push(0b01110000);
+            arr.push(convert(operands[0]));
             break;
         case "JS":
             arr.push(0b01111000);
+            arr.push(convert(operands[0]));
             break;
         case "JNE": case "JNZ":
             arr.push(0b01110101);
+            arr.push(convert(operands[0]));
             break;
         case "JNL": case "JGE":
             arr.push(0b01111101);
+            arr.push(convert(operands[0]));
             break;
         case "JNLE": case "JG":
             arr.push(0b01111111);
+            arr.push(convert(operands[0]));
             break;
         case "JNB": case "JAE":
             arr.push(0b01110011);
+            arr.push(convert(operands[0]));
             break;
         case "JNBE": case "JA":
             arr.push(0b01110111);
+            arr.push(convert(operands[0]));
             break;
         case "JNP": case "JPO":
             arr.push(0b01111011);
+            arr.push(convert(operands[0]));
             break;
         case "JNO":
             arr.push(0b01110001);
+            arr.push(convert(operands[0]));
             break;
         case "JNS":
             arr.push(0b01111001);
+            arr.push(convert(operands[0]));
             break;
         case "LOOP":
             arr.push(0b11100010);
+            arr.push(convert(operands[0]));
             break;
         case "LOOPZ": case "LOOPE":
             arr.push(0b11100001);
+            arr.push(convert(operands[0]));
             break;
         case "LOOPNZ": case "LOOPNE":
             arr.push(0b11100000);
+            arr.push(convert(operands[0]));
             break;
         case "JCXZ":
             arr.push(0b11100011);
+            arr.push(convert(operands[0]));
             break;
         case "INT":
-            arr.push();
+            arr.push(0b11001100);
             break;
         case "CLC":
             arr.push(0b11111000);
@@ -1096,19 +1127,21 @@ function regToId(regname) {
     }
 }
 
-var inst = "shl";
+var inst = "ror";
 let testing = toBcode;
 
-//case mov
+console.log(toBcode("and ax,[bp+0]"));
+console.log(toBcode("call 10:200"));
+
 /*console.log(testing(inst + " " + "DX"));
 console.log(testing(inst + " " + "Ds"));
 console.log(testing(inst + " " + "[bx]"));
 console.log(testing(inst + " " + "[100H+di]"));
 console.log(testing(inst + " " + "[bp]"));
 console.log(testing(inst + " " + "es:[bx-300]"));
-console.log(testing(inst + " " + "[5h]"));*/
-console.log(testing(inst + " " +"w.[bx-300]"+ ",cl" ));
-console.log(testing(inst+" "+"b.[bx-300]"+",cl"));
+console.log(testing(inst + " " + "[5h]"));
+console.log(testing(inst + " " +"w.[bx]"+ ",cl" ));
+console.log(testing(inst+" "+"b.[bx]"+",cl"));
 console.log(testing(inst+" "+"bx"+",01ffh"));
 console.log(testing(inst+" "+"bx"+",cx"));
 console.log(testing(inst+" "+"[bx]"+",1001b"));
@@ -1131,5 +1164,6 @@ console.log(testing(inst + " " + "cx" + ",[100H+di]"));
 console.log(testing(inst + " " + "cx" + ",[100H+di+bx]"));
 console.log(testing(inst + " " + "dx" + ",[bp]"));
 console.log(testing(inst + " " + "cx" + ",es:[bx-300]"));
-console.log(testing(inst + " " + "dx" + ",[bx-300]"));
+console.log(testing(inst + " " + "dx" + ",[bx-300]"));*/
+
 
