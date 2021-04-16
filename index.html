@@ -1,0 +1,140 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <main>
+
+  <textArea class="list" id="count">
+   1 
+  </textArea>
+
+  <div class="container">
+    <div class="backdrop">
+      <div class="custom-area">
+       
+  
+      </div>
+    </div>
+
+    <textarea id="myTextArea">
+
+</textarea>
+
+  </div>
+  
+  </main>
+
+<script>
+
+
+
+//bugs{
+
+  let registers = /AX|BX|CX|DX|CS|DS|ES|SS|DI|SI|IP|BP|al|ah|ch|cl|dl|dh|bh|bl/ig
+
+let reComments = /.*AX.*|.*BX.*|.*CX.*|.*DX.*|.*CS.*|.*DS.*|.*ES.*|.*SS.*|.*DI.*|.*SI.*|.*IP.*|.*BP.*|.*al.*|.*ah.*|.*ch.*|.*cl.*|.*dl.*|.*dh.*|.*bh.*|.*bl.*/ig
+
+let re = /[^a-z]AX|[^a-z]BX|[^a-z]CX|[^a-z]DX|[^a-z]CS|[^a-z]DS|[^a-z]ES|[^a-z]SS|[^a-z]DI|[^a-z]SI|[^a-z]IP|[^a-z]BP|[^a-z]al|[^a-z]ah|[^a-z][^a-z]ch|[^a-z]cl|[^a-z]dl|[^a-z]dh|[^a-z]bh|[^a-z]bl/igs
+
+//SP 1 ERE Bug
+//or/xor error
+//instructions + registers 
+//comments c'est resulu
+
+let dirctives = /.*ORG|.*DEFINE|.*EQU|.*PROC|.*LOCAL|.*ENDM|.*ENDP|.*OFFSET/gi
+
+var instrucionsComments = /MOV.*|.*PUSH.*|.*POP.*|.*XCHG.*|.*LEA.*|.*LAHF.*|.*SAHF.*|.*PUSHF.*|.*POPF.*|.*ADD.*|.*ADC.*|.*DEC.*|.*INC.*|.*AAA.*|.*SUB.*|.*SSB.*|.*NEG.*|.*CMP.*|.*MUL.*|.*IMUL.*|.*DIV.*|.*IDIV.*|.*CBW.*|.*CWD.*|.*NOT.*|.*SHL.*|.*SAL.*|.*SHR.*|.*SAR.*|.*ROL.*|.*ROR.*|.*RCL.*|.*RCR.*|.*AND.*|.*TEST.*|.*XOR.*|.*REP.*|.*MOVSB.*|.*CMPSB.*|.*SCASB.*|.*LODSB.*|.*STOSB.*|.*MOVSW.*|.*CMPSW.*|.*SCASW.*|.*LODSW.*|.*STOSW.*|.*CALL.*|.*JMP.*|.*RET.*|.*JE.*|.*JZ.*|.*JL.*|.*JNGE.*|.*JLE.*|.*JNG|.*JB|.*JNAE|.*JBE.*|.*JNA.*|.*JP.*|.*JPE.*|.*JO.*|.*JS.*|.*JNE.*|.*JNZ.*|.*JNL.*|.*JGE|.*JNLE.*|.*JG.*|.*JNB.*|.*JAE.*|.*JNBE.*|.*JA.*|.*JNP|.*JPO|.*JNO|.*JNS.*|.*LOOP.*|.*LOOPZ.*|.*LOOPE.*|.*LOOPNZ.*|.*LOOPNE.*|.*JCXZ.*|.*INT.*/isg
+
+var instrucions = /MOV|[^a-z]PUSH|[^a-z]POP|[^a-z]XCHG|[^a-z]LEA|[^a-z]LAHF|[^a-z]SAHF|[^a-z]PUSHF|[^a-z]POPF|[^a-z]ADD|[^a-z]ADC|[^a-z]DEC|[^a-z]INC|[^a-z]AAA|[^a-z]SUB|[^a-z]SSB|[^a-z]NEG|[^a-z]CMP|[^a-z]MUL|[^a-z]IMUL|[^a-z]DIV|[^a-z]IDIV|[^a-z]CBW|[^a-z]CWD|[^a-z]NOT|[^a-z]SHL|[^a-z]SAL|[^a-z]SHR|[^a-z]SAR|[^a-z]ROL|[^a-z]ROR|[^a-z]RCL|[^a-z]RCR|[^a-z]AND|[^a-z]TEST|[^a-z]XOR|[^a-z]REP|[^a-z]MOVSB|[^a-z]CMPSB|[^a-z]SCASB|[^a-z]LODSB|[^a-z]STOSB|[^a-z]MOVSW|[^a-z]CMPSW|[^a-z]SCASW|[^a-z]LODSW|[^a-z]STOSW|[^a-z]CALL|[^a-z]JMP|[^a-z]RET|[^a-z]JE|[^a-z]JZ|[^a-z]JL|[^a-z]JNGE|[^a-z]JLE|[^a-z]JNG|[^a-z]JB|[^a-z]JNAE|[^a-z]JBE|[^a-z]JNA|[^a-z]JP|[^a-z]JPE|[^a-z]JO|[^a-z]JS|[^a-z]JNE|[^a-z]JNZ|[^a-z]JNL|[^a-z]JGE|[^a-z]JNLE|[^a-z]JG|[^a-z]JNB|[^a-z]JAE|[^a-z]JNBE|[^a-z]JA|[^a-z]JNP|[^a-z]JPO|[^a-z]JNO|[^a-z]JNS|[^a-z]LOOP|[^a-z]LOOPZ|[^a-z]LOOPE|[^a-z]LOOPNZ|[^a-z]LOOPNE|[^a-z]JCXZ|[^a-z]INT/ig
+
+
+
+let textArea = document.getElementById("myTextArea");
+let customArea = document.querySelector(".custom-area");
+let backdrop = document.querySelector(".backdrop");
+let count = document.getElementById("count");
+
+
+// Event listeners.
+
+textArea.addEventListener("input", function(e)
+{
+
+  customArea.innerHTML =applyColors(textArea.value).replaceAll(dirctives, function(m){
+      let c = "cyan"
+        return `<span style="color:${c}">${m}</span>`;
+    }).replaceAll(instrucionsComments, function(m){
+          let c = "violet"
+        return `<span style="color:${c}">${m}</span>`;
+    }).replace(/0x[0-9A-F]+|\d+h?/ig, function(m){
+
+       let c = "orange"
+      return `<spam style="color:${c}">${m}</spam>`;
+  }).replace(/\"\w+\"/ig, function(m){
+          let c = "green"
+        
+
+          return `<spam style="color:${c}">${m}</spam>`;
+      }).replace(/\;.+\n/ig, function(m){
+
+
+        let c = "yellow";
+    
+        
+
+
+      return `<spam style="color:${c}">${m}</spam>`;
+ })
+
+//count.innerHTML = addLine(customArea.innerHTML, count.innerHTML)
+    //console.log(customArea.innerHTML.split("\t"))
+})
+
+
+
+textArea.addEventListener("scroll", function()
+{
+    backdrop.scrollTop = textArea.scrollTop;
+});
+
+
+
+
+function applyColors(text)
+
+{
+
+
+
+return text.replaceAll(re, function(m)
+    {  
+      //console.log(all_regex)
+      let c = "red"
+   
+        return `<span style="color:${c}">${m}</span>`;
+    })
+
+}
+
+
+
+
+
+function applyColorsString(text){
+
+  return text.replace(reComments, function(m)
+
+    {  
+      console.log(m)
+      let c = "pink"
+      return `<span style="color:${c}">${m}</span>`;
+
+})
+}
+
+
+/* bugs:
+  registers+instr+dir = comments ci bon
+  registers... repetitive ci bon
+  strings
+*/
+</script>
