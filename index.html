@@ -15,36 +15,39 @@
       </div>
     </div>
 
-    <textarea id="myTextArea">
+    <textarea id="myTextArea" onkeydown="if(event.keyCode===9){
+      var v=this.value,
+      s=this.selectionStart,
+      e=this.selectionEnd;
+  
+      this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;
+      return false;
+    }
 
-</textarea>
+     if(event.keyCode === 13)
+      if(event.keyCode === 9)
+        console.log(9)
+      
+
+    ">
+      
+    </textarea>
 
   </div>
   
-  </main>
+  </main> 
 
 <script>
 
 
+  let registers = /\bAX[^a-z0-9]|\bBX[^a-z0-9]|\bCX[^a-z0-9]|\bDX[^a-z0-9]|\bCS[^a-z0-9]|\bDS[^a-z0-9]|\bES[^a-z0-9]|\bSS[^a-z0-9]|\bDI[^a-z0-9]|\bSI[^a-z0-9]|\bSP[^a-z0-9]|\bBP[^a-z0-9]|\bIP[^a-z0-9]/ig
+  let re = /(;.*ax)/igy
 
-//bugs{
+let directives = /\bORG[^a-z0-9]|\bDEFINE[^a-z0-9]|\bEQU[^a-z0-9]|\bPROC[^a-z0-9]|\bLOCAL[^a-z0-9]|\bENDM[^a-z0-9]|\bENDP[^a-z0-9]|\bOFFSET[^a-z0-9]/gi
 
-  let registers = /AX|BX|CX|DX|CS|DS|ES|SS|DI|SI|IP|BP|al|ah|ch|cl|dl|dh|bh|bl/ig
+var instructions = /\bMOV[^a-z0-9]|\bPUSH[^a-z0-9]|\bPOP[^a-z0-9]|\bXCHG[^a-z0-9]|\bLEA[^a-z0-9]|\bLAHF[^a-z0-9]|\bSAHF[^a-z0-9]|\bPUSHF[^a-z0-9]|\bPOPF[^a-z0-9]|\bADD[^a-z0-9]|\bADC[^a-z0-9]|\bDEC[^a-z0-9]|\bINC[^a-z0-9]|\bAAA[^a-z0-9]|\bSUB[^a-z0-9]|\bSSB[^a-z0-9]|\bNEG[^a-z0-9]|\bCMP[^a-z0-9]|\bMUL[^a-z0-9]|\bIMUL[^a-z0-9]|\bDIV[^a-z0-9]|\bIDIV[^a-z0-9]|\bCBW[^a-z0-9]|\bCWD[^a-z0-9]|\bNOT[^a-z0-9]|\bSHL[^a-z0-9]|\bSAL[^a-z0-9]|\bSHR[^a-z0-9]|\bSAR[^a-z0-9]|\bROL[^a-z0-9]|\bROR[^a-z0-9]|\bRCL[^a-z0-9]|\bRCR[^a-z0-9]|\bAND[^a-z0-9]|\bTEST[^a-z0-9]|\bOR[^a-z0-9]|\bXOR[^a-z0-9]|\bREP[^a-z0-9]|\bMOVSB[^a-z0-9]|\bCMPSB[^a-z0-9]|\bSCASB[^a-z0-9]|\bLODSB[^a-z0-9]|\bSTOSB[^a-z0-9]|\bMOVSW[^a-z0-9]|\bCMPSW[^a-z0-9]|\bSCASW[^a-z0-9]|\bLODSW[^a-z0-9]|\bSTOSW[^a-z0-9]|\bCALL[^a-z0-9]|\bJMP[^a-z0-9]|\bRET[^a-z0-9]|\bJE[^a-z0-9]|\bJZ[^a-z0-9]|\bJL[^a-z0-9]|\bJNGE[^a-z0-9]|\bJLE[^a-z0-9]|\bJNG[^a-z0-9]|\bJB[^a-z0-9]|\bJNAE[^a-z0-9]|\bJBE[^a-z0-9]|\bJNA[^a-z0-9]|\bJP[^a-z0-9]|\bJPE[^a-z0-9]|\bJO[^a-z0-9]|\bJS[^a-z0-9]|\bJNE[^a-z0-9]|\bJNZ[^a-z0-9]|\bJNL[^a-z0-9]|\bJGE[^a-z0-9]|\bJNLE[^a-z0-9]|\bJG[^a-z0-9]|\bJNB[^a-z0-9]|\bJAE[^a-z0-9]|\bJNBE[^a-z0-9]|\bJA[^a-z0-9]|\bJNP[^a-z0-9]|\bJPO[^a-z0-9]|\bJNO[^a-z0-9]|\bJNS[^a-z0-9]|\bLOOP[^a-z0-9]|\bLOOPZ[^a-z0-9]|\bLOOPE[^a-z0-9]|\bLOOPNZ[^a-z0-9]|\bLOOPNE[^a-z0-9]|\bJCXZ[^a-z0-9]|\bINT[^a-z0-9]/ig
 
-let reComments = /.*AX.*|.*BX.*|.*CX.*|.*DX.*|.*CS.*|.*DS.*|.*ES.*|.*SS.*|.*DI.*|.*SI.*|.*IP.*|.*BP.*|.*al.*|.*ah.*|.*ch.*|.*cl.*|.*dl.*|.*dh.*|.*bh.*|.*bl.*/ig
 
-let re = /[^a-z]AX|[^a-z]BX|[^a-z]CX|[^a-z]DX|[^a-z]CS|[^a-z]DS|[^a-z]ES|[^a-z]SS|[^a-z]DI|[^a-z]SI|[^a-z]IP|[^a-z]BP|[^a-z]al|[^a-z]ah|[^a-z][^a-z]ch|[^a-z]cl|[^a-z]dl|[^a-z]dh|[^a-z]bh|[^a-z]bl/igs
-
-//SP 1 ERE Bug
-//or/xor error
-//instructions + registers 
-//comments c'est resulu
-
-let dirctives = /.*ORG|.*DEFINE|.*EQU|.*PROC|.*LOCAL|.*ENDM|.*ENDP|.*OFFSET/gi
-
-var instrucionsComments = /MOV.*|.*PUSH.*|.*POP.*|.*XCHG.*|.*LEA.*|.*LAHF.*|.*SAHF.*|.*PUSHF.*|.*POPF.*|.*ADD.*|.*ADC.*|.*DEC.*|.*INC.*|.*AAA.*|.*SUB.*|.*SSB.*|.*NEG.*|.*CMP.*|.*MUL.*|.*IMUL.*|.*DIV.*|.*IDIV.*|.*CBW.*|.*CWD.*|.*NOT.*|.*SHL.*|.*SAL.*|.*SHR.*|.*SAR.*|.*ROL.*|.*ROR.*|.*RCL.*|.*RCR.*|.*AND.*|.*TEST.*|.*XOR.*|.*REP.*|.*MOVSB.*|.*CMPSB.*|.*SCASB.*|.*LODSB.*|.*STOSB.*|.*MOVSW.*|.*CMPSW.*|.*SCASW.*|.*LODSW.*|.*STOSW.*|.*CALL.*|.*JMP.*|.*RET.*|.*JE.*|.*JZ.*|.*JL.*|.*JNGE.*|.*JLE.*|.*JNG|.*JB|.*JNAE|.*JBE.*|.*JNA.*|.*JP.*|.*JPE.*|.*JO.*|.*JS.*|.*JNE.*|.*JNZ.*|.*JNL.*|.*JGE|.*JNLE.*|.*JG.*|.*JNB.*|.*JAE.*|.*JNBE.*|.*JA.*|.*JNP|.*JPO|.*JNO|.*JNS.*|.*LOOP.*|.*LOOPZ.*|.*LOOPE.*|.*LOOPNZ.*|.*LOOPNE.*|.*JCXZ.*|.*INT.*/isg
-
-var instrucions = /MOV|[^a-z]PUSH|[^a-z]POP|[^a-z]XCHG|[^a-z]LEA|[^a-z]LAHF|[^a-z]SAHF|[^a-z]PUSHF|[^a-z]POPF|[^a-z]ADD|[^a-z]ADC|[^a-z]DEC|[^a-z]INC|[^a-z]AAA|[^a-z]SUB|[^a-z]SSB|[^a-z]NEG|[^a-z]CMP|[^a-z]MUL|[^a-z]IMUL|[^a-z]DIV|[^a-z]IDIV|[^a-z]CBW|[^a-z]CWD|[^a-z]NOT|[^a-z]SHL|[^a-z]SAL|[^a-z]SHR|[^a-z]SAR|[^a-z]ROL|[^a-z]ROR|[^a-z]RCL|[^a-z]RCR|[^a-z]AND|[^a-z]TEST|[^a-z]XOR|[^a-z]REP|[^a-z]MOVSB|[^a-z]CMPSB|[^a-z]SCASB|[^a-z]LODSB|[^a-z]STOSB|[^a-z]MOVSW|[^a-z]CMPSW|[^a-z]SCASW|[^a-z]LODSW|[^a-z]STOSW|[^a-z]CALL|[^a-z]JMP|[^a-z]RET|[^a-z]JE|[^a-z]JZ|[^a-z]JL|[^a-z]JNGE|[^a-z]JLE|[^a-z]JNG|[^a-z]JB|[^a-z]JNAE|[^a-z]JBE|[^a-z]JNA|[^a-z]JP|[^a-z]JPE|[^a-z]JO|[^a-z]JS|[^a-z]JNE|[^a-z]JNZ|[^a-z]JNL|[^a-z]JGE|[^a-z]JNLE|[^a-z]JG|[^a-z]JNB|[^a-z]JAE|[^a-z]JNBE|[^a-z]JA|[^a-z]JNP|[^a-z]JPO|[^a-z]JNO|[^a-z]JNS|[^a-z]LOOP|[^a-z]LOOPZ|[^a-z]LOOPE|[^a-z]LOOPNZ|[^a-z]LOOPNE|[^a-z]JCXZ|[^a-z]INT/ig
 
 
 
@@ -59,37 +62,9 @@ let count = document.getElementById("count");
 textArea.addEventListener("input", function(e)
 {
 
-  customArea.innerHTML =applyColors(textArea.value).replaceAll(dirctives, function(m){
-      let c = "cyan"
-        return `<span style="color:${c}">${m}</span>`;
-    }).replaceAll(instrucionsComments, function(m){
-          let c = "violet"
-        return `<span style="color:${c}">${m}</span>`;
-    }).replace(/0x[0-9A-F]+|\d+h?/ig, function(m){
+  customArea.innerHTML =applyColors(textArea.value)
 
-       let c = "orange"
-      return `<spam style="color:${c}">${m}</spam>`;
-  }).replace(/\"\w+\"/ig, function(m){
-          let c = "green"
-        
-
-          return `<spam style="color:${c}">${m}</spam>`;
-      }).replace(/\;.+\n/ig, function(m){
-
-
-        let c = "yellow";
-    
-        
-
-
-      return `<spam style="color:${c}">${m}</spam>`;
- })
-
-//count.innerHTML = addLine(customArea.innerHTML, count.innerHTML)
-    //console.log(customArea.innerHTML.split("\t"))
-})
-
-
+    })
 
 textArea.addEventListener("scroll", function()
 {
@@ -97,26 +72,83 @@ textArea.addEventListener("scroll", function()
 });
 
 
-
+textArea.addEventListener("onkeydown", function(e){
+  v = this.selectionEnd;
+  console.log(v)
+})
 
 function applyColors(text)
 
 {
+//console.log(text.match(instructions))
 
 
-
-return text.replaceAll(re, function(m)
+return text.replace(registers, function(m)
     {  
       //console.log(all_regex)
-      let c = "red"
+      let c = "orange"
    
-        return `<span style="color:${c}">${m}</span>`;
-    })
+        return `<span class="re">${m}</span>`;
+    }).replace(directives, function(m){
 
+       let c = "cyan"
+   
+        return `<span class="dir">${m}</span>`;
+
+    }).replace(instructions, function(m){
+      let c = "violet"
+   
+        return `<span class="ins">${m}</span>`;
+
+    }).replace(/(\;(.*)\n?)/gi, function(m){
+      let c = "yellow"
+       if(m.match(/\;{1,}<span class="ins">/giy)) m = m.replaceAll(/<span class="ins">/gi,`<span class="comments">`)
+       if(m.match(/\;{1,}<span class="re">/giy)) m = m.replaceAll(/<span class="re">/gi,`<span class="comments">`)
+       if(m.match(/\;{1,}<span class="dir">/giy)) m = m.replaceAll(/<span class="dir">/gi,`<span class="comments">`)
+       console.log(m)
+       if(m.match(/\s*<span class="ins">/gi)) {
+        console.log(m)
+        m = m.replaceAll(/<span class="ins">/gi,`<span class="comments">`)}
+        if(m.match(/\s*<span class="re">/gi)) m = m.replaceAll(/<span class="re">/gi,`<span class="comments">`)
+          if(m.match(/\s*<span class="dir">/gi)) m = m.replaceAll(/<span class="dir">/gi,`<span class="comments">`)
+
+  
+      
+        return `<span class="comments">${m}</span>`;
+        }).replace(/\'(.*)'/gi, function(m){
+
+
+          if(m.match(/\'{1,}<span class="ins">/giy)) m = m.replaceAll(/<span class="ins">/gi,`<span class="strings">`)
+       if(m.match(/\'{1,}<span class="re">/giy)) m = m.replaceAll(/<span class="re">/gi,`<span class="strings">`) 
+        
+       if(m.match(/\'{1,}<span class="dir">/giy)) m = m.replaceAll(/<span class="dir">/gi,`<span class="strings">`)
+
+       if(m.match(/\s*<span class="ins">/gi)) m = m.replaceAll(/<span class="ins">/gi,`<span class="strings">`)
+        if(m.match(/\s*<span class="re">/gi)) m = m.replaceAll(/<span class="re">/gi,`<span class="strings">`)
+          if(m.match(/\s*<span class="dir">/gi)) m = m.replac
+          return `<span class="strings">${m}</span>`;
+        }).replace(/0x[0-9a-f]+|[a-f0-9]+h|0b[0-1]+|\d+/gi, function(m){
+      console.log(m)
+         return `<span class="digit">${m}</span>`
+    })
 }
 
+// \d+|  |[a-f0-9]+h|0b[0-1]+/\'(.*)'/
+function addTabulation(){
+
+}
+/*
+comments:
+strings
+
+*/
+//var 
 
 
+
+
+
+</script>
 
 
 function applyColorsString(text){
