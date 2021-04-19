@@ -1,19 +1,18 @@
-   const wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP'];
-   const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
-   const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
-   const Registers = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP', 'AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH', 'CS', 'DS', 'ES', 'SS'];
-   const instructions=["ENDM","JMP","EQU","DEFINE","ORG","ENDP","MOV","PUSH", "POP", "XCHG","LEA","LAHF","SAHF","PUSHF","POPF" ,"ADD","ADC","DEC" ,"INC","AAA","SUB","SSB" ,"NEG" ,"CMP" ,"MUL","IMUL","DIV","IDIV","CBW","CWD","NOT","SHL","SAL","SHR", "SAR","ROL","ROR", "RCL","RCR","AND","TEST","OR","XOR","REP","MOVSB", "CMPSB", "SCASB","LODSB","STOSB","MOVSW", "CMPSW", "SCASW","LODSW","STOSW","CALL"]
-   const keywords=["MACRO","PROC"] ;
-   const BracketRegister = ['BX', 'BP', 'SI', 'DI'];
-   const preProIns = ["ORG", "DEFINE", "EQU", "PROC", "LOCAL", "ENDM", "ENDP", "OFFSET"];
-    
-   const Stringinstructions = ["MOVSB", "CMPSB", "SCASB", "LODSB", "STOSB", "MOVSW", "CMPSW", "SCASW", "LODSW", "STOSW"];
+const wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP'];
+const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
+const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
+const Registers = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP', 'AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH', 'CS', 'DS', 'ES', 'SS'];
+const instructions=["ENDM","JMP","EQU","DEFINE","ORG","ENDP","MOV","PUSH", "POP", "XCHG","LEA","LAHF","SAHF","PUSHF","POPF" ,"ADD","ADC","DEC" ,"INC","AAA","SUB","SSB" ,"NEG" ,"CMP" ,"MUL","IMUL","DIV","IDIV","CBW","CWD","NOT","SHL","SAL","SHR", "SAR","ROL","ROR", "RCL","RCR","AND","TEST","OR","XOR","REP","MOVSB", "CMPSB", "SCASB","LODSB","STOSB","MOVSW", "CMPSW", "SCASW","LODSW","STOSW","CALL"]
+const keywords=["MACRO","PROC"] ;
+const BracketRegister = ['BX', 'BP', 'SI', 'DI'];
+const preProIns = ["ORG", "DEFINE", "EQU", "PROC", "LOCAL", "ENDM", "ENDP", "OFFSET"];
+ 
+const Stringinstructions = ["MOVSB", "CMPSB", "SCASB", "LODSB", "STOSB", "MOVSW", "CMPSW", "SCASW", "LODSW", "STOSW"];
 "use strict";
 /*
       instructionType = "prePropIns";
       instructionType = "InsSIM";
       expressionType = "INST","macro definition","VAR","MACRO","NULL";
-
 */
 
 class LexicalAnalysis{
@@ -37,19 +36,33 @@ class LexicalAnalysis{
          return ((t == null) ? "":t[0].replace(/\s/g, ""));
     }
     analyse(s) {
+        
         let tab = s.split(/\n/);
         let temp;
-        let x = []
+        let x = [];
+
         // to know if there is an error just test the last element.good 
         for (let index = 0; index < tab.length; index++) {
+
             const element = tab[index];
             temp = this.execute(element);
-            if (!temp.good) break;
             temp.index = index;
             x.push(temp);
+
+            if (!temp.good) 
+                return {
+
+                    state: false, 
+                    lexicalView: x, 
+                };
+            
         }
 
-        return x;
+        return {
+
+            state: true, 
+            lexicalView: x, 
+        };
     }
 
     execute(str)
@@ -685,6 +698,3 @@ class LexicalAnalysis{
 let  lx = new LexicalAnalysis();
 console.log("jmp es:[45h]");
 console.log(lx.verifyMemory("es: [45h] "));
-
-
-
