@@ -1,18 +1,21 @@
-const wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP'];
-const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
-const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
-const Registers = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP', 'AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH', 'CS', 'DS', 'ES', 'SS'];
-const instructions=["ENDM","JMP","EQU","DEFINE","ORG","ENDP","MOV","PUSH", "POP", "XCHG","LEA","LAHF","SAHF","PUSHF","POPF" ,"ADD","ADC","DEC" ,"INC","AAA","SUB","SSB" ,"NEG" ,"CMP" ,"MUL","IMUL","DIV","IDIV","CBW","CWD","NOT","SHL","SAL","SHR", "SAR","ROL","ROR", "RCL","RCR","AND","TEST","OR","XOR","REP","MOVSB", "CMPSB", "SCASB","LODSB","STOSB","MOVSW", "CMPSW", "SCASW","LODSW","STOSW","CALL"]
-const keywords=["MACRO","PROC"] ;
-const BracketRegister = ['BX', 'BP', 'SI', 'DI'];
-const preProIns = ["ORG", "DEFINE", "EQU", "PROC", "LOCAL", "ENDM", "ENDP", "OFFSET"];
- 
-const Stringinstructions = ["MOVSB", "CMPSB", "SCASB", "LODSB", "STOSB", "MOVSW", "CMPSW", "SCASW", "LODSW", "STOSW"];
+   const wordRegisters = ['AX', 'BX', 'CX', 'DX','DI', 'SI', 'SP', 'BP'];
+   const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
+   const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
+   const Registers = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP', 'AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH', 'CS', 'DS', 'ES', 'SS'];
+   const instructions=["ENDM","JMP","EQU","DEFINE","ORG","ENDP","MOV","PUSH", "POP", "XCHG","LEA","LAHF","SAHF","PUSHF","POPF" ,"ADD","ADC","DEC" ,"INC","AAA","SUB","SSB" ,"NEG" ,"CMP" ,"MUL","IMUL","DIV","IDIV","CBW","CWD","NOT","SHL","SAL","SHR", "SAR","ROL","ROR", "RCL","RCR","AND","TEST","OR","XOR","REP","MOVSB", "CMPSB", "SCASB","LODSB","STOSB","MOVSW", "CMPSW", "SCASW","LODSW","STOSW","CALL"]
+   const keywords=["MACRO","PROC"] ;
+   const BracketRegister = ['BX', 'BP', 'SI', 'DI'];
+   const preProIns = ["ORG", "DEFINE", "EQU", "PROC", "LOCAL", "ENDM", "ENDP", "OFFSET"];
+   const Stringinstructions = ["MOVSB", "CMPSB", "SCASB", "LODSB", "STOSB", "MOVSW", "CMPSW", "SCASW", "LODSW", "STOSW"];
 "use strict";
+//!!!!!!!!!!!------------
+//verfiy if the keywords is enough
+//!!!!!!!!!!!------------
 /*
       instructionType = "prePropIns";
       instructionType = "InsSIM";
       expressionType = "INST","macro definition","VAR","MACRO","NULL";
+
 */
 
 class LexicalAnalysis{
@@ -25,53 +28,23 @@ class LexicalAnalysis{
         instName:null,
         variableName:null,
         variableClass:null,
-        operands: [],
-        index:null
+        operands:[]
      };
      //return the firstKlma word from  a string 
-     extractFirstAwel(str)
-    {
+    extractFirstAwel(str){
+  
         let t = str.trim().match(/(\w+\s*\:|\w+)/);
         
          return ((t == null) ? "":t[0].replace(/\s/g, ""));
     }
-    analyse(s) {
-        
-        let tab = s.split(/\n/);
-        let temp;
-        let x = [];
 
-        // to know if there is an error just test the last element.good 
-        for (let index = 0; index < tab.length; index++) {
-
-            const element = tab[index];
-            temp = this.execute(element);
-            temp.index = index;
-            x.push(temp);
-
-            if (!temp.good) 
-                return {
-
-                    state: false, 
-                    lexicalView: x, 
-                };
-            
-        }
-
-        return {
-
-            state: true, 
-            lexicalView: x, 
-        };
-    }
-
-    execute(str)
-    {
+    execute(str){
+    
         this.lexical=
         {  good:true,
             expressionType:null,
             instructionType:null,
-            label:null,
+            label:[],
             message:null,
             instName:null,
             variableName:null,
@@ -81,13 +54,13 @@ class LexicalAnalysis{
          
         let firstKlma = this.extractFirstAwel(str);
        
-        if ( firstKlma[ firstKlma.length - 1]==':')
+        while ( firstKlma[ firstKlma.length - 1]==':'&& this.lexical.good)
         {
                    
        
             if (this.legalName(firstKlma.replace(':','')))
             {
-                this.lexical.label=firstKlma.replace(':',''); 
+                this.lexical.label.push(firstKlma.replace(':','')); 
                 str = str.replace(str.match(/(?<=\s*)(\w+\s*\:|\w+(?=\s+\w))/)[0],"").trim();
                 firstKlma = this.extractFirstAwel(str);
             }
@@ -347,7 +320,7 @@ class LexicalAnalysis{
     Num(str) {
         if ((str==null)) return false 
         let v = str.replace(/(?<=\-)\s*(?=\w)/g, "");
-            return /^0x[a-f0-9]$|^0[A-F][A-Fa-f0-9]*h$|^\d+[A-Fa-f0-9]*h$|^[0-1]+(b$)|^\d+$|^"."$|^'.'$/i.test(str[0] === "-" ? v.replace("-", "") : str);
+            return /^0x[a-f0-9]$|^0[A-F][A-Za-z0-9]*h$|^\d+[A-Za-z0-9]*h$|^[0-1]+(b$)|^\d+$|^"."$|^'.'$/i.test(str[0] === "-" ? v.replace("-", "") : str);
     }
     chartoascii(str) {
         if (/"."|'.'/i.test(str))
@@ -357,109 +330,109 @@ class LexicalAnalysis{
 
 
   
-		    testAppMacroOperand(str){
+    testAppMacroOperand(str){
 
-		        this.lexical.expressionType = "MACRO";
-		        this.lexical.instruction = str.split(' ')[0].trim();
+        this.lexical.expressionType = "MACRO";
+        this.lexical.instruction = str.split(' ')[0].trim();
 
-		        str = str.trim();//Le cas où on a une ligne vide
-		        if ( str == '' ) 
-		        {
-		            this.lexical.expressionType = "NULL";
-		            return;
-		        }
+        str = str.trim();//Le cas où on a une ligne vide
+        if ( str == '' ) 
+        {
+            this.lexical.expressionType = "NULL";
+            return;
+        }
 
-		        if ( !this.legalName(str.split(' ')[0].trim())  )
-		        {
-		            this.lexical.good = false;
-		            this.lexical.message = 'ERROR: ILLEGAL INSTRUCTION';
-		            return;
-		        }
-		        
+        if ( !this.legalName(str.split(' ')[0].trim())  )
+        {
+            this.lexical.good = false;
+            this.lexical.message = 'ERROR: ILLEGAL INSTRUCTION';
+            return;
+        }
+        
 
-		        var inString = false,
-		            accoType = '\"',
-		            strOp = '';
-		        var op = '';
+        var inString = false,
+            accoType = '\"',
+            strOp = '';
+        var op = '';
 
-		        for (var i = this.lexical.instruction.length; i < str.length; i++) {
+        for (var i = this.lexical.instruction.length; i < str.length; i++) {
 
-		            //STRING PARAMETER MANAGEMENT
-		            //------------------------------------------------------------
-		                //CAS ACCOLADE   --- FIN STR
-		                if ( str[i] == accoType && inString ) {
-		                    op = strOp + str[i];
+            //STRING PARAMETER MANAGEMENT
+            //------------------------------------------------------------
+                //CAS ACCOLADE   --- FIN STR
+                if ( str[i] == accoType && inString ) {
+                    op = strOp + str[i];
 
-		                    strOp = '';
-		                    inString = false;
-		                }
+                    strOp = '';
+                    inString = false;
+                }
 
-		                //CAS ACCOLADE   --- DEBUT STR
-		                else if ( (str[i] == '"' || str[i] == "'") && !inString) {
-		                    strOp += str[i];
-		                    inString = true;
-		                    accoType = str[i];
-		                }
+                //CAS ACCOLADE   --- DEBUT STR
+                else if ( (str[i] == '"' || str[i] == "'") && !inString) {
+                    strOp += str[i];
+                    inString = true;
+                    accoType = str[i];
+                }
 
-		                else if ( str[i] != accoType && inString) {
-		                    strOp += str[i];
-		                }
+                else if ( str[i] != accoType && inString) {
+                    strOp += str[i];
+                }
 
-		            //NON STRING PARAMETER
-		            else if ( str[i] == ',' && !inString ) {
-		                this.lexical.operands.push({name: op.trim(), type: ''});
-		                op = '  ';
-		            }
-		            else
-		                op += str[i];
-		            
-		        }
-		        if ( strOp != '' )
-		        	op = strOp;
-		        if ( op != '' ) 
-		            this.lexical.operands.push({name: op.trim(), type: ''});
-
-
-		        console.log(this.lexical.operands)
-
-		        //ON VERIFY LA VALIDITE DES PARAMETRES
-		        var i = 0;
-		        while(this.lexical.good && i < this.lexical.operands.length)
-		        {
-		            let op = this.lexical.operands[i].name;
-
-		            //Verify string parameter
-		            if((op[0] == '"' || op[0] == "'") && op[op.length-1] != op[0])
-		            {
-		                this.lexical.good = false;
-		                this.lexical.message = 'ERROR: ILLEGAL STRING FORMATING';
-		            }
-		            else if ( !(op[0] == '"' || op[0] == "'") && 
-		            		!this.legalName(op) && !this.isNumber(op) ) 
-		            {
-		                this.lexical.good = false;
-		                this.lexical.message = 'ERROR: ILLEGAL OPERANDS';
-		            }
-
-		            if ( (op[0] == '"' || op[0] == "'") && op[op.length-1] == op[0] )
-		            	this.lexical.operands[i].type = 'STR';
-		            else if ( this.isNumber(op) ) 
-		            	this.lexical.operands[i].type = 'INT';
-		            else if ( this.legalName(op) )
-		            	this.lexical.operands[i].type = 'VAR';
+            //NON STRING PARAMETER
+            else if ( str[i] == ',' && !inString ) {
+                this.lexical.operands.push({name: op.trim(), type: ''});
+                op = '  ';
+            }
+            else
+                op += str[i];
+            
+        }
+        if ( strOp != '' )
+            op = strOp;
+        if ( op != '' ) 
+            this.lexical.operands.push({name: op.trim(), type: ''});
 
 
+        console.log(this.lexical.operands)
 
-		            i++;
-		        }
+        //ON VERIFY LA VALIDITE DES PARAMETRES
+        var i = 0;
+        while(this.lexical.good && i < this.lexical.operands.length)
+        {
+            let op = this.lexical.operands[i].name;
+
+            //Verify string parameter
+            if((op[0] == '"' || op[0] == "'") && op[op.length-1] != op[0])
+            {
+                this.lexical.good = false;
+                this.lexical.message = 'ERROR: ILLEGAL STRING FORMATING';
+            }
+            else if ( !(op[0] == '"' || op[0] == "'") && 
+                    !this.legalName(op) && !this.isNumber(op) ) 
+            {
+                this.lexical.good = false;
+                this.lexical.message = 'ERROR: ILLEGAL OPERANDS';
+            }
+
+            if ( (op[0] == '"' || op[0] == "'") && op[op.length-1] == op[0] )
+                this.lexical.operands[i].type = 'STR';
+            else if ( this.isNumber(op) ) 
+                this.lexical.operands[i].type = 'INT';
+            else if ( this.legalName(op) )
+                this.lexical.operands[i].type = 'VAR';
 
 
-		    }
+
+            i++;
+        }
+
+
+    }
 
     //change it 
       
     testInst(str) {
-        console.log("555"+this.extractFirstAwel(str));
+        
         let testString = this.extractFirstAwel(str);
         if ((!preProIns.includes(testString.toUpperCase())) && (!instructions.includes(testString.toUpperCase()))) {
             this.lexical.message="INVALID INSTRUCTION NAME ";
@@ -479,7 +452,7 @@ class LexicalAnalysis{
     isOffsetV(str) {
         let v=str.trim().match((/(?<=\s)\w+/));
         return (/OFFSET\s+\w/i.test(str.trim()) && legalVarName(v[0]));
-        }
+    }
         //no spaces behind or after the backets
     isNumber(str)
         {
@@ -491,7 +464,7 @@ class LexicalAnalysis{
             return correct;
         }
         else return this.Num(str);
-        }
+    }
 
     legalVarName(str) {
         str = str.toUpperCase().trim();
@@ -555,51 +528,58 @@ class LexicalAnalysis{
          }
     }
   
-       testInstOps(str) {
+    testInstOps(str) {
      var operands = [];
      if (/^REP|^REPE|^REPNE/i.test(str.trim())) {
-         var str2 = (str+" ").replace(/\w+(?=\s)/, "");//delete first word
-         console.log(str2);
+         var str2 = str.replace(/\w+(?=\s)/, "");//delete first word
+         this.lexical.expressionType = "INST";
+         this.lexical.instructionType="insSIM";
+         this.lexical.instName = (/^REPNE/i.test(str.trim())) ? "REPNE" :(/^REPE/i.test(str.trim()))?"REPE":"REP";
          if (Stringinstructions.includes(str2.trim().toUpperCase())) {
-             this.lexical.operands.push({name:str2.toUpperCase(), type:"INS"}); return true;
+
+             this.lexical.operands.push({name:str2.toUpperCase(), type:"INS"});
+            return true;
          }
                 
                  else
-                      { this.lexical.message = "INVALID PARAMETER"; return false };
+                      { this.lexical.message = "INVALID PARAMETER"; 
+                      return false };
          
         }
      else if (/^JMP|^CALL/i.test(str.trim())) {
-         console.log("fuck");
+        
          var str2 = str.replace(/\w+(?=\s)/, "");
-         this.instName = (/^JMP/i.test(str.trim())) ? "JMP" : "CALL";
-         this.expressionType = "INST";
+         this.lexical.instName = (/^JMP/i.test(str.trim())) ? "JMP" : "CALL";
+         this.lexical.expressionType = "INST";
+         this.lexical.instructionType="insSIM";
          
          if (this.isNumber(str2.trim())) {
              this.lexical.operands.push({ name: str2.toUpperCase(), type: "INT" });
              return true;
          }
-         else if (this.legalVarName(str2.trim())) {
+        else if (this.legalVarName(str2.trim())) {
              this.lexical.operands.push({ name: str2.toUpperCase(), type: "LAB" });
              return true;
          }
        
-         else if (/\:/.test(str)) {
+        else if (/\:/.test(str)) {
              let arr = str2.split(":");
              if (this.isNumber(arr[0].trim()) && this.isNumber(arr[1].trim())) {
-                this.lexical.operands.push({name:str2.toUpperCase(), type:"DIS"}); return true; 
+                this.lexical.operands.push({name:str2.toUpperCase(), type:"DIS"});
+                return true; 
                  
              }
 
-               else if (this.verifyMemory(str2.trim())) {
-             this.lexical.operands.push({ name: str2.toUpperCase(), type: this.opsType(str2.trim()) });
-             return true;            
-             }
-             else {
-                 this.lexical.message = "WRONG PARAMETER"; return false;
-             }
-         }
+        else if (this.verifyMemory(str2.trim())) {
+            this.lexical.operands.push({ name: str2.toUpperCase(), type: this.opsType(str2.trim()) });
+            return true;            
+            }
+            else {
+                this.lexical.message = "WRONG PARAMETER"; return false;
+            }
         }
-    var str2 = str.replace(/\w+(?=\s)/, "");//delete first word
+        }
+        var str2 = str.replace(/\w+(?=\s)/, "");//delete first word
         var arr = [];
         var correct = true;
         var Op = {
@@ -619,20 +599,21 @@ class LexicalAnalysis{
             return true;
         }
         else return true;
-}
-    verifyMemory(str) {
-           var str2 = /.*(?=\[)/.test(str)?str.match(/.*(?=\[)/):" ";
-           str2 = str2[0].trim();
+    }
+    verifyMemory(str) 
+    {
+        var str2 = str.match(/.*(?=\[)/)||" ";
+        str2 = str2[0].trim();
             var arr = [];
             var str3 = "";
             str2 = str2.replace(/(?<=\w)\s*(?=\[)/,"");
             str2 = str2.replace(/(?<=\w)\s+(?=(es|ss|ds|cs))/i," ");
-           
+        
     switch (str2.toUpperCase()) {
-         case "WORD": case "BYTE": case "W.": case "B.": case "":case "ES:":case "BYTE ES:":case "WORD ES:":case "DS:":case "BYTE DS:":case "WORD DS:":case "CS:":case "BYTE CS:":case "WORD CS:":case "SS:":case "BYTE SS:":case "WORD SS:"://test whats behind and after the brackets
-           
-            if ((/\]$/.test(str))) {  //check whats after the  brackets
-               
+        case "WORD": case "BYTE": case "W.": case "B.": case "":case "ES:":case "BYTE ES:":case "WORD ES:":case "DS:":case "BYTE DS:":case "WORD DS:":case "CS:":case "BYTE CS:":case "WORD CS:":case "SS:":case "BYTE SS:":case "WORD SS:"://test whats behind and after the brackets
+        
+            if (/\]\s*$/.test(str)) {  //check whats after the  brackets
+                console.log("hh");
 
                 str3 = str.replace(/.*\[/i, "");//replace whats behind and after the brackets     
                 str3 = str3.replace(/\]/i, "");//replace whats behind and after the brackets 
@@ -657,7 +638,7 @@ class LexicalAnalysis{
                         {
                             array.push(arr[i].toUpperCase());
                         }
-                       
+                    
                         if (!(BracketRegister.includes(arr[i].toUpperCase()) || this.isNumber(arr[i]) )) {//register or variable without spaces or isNumberber
                             correct = false;
                             break;
@@ -679,11 +660,10 @@ class LexicalAnalysis{
             else return false;
             break;
         default:
-            return false;
+            return  false;
     }
-}
-    occ(str, arr) 
-    {
+    }
+    occ(str, arr) {
         let x = 0;
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] === str)
@@ -696,5 +676,4 @@ class LexicalAnalysis{
 }
 
 let  lx = new LexicalAnalysis();
-console.log("jmp es:[45h]");
-console.log(lx.verifyMemory("es: [45h] "));
+console.log(lx.execute("jj:mov:ll:movsb"));
