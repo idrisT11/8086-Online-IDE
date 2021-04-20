@@ -7,6 +7,15 @@ class PreProcessor {
         this.good = true; 
         this.message = ""; 
         this.errorLine = null;
+       
+          this.macros = [];
+         /*	
+            name: STR,
+            op: line.operands,
+            index: line.index,
+            innerContent: [],
+            localInstParameter:[],
+         */
 
     }
 
@@ -322,6 +331,332 @@ class PreProcessor {
         
         return 0;
     }
+  
+  
+  //====================================================================================================
+  
+  //General function for macro managing
+	manageMacro(lexicalView){
+		
+		if ( this.getMacro(lexicalView) && !this.sameNameMacro() && this.manageMacroCalls(lexicalView) ) 
+			return 1;
+		else 
+			return 0;
+		
+	}
+
+	//Getting macros
+	getMacro(lexicalView){
+
+		var inMacro = false,
+			macroIndex = 0,
+			macroLineDeclaration = 0,
+			macroLengthDeclaration = 0,
+			localInstParameter = [];
+
+		for (var i = 0; i < lexicalView.length; i++) 
+		{
+			let line = lexicalView[i];
+
+			//CAS D'UNE INSTRCUTION LOCAL EN DEHORS D'UNE MACRO
+			if ( line.expressionType == 'INST' && line.instName = 'LOCAL' && !inMacro ) 
+			{
+				this.message = 'ERROR : ILLEGAL USE OF "LOCAL" DIRECTIVE';
+				this.good = false;
+				return 0;
+			}
+
+			//CAS D'UNE INSTRCUTION ENDM EN DEHORS D'UNE MACRO
+			else if ( line.expressionType == 'INST' && line.instName = 'ENDM' && !inMacro) 
+			{
+				this.message = 'ERROR : ILLEGAL USE OF "ENDM" DIRECTIVE';
+				this.good = false;
+				return 0;
+			}
+
+			//CAS D'UNE DECLARATION MACRO DANS UNE AUTRE MACRO
+			else if ( line.expressionType == 'macro definition' && inMacro)
+			{
+				this.message = 'ERROR : MACRO DECLARATION MISSING "ENDM" SYMBOL';
+				this.good = false;
+				return 0;
+			}
+
+
+			else if ( line.expressionType == 'macro definition' && !inMacro)
+			{
+				inMacro = true;
+				macroIndex = line.index;
+				this.macro.push({
+					name: line.instName,
+					op: line.operands,
+					index: line.index,
+					innerContent: [],
+					localInstParameter: [],
+				});
+
+				macroLineDeclaration = i;
+				macroLengthDeclaration = 1;
+			}
+
+			else if ( line.expressionType == 'INST' && line.instName = 'LOCAL' && inMacro ) 
+			{
+				if ( localInstParameter.length != 0 ) 
+				{
+					this.message = 'ERROR : ONLY ONE LOCAL DIRECTIVE IN A MACRO ALLOWED';
+					this.good = false;
+					return 0;
+				}
+				else
+					localInstParameter = line.operands;
+
+				macroLengthDeclaration++;
+			}
+
+			else if ( line.expressionType == 'INST' && line.instName = 'ENDM' && inMacro) 
+			{
+				inMacro = false;
+				j++;
+				macroLengthDeclaration++;
+
+				lexicalView.splice(macroLineDeclaration, macroLengthDeclaration, ...[]);
+				//On enleve les lignes de la declaration de macro
+				i -= macroLengthDeclaration;
+				macroLengthDeclaration = 0;
+			}
+
+			else
+			{
+
+				macroLengthDeclaration++;
+				this.macro[j].innerContent.push(line);
+			}
+
+		}
+		//CAS D'UNE MACRO QUI NE FINIT PAS AVEC LE SYMBOLE "ENDM"
+		if ( inMacro ) 
+		{
+			this.message = 'ERROR : MACRO DECLARATION MISSING "ENDM" SYMBOL';
+			this.good = false;
+			return 0;
+		}
+
+		return 1;
+	}
+
+	//Verification de si deux macros portes le même nom
+	sameNameMacro(){
+		for (var i = 0; i < macros.length; i++) 
+			for (var j = i+1; j < macros.length; j++) 
+				if(macros[i].name == macros[j].name)
+					return 1;
+			
+			
+		return 0
+	}
+
+	//Rend l'indice de la macro dans le tableau this.macro
+	getMacroId(neededMacroName){
+		var i = 0,
+			trouve = false;
+
+		while (!trouve && i < this.macros)
+		{
+			trouve = macros[i].name == neededMacroName;
+			i++;
+		}
+		
+		//si on trouve on rend lindice, sinon on rend -1
+		return (trouve) ? i : -1;
+	}
+
+
+	//Remplace le code de la macro
+	manageMacroCalls(lexicalView){
+		let nbParcours = 0;
+
+		for (var i = 0; i < lexicalView.length; i++) {
+			let line = lexicalView[i];
+
+			if ( line.expressionType == "MACRO" ) 
+			{
+				//ON EXTRAIT LA MACRO PUIS ON VERIFIE SI ELLE EXISTE
+				//------------------------------------------------------------
+				//------------------------------------------------------------
+				let macroId = this.getMacroId(line.instName);
+				if ( macroId == -1) 
+				{
+					this.message = 'ERROR : UNDECLARED MACRO ';
+					this.good = false;
+
+					return 0;
+				}
+				let macroCode = [];
+				//EXTRACT STRING PARAMETER
+				//------------------------------------------------------------
+				//------------------------------------------------------------
+				let stringParameter = [];
+
+				for (var j = 0; j < line.operands.length; j++) {
+					if( line.operands[j].type == "STR" )
+					{
+						stringParameter.push({
+							value: line.operands[j].name,
+							variableName: '__' + line.instName + j.toString(),
+
+						});
+
+						lexicalView[i].operands[j].type = "VAR8";
+						lexicalView[i].operands[j].name = '__VAR' + line.instName + j.toString();
+					}
+				}
+
+				//GENERATING STRING DECLARATION
+				//------------------------------------------------------------
+				//------------------------------------------------------------
+				let jmpPadding = 0;
+				for (var j = 0; j < stringParameter.length; j++) {
+					macroCode.push({
+						label: null,
+						expressionType: 'VAR',
+						instructionType: null,
+						instName: 'DB',
+						good: true,
+						operands: [
+							{name: stringParameter[j], type: 'STR'},
+							{name: '0', type: 'INT'}
+						],
+						variableName: '__' + line.instName + j.toString(),
+						variableType: 'DB',
+
+						index: line.index
+					});
+					jmpPadding += stringParameter[j].length - 2 + 1
+					// -2 : les guillemets
+					// +1 : le zero final
+				}
+
+				//Si on un une declaration de string, on push un jump
+				if ( jmpPadding != 0 )
+				{
+					//Si le padding est plus petit qu'un byte, alors on aura un short jump(2bytes)
+					//Sinon, ça sera un long jump (3bytes)
+					jumpPadding = ((jmpPadding+2) & 0xFF) == 0 ? jmpPadding + 2 : jmpPadding + 3;
+
+					macroCode.unshift({
+						label: null,
+						expressionType: 'INST',
+						instructionType: null,
+						instName: 'JMP',
+						good: true,
+						operands: [
+							{name: jumpPadding.toString() , type: 'INT'},
+						],
+						variableName: null,
+						variableType: null,
+
+						index: line.index
+					});
+				}
+
+				//------------------------------------------------------------
+				//------------------------------------------------------------
+
+				this.replaceOccMacro(lexicalView[i].operands, macroId);
+
+				for (var j = 0; j < this.macros[macro].innerContent.length; j++) 
+				{
+
+					let lineInMacro = this.macros[macro].innerContent[j];
+
+					macroCode.push(lineInMacro);
+				}
+				
+
+				//On remplace
+				lexicalView.splice(i, 1, ...macroCode);
+			}
+			
+		}
+
+
+	}
+
+
+	//Remplacing the macro declaration and local labels
+	replaceOccMacro(operands, macroId)
+	{
+		let table = this.macros[macroId].innerContent,
+			labelList = this.macro[macroId].localInstParameter,
+			parameterList = this.macro[macroId].op;//list of <operand objects>
+
+		//remplacing local labels
+		for (var i = 0; i < labelList.length; i++) 
+		{
+
+			let labelToBeChanged = labelList[i];
+
+			//For every line in the macro
+			for (var j = 0; j < table.length; j++) 
+			{
+
+				//For a label as a label declaration
+				for (var k = 0; k < table[j].label.length; k++) 
+				
+					if ( table[j].label[k] == labelToBeChanged ) 
+
+						table[j].label[k] = '__LOCAL_LABEL' + labelToBeChanged;
+
+				
+				
+
+				//For a label as an operand 
+				for (var k = 0; k < table[j].operands.length; k++) 
+				{
+
+					let op = table[j].operands[k];
+
+					if ( op.name == labelToBeChanged ) 
+
+						op.name = '__LOCAL_LABEL' + labelToBeChanged;
+
+				}
+			}
+		}
+
+
+		//remplacing paramters
+		for (var i = 0; i < parameterList.length; i++) 
+		{
+
+			let parameterName = parameterList[i],
+				parameterValue = operands[i];
+
+			//For every line in the macro
+			for (var j = 0; j < table.length; j++) 
+			{
+
+				//For every operands in the macro
+				for (var k = 0; k < table[j].operands.length; k++) 
+				{
+
+					let op = table[j].operands[k];
+
+					//If the operand name correspond to the parameter name
+					if ( op.name == parameterName.name ) 
+					{
+
+						op.name = parameterValue.name;
+						op.type = parameterValue.type;
+					}
+
+						
+
+				}
+			}
+		}
+		
+	}
 
 }
 
