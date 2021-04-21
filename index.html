@@ -1,11 +1,9 @@
-<head>
+head>
     <link rel="stylesheet" href="style.css">
   </head>
   <main>
 
-  <textArea class="list" id="count">
-   1 
-  </textArea>
+  <textArea class="list" id="count">1</textArea>
 
   <div class="container">
     <div class="backdrop">
@@ -24,14 +22,51 @@
       return false;
     }
 
-     if(event.keyCode === 13)
-      if(event.keyCode === 9)
-        console.log(9)
-      
 
-    ">
+      var count = document.getElementById('count');
+      var count1 = document.getElementById('myTextArea')
+      var nb=1;
+
+
+       if((count1.selectionStart!=null)&&(count1.selectionStart!=undefined))
+var position = count1.selectionStart;
+
+       for(let i = 0; i<=this.value.length; i++)
+      if(this.value[i] == '\n')nb++;
+
+
+    
+
+     if((event.keyCode === 13)){
       
-    </textarea>
+      if(nb == 1) nb=2;
+      else nb+=1
+
+    count.value = count.value+'\n'+nb.toString();
+
+}
+"  onkeyup ="
+      var count = document.getElementById('count');
+      var count1 = document.getElementById('myTextArea')
+      var nb=1;
+          for(let i = 0; i<=this.value.length; i++)
+      if(this.value[i] == '\n')nb++;
+    console.log(nb);
+
+
+    if(event.keyCode == 8){
+      if(nb >= 9){
+        var last_line = count.value.substring(count.value.length -2);
+        if (nb < parseInt(last_line)){
+            count.value = count.value.substring(0, count.value.length -3);
+        }
+      }
+      else if(nb < parseInt(count.value.substring(count.value.length -2)))
+        count.value = count.value.substring(0, count.value.length -2);
+    }
+
+
+"></textarea>
 
   </div>
   
@@ -64,7 +99,18 @@ textArea.addEventListener("input", function(e)
 
   customArea.innerHTML =applyColors(textArea.value)
 
+  console.log(getText(textArea.value))
+
     })
+
+var s1 = document.getElementById('myTextArea');
+var s2 = document.getElementById('count');
+
+function select_scroll_1(e) { s2.scrollTop = s1.scrollTop; }
+function select_scroll_2(e) { s1.scrollTop = s2.scrollTop; }
+
+s1.addEventListener('scroll', select_scroll_1, false);
+s2.addEventListener('scroll', select_scroll_2, false);
 
 textArea.addEventListener("scroll", function()
 {
@@ -72,15 +118,10 @@ textArea.addEventListener("scroll", function()
 });
 
 
-textArea.addEventListener("onkeydown", function(e){
-  v = this.selectionEnd;
-  console.log(v)
-})
-
 function applyColors(text)
 
 {
-//console.log(text.match(instructions))
+
 
 
 return text.replace(registers, function(m)
@@ -105,9 +146,9 @@ return text.replace(registers, function(m)
        if(m.match(/\;{1,}<span class="ins">/giy)) m = m.replaceAll(/<span class="ins">/gi,`<span class="comments">`)
        if(m.match(/\;{1,}<span class="re">/giy)) m = m.replaceAll(/<span class="re">/gi,`<span class="comments">`)
        if(m.match(/\;{1,}<span class="dir">/giy)) m = m.replaceAll(/<span class="dir">/gi,`<span class="comments">`)
-       console.log(m)
+       
        if(m.match(/\s*<span class="ins">/gi)) {
-        console.log(m)
+        
         m = m.replaceAll(/<span class="ins">/gi,`<span class="comments">`)}
         if(m.match(/\s*<span class="re">/gi)) m = m.replaceAll(/<span class="re">/gi,`<span class="comments">`)
           if(m.match(/\s*<span class="dir">/gi)) m = m.replaceAll(/<span class="dir">/gi,`<span class="comments">`)
@@ -128,45 +169,15 @@ return text.replace(registers, function(m)
           if(m.match(/\s*<span class="dir">/gi)) m = m.replac
           return `<span class="strings">${m}</span>`;
         }).replace(/0x[0-9a-f]+|[a-f0-9]+h|0b[0-1]+|\d+/gi, function(m){
-      console.log(m)
+      
          return `<span class="digit">${m}</span>`
     })
 }
 
-// \d+|  |[a-f0-9]+h|0b[0-1]+/\'(.*)'/
-function addTabulation(){
 
-}
-/*
-comments:
-strings
-
-*/
-//var 
-
-
-
-
-
-</script>
-
-
-function applyColorsString(text){
-
-  return text.replace(reComments, function(m)
-
-    {  
-      console.log(m)
-      let c = "pink"
-      return `<span style="color:${c}">${m}</span>`;
-
-})
+function getText(text){
+  text  = text.replace(/<span .+>/, '').replace(/<\/span>/, '');
+  return text;
 }
 
-
-/* bugs:
-  registers+instr+dir = comments ci bon
-  registers... repetitive ci bon
-  strings
-*/
 </script>
