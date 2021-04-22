@@ -1,0 +1,95 @@
+.backdrop, #myTextArea ,.list {
+    font: 12px 'Open Sans', sans-serif;
+    letter-spacing: 1px;
+    width: 50%;
+    height: 54%;
+    background-color:  #1f1f1f ;
+    padding-left : 5px;
+  color: #ccc;
+    font-size:  15px;
+    
+  
+
+  }
+  
+  #myTextArea {
+    margin: 0;
+    position: absolute;
+    border-radius: 0;
+    background-color: transparent;
+    color: transparent;
+    caret-color: #555555;
+    z-index: 2;
+    resize: none;
+ 
+ 
+}
+  .backdrop {
+    position: absolute;
+    z-index: 1;
+    border: none;
+    overflow: auto;
+    pointer-events: none;
+
+  }
+  
+  .custom-area {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+
+   
+  }
+
+  .registers{
+      color : red;
+  }
+main{
+  display: flex;
+}
+
+.list{
+  background-color: rgb(200, 27, 85);
+  height: 340px;
+  width: 50px;
+  border:1px solid red;
+  text-align: : center;
+   resize: none;
+   overflow: hidden;
+}
+
+.list p{
+  margin : 0 auto;
+   text-align: center;
+ 
+}
+
+
+.re{
+ color: #629755
+}
+
+
+.dir{
+  color: #cc7832;
+}
+
+.ins{
+  color: cyan
+}
+
+.digit{
+  color :  #6897BB;
+}
+
+.comments{
+  color: #808080
+}
+
+.strings{
+  color: green;
+}
+.code{
+  background-color: red;
+  padding: 3px;
+  margin: 0;
+}
