@@ -1,11 +1,11 @@
-
 <head>
     <link rel="stylesheet" href="style.css">
   </head>
+
+  <div class="template">
   <main>
 
- <div id="code"> 
-<textArea class="list" id="count">1</textArea>
+<textArea class="list" id="count">1 </textArea>
   <div class="container">
 
     <div class="backdrop">
@@ -26,8 +26,7 @@
       var count = document.getElementById('count');
       var count1 = document.getElementById('myTextArea')
       var nb=1;
-       if((count1.selectionStart!=null)&&(count1.selectionStart!=undefined))
-var position = count1.selectionStart;
+      
        for(let i = 0; i<=this.value.length; i++)
       if(this.value[i] == '\n')nb++;
     
@@ -57,9 +56,10 @@ var position = count1.selectionStart;
 "></textarea>
 
   </div>
-</div>
+
   
   </main> 
+</div>
 
 <script>
 
