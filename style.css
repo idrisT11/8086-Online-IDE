@@ -93,3 +93,8 @@ main{
   padding: 3px;
   margin: 0;
 }
+
+#code{
+  display: flex;
+  flex-wrap: wrap;
+}
