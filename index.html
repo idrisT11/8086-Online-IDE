@@ -1,11 +1,13 @@
-head>
+
+<head>
     <link rel="stylesheet" href="style.css">
   </head>
   <main>
 
-  <textArea class="list" id="count">1</textArea>
-
+ <div id="code"> 
+<textArea class="list" id="count">1</textArea>
   <div class="container">
+
     <div class="backdrop">
       <div class="custom-area">
        
@@ -21,29 +23,19 @@ head>
       this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;
       return false;
     }
-
-
       var count = document.getElementById('count');
       var count1 = document.getElementById('myTextArea')
       var nb=1;
-
-
        if((count1.selectionStart!=null)&&(count1.selectionStart!=undefined))
 var position = count1.selectionStart;
-
        for(let i = 0; i<=this.value.length; i++)
       if(this.value[i] == '\n')nb++;
-
-
     
-
      if((event.keyCode === 13)){
       
       if(nb == 1) nb=2;
       else nb+=1
-
     count.value = count.value+'\n'+nb.toString();
-
 }
 "  onkeyup ="
       var count = document.getElementById('count');
@@ -52,8 +44,6 @@ var position = count1.selectionStart;
           for(let i = 0; i<=this.value.length; i++)
       if(this.value[i] == '\n')nb++;
     console.log(nb);
-
-
     if(event.keyCode == 8){
       if(nb >= 9){
         var last_line = count.value.substring(count.value.length -2);
@@ -64,11 +54,10 @@ var position = count1.selectionStart;
       else if(nb < parseInt(count.value.substring(count.value.length -2)))
         count.value = count.value.substring(0, count.value.length -2);
     }
-
-
 "></textarea>
 
   </div>
+</div>
   
   </main> 
 
