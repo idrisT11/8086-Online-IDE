@@ -1,13 +1,16 @@
-.backdrop, #myTextArea ,.list {
+
+/* here you can change the width + the height*/
+
+.backdrop, #myTextArea {
     font: 12px 'Open Sans', sans-serif;
     letter-spacing: 1px;
-    width: 50%;
-    height: 54%;
+    width: 230px;
+    height: 330px;
     background-color:  #1f1f1f ;
     padding-left : 5px;
   color: #ccc;
     font-size:  15px;
-    
+ 
   
 
   }
@@ -25,7 +28,7 @@
  
 }
   .backdrop {
-    position: absolute;
+   position: absolute;
     z-index: 1;
     border: none;
     overflow: auto;
@@ -43,25 +46,21 @@
   .registers{
       color : red;
   }
-main{
-  display: flex;
-}
+
+/* change les bordure de barre de lignes*/
 
 .list{
   background-color: rgb(200, 27, 85);
-  height: 340px;
+  height: 330px;
   width: 50px;
   border:1px solid red;
   text-align: : center;
    resize: none;
    overflow: hidden;
+   font: 12px 'Open Sans', sans-serif;
+    letter-spacing: 1px;
 }
 
-.list p{
-  margin : 0 auto;
-   text-align: center;
- 
-}
 
 
 .re{
@@ -85,16 +84,25 @@ main{
   color: #808080
 }
 
-.strings{
+.strings{;
   color: green;
 }
 .code{
   background-color: red;
   padding: 3px;
-  margin: 0;
+  
 }
-
-#code{
+main{
   display: flex;
   flex-wrap: wrap;
+ 
 }
+
+/* ici tu peux manipulr la position de text area comme tu veux*/
+.template{
+  display: flex;
+ margin:  150px 30px 0 100px;
+}
+
+
+
