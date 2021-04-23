@@ -1,4 +1,5 @@
 
+
 /* here you can change the width + the height*/
 
 .backdrop, #myTextArea {
@@ -64,7 +65,7 @@
 
 
 .re{
- color: #629755
+ color: #9fb727
 }
 
 
@@ -73,11 +74,11 @@
 }
 
 .ins{
-  color: cyan
+  color: #4d896e;
 }
 
 .digit{
-  color :  #6897BB;
+  color : #8679e1;
 }
 
 .comments{
@@ -85,7 +86,7 @@
 }
 
 .strings{;
-  color: green;
+  color: #bfbc68;
 }
 .code{
   background-color: red;
