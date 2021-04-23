@@ -17,21 +17,14 @@ class PreProcessor {
 
     _checkVariable(varName) {
 
-        // Check if varName exists in this.variables and in this.labels
+        // Check if varName exists in this.variables
         
         // check in this.variables
-        for (var i = 0; i < this.variables; i++) {
+        for (var i = 0; i < this.variables.length; i++) {
 
-            if (this.variables[i].name == varName)
+            if (this.variables[i].varName == varName)
 
                 // it exists
-                return true;
-        }
-
-        for (var i = 0; i < this.labels; i++) {
-
-            if (this.labels[i].name == varName)
-                
                 return true;
         }
 
@@ -41,7 +34,6 @@ class PreProcessor {
     getVariables(objectsArray) {
 
         // looping through each line and extract variable names and labels
-
 
         for (var i = 0; i < objectsArray.length; i++) {
 
@@ -59,7 +51,7 @@ class PreProcessor {
                 labelName : null,
             }
 
-            if (objectsArray[i].expressionType == "VAR" && objectsArray[i].variableName != null && !this._checkVariable(objectsArray[i].variableName)) {
+            if (objectsArray[i].expressionType == "VAR" && objectsArray[i].variableName != null && !this._checkVariable(objectsArray[i].variableName) && !this._findInLabels(objectsArray[i].variableName)) {
 
                 variablesObject.line = i; 
                 variablesObject.varName = objectsArray[i].variableName.toUpperCase(); 
@@ -76,8 +68,6 @@ class PreProcessor {
                
             }
 
-                
-
             if (objectsArray[i].label != null) {
 
                 labelsObject.line = i; 
@@ -87,8 +77,8 @@ class PreProcessor {
 
             }
 
-
         }
+
 
     }
 
@@ -115,20 +105,13 @@ class PreProcessor {
 
             for (var j = 0; j < objectsArray[i].operands.length; j++) {
 
-
                 if (/VAR/.test(objectsArray[i].operands[j].type)) {
 
                     found = false;
 
                     for (var k = 0; k < this.variables.length; k++) {
 
-
                         if (this.variables[k].varName.toUpperCase() == objectsArray[i].operands[j].name.toUpperCase()) {
-
-                            /*console.log("OBJECT NUM:", i); 
-                            console.log("THIS.VARIABLES: ", this.variables[k].varName);
-                            console.log("OBJECTS VAR NAME: ", objectsArray[i].operands[j].name);
-                            console.log("======================");*/
 
                             found = true; 
 
@@ -142,7 +125,6 @@ class PreProcessor {
                             
                         }
 
-
                     }
 
                     if (!found) {
@@ -155,56 +137,195 @@ class PreProcessor {
                         else {
 
                             this.good = false;
-                            this.errorLine = i; 
+                            this.errorLine = i+1; 
                             this.message = "Variable/Label doesn't exist"; 
 
                             return -1;
                         }
 
                         }
-                    
                 }
+
+                else if (/OFF/.test(objectsArray[i].operands[j].type)) {
+
+                    let opsVars = objectsArray[i].operands[j].name.split(" "); 
+                    if (!this._checkVariable(opsVars[1])) {
+
+                        this.good = false; 
+                        this.errorLine = i + 1; 
+                        this.message = "ERROR: VARIABLE DOESN'T EXIST";
+
+                        return -1;
+                    }
+
             }
 
         }
         
         return 0;
     }
+}
+    manageProcedures(objectsArray) {
 
+        // handle procedures calling 
 
+        var procBegin = 0,  // the object index where the procedure begins
+            procEnd = 0,   
+            inProc = false,
+            endpFound = false, // end of the procedure
+            j = 0, 
+            valid = false;
 
-    static executeDefine(code, obj) {
+        for (var i = 0; i < objectsArray.length; i++) {
 
-        // code is the whole code written by the user
-        // obj is an object
+            if (objectsArray[i].expressionType == "INST" && objectsArray[i].instName == "PROC") {
 
-        // convert the code into an array of instructions
-        var instArray = code.split('\n');
-        
-        for (var i = 0; i < instArray.length; i++) {
+                // PROC LABEL :: checking if the instruction has only one label 
+                if (objectsArray[i].operands.length == 1) {
 
-            if (instArray[i] != "" || instArray[i] != " ") {
+                    if (objectsArray[i].operands[0].type == "VAR") {
 
-                if (/DEFINE/.test(instArray[i])) {
+                        inProc = true; 
+                        procBegin = i + 1;  // procedure begins : PROC LABEL instruction 
+                        j = procBegin; 
 
-                    // first value after the DEFINE keyword 
-                    var firstValue = obj.operands[0]; 
+                        while ( !endpFound && j < objectsArray.length  ) {
 
-                    // second value after the DEFINE with which we will replace it
-                    var secondValue = obj.operands[1];  
+                            if ( objectsArray[j].expressionType == "INST" && objectsArray[j].instName == "ENDP") 
 
+                                endpFound = true; 
+
+                            else 
+
+                                j = j + 1;
+
+                        }
+
+                        if (!endpFound) {
+
+                            this.good = false; 
+                            this.message = "ERROR: UNABLE TO FIND THE ENDP SYMBOL";
+
+                            return -1;
+
+                        }
+
+                        procEnd = j; 
+
+                        // checking if there is not another declaration of a procedure inside a procedure
+                        for (var j = procBegin; j < objectsArray.length; j++) {
+
+                            if (objectsArray[j].expressionType == "INST" && objectsArray[j].instName == "PROC") {
+
+                                this.good = false; 
+                                this.errorLine = j; 
+                                this.message = "ERROR: INVALID PROCEDURE BODY"; 
+
+                                return -1;
+                            }
+                        }
+
+                        
+                        // checking if the code inside the procedure is correct 
+                        j = procBegin; 
+                        while ( !valid && objectsArray[j].instName != "ENDP" ) {
+
+                            // checking if there is at least one valid instruction
+                            if (objectsArray[j].expressionType != null)
+
+                                valid = true; 
+
+                            
+
+                            else 
+                                j = j + 1;
+                        }
+
+                        if (!valid) {
+
+                            this.good = false; 
+                            this.message = "ERROR: PROCEDURE EMPTY"; 
+
+                            return -1;
+                        }
+
+                        
+                    }
+
+                    else {
+
+                        this.good = false; 
+                        this.errorLine = i + 1 ; 
+                        this.message = "ERROR: WRONG PROCEDURE DECLARATION"; 
+
+                        return -1;
+
+                    }
                 }
+
+                else {
+
+                    this.good = false; 
+                    this.errorLine = i + 1; 
+                    this.message = "ERROR: WRONG PROCEDURE DECLARATION"; 
+
+                    return -1;
+                }
+
+
+            }
+        
+        }
+
+        return 0;
+    }
+    
+    executeDefine(objectsArray) {
+
+        for (var i = 0; i < objectsArray.length; i++){
+
+            if (objectsArray[i].expressionType == "INST" && objectsArray[i].instName == "DEFINE") {
+
+                // instruction requires only 2 operands
+                if (objectsArray[i].operands.length != 2) {
+
+                    this.good = false; 
+                    this.errorLine = objectsArray[i].index; 
+                    this.message = "ERROR: INVALID OPERANDS LIST FOR DEFINE INSTRUCTION"; 
+
+                    return -1;
+                }
+
+                // checking operands type 
+                if (objectsArray[i].operands[0].type != "VAR" || objectsArray[i].operands[1].type != "INT") {
+                    this.good = false; 
+                    //this.errorLine = objectsArray[i].index; 
+                    this.message = "ERROR : INVALID OPERANDS"; 
+
+                    return -1;
+                }
+
+                let operandName = objectsArray[i].operands[0].name,
+                    operandValue = objectsArray[i].operands[1].name;
+
+                // replacing in source code 
+                for (var j = 0; j < objectsArray.length; j++) {
+
+                    for (var k = 0; k < objectsArray[j].operands.length; k++) {
+
+                        if (objectsArray[j].operands[k].name == operandName) {
+
+                            objectsArray[j].operands[k].name = operandValue; 
+                            objectsArray[j].operands[k].type = "INT";
+
+                        }
+                    }                    
+                }                
 
             }
         }
-
-        // get the instructions which doesn't contain DEFINE 
-        var opcodes = instArray.filter(inst => !/DEFINE/.test(inst));
-
-        // replacing in source code 
-        opcodes = opcodes.map((item) => {if (item.indexOf(firstValue) != -1) return item.replace(firstValue, secondValue); else return item});
-
-        return opcodes.join('\n');
+        
+        return 0;
     }
 
 }
@@ -215,60 +336,91 @@ class PreProcessor {
 var op = {
     operands : ["A", "10"],
 }
-var objectsArray = [{
-    expressionType: "VAR",
+var objectsArray = [
+    {
+        expressionType: "VAR", 
+        variableName: "X", 
+        variableClass: "DW", 
+        label: "label1", 
+        instName :"CMP",
+        operands : [{
+            name: "offset X", 
+            type: "OFF",
+        }]
+    },
+    {
+    expressionType: "INST",
     variableName: "X", 
     variableClass: "DB", 
     label: "label1",  
+    instName: "PROC",
     operands:[{
-        name: "X", 
-        type: 'VAR',
+        name: "label1", 
+        type: "VAR",
     },
-    {name: "X",
-    type: 'VAR',},
-    {name: "Y", 
-    type: "VAR"},],
+    ],
 
 },
 {
-    expressionType:"VAR", 
+    expressionType: null, 
     variableName: "A", 
     variableClass: "DW", 
-    label: "label2",
+    label: null,
+    instName: "MOV",
+    operands:[{
+        name: "label2", 
+        type: "VAR",
+    }],
+},
+{
+    expressionType: null, 
+    variableName: "A", 
+    variableClass: "DW", 
+    label: null,
+    instName: "MOV",
     operands:[{
         name: "label1", 
         type: "VAR",
     }],
 },
 {
-    expressionType:"VAR", 
+    expressionType:"INST", 
     variableName: "Y", 
     variableClass: "DB", 
     label: "label3",
+    instName: "DEFINE",
     operands:[{
-        name: "Y", 
+        name: "label1", 
         type: "VAR",
     },
-    {name: "A",
-    type: "VAR",},],
-},];
+    {name: "10",
+    type: "INT",},],
+},
+{
+    expressionType:"INST", 
+    variableName: "Y", 
+    variableClass: "DB", 
+    label: null,
+    instName: "ENDP",
+    operands:[{
+        name: "label2", 
+        type: "VAR",
+    },
+    {name: "69",
+    type: "INT",},],
+}];
 
 var testObj = new PreProcessor(); 
 testObj.getVariables(objectsArray);
-console.log(testObj.variables);
-console.log(testObj.manageVariables(objectsArray));
-
-//console.log(testObj.message);
-//console.log(testObj.labels);
 //console.log(testObj.variables);
-/*var sub = document.getElementById("sub"); 
-    text = document.getElementById("code");
-    code = "";
-    instArray = [];
+//console.log(testObj.manageProcedures(objectsArray));
+//console.log(testObj.manageProcedures(objectsArray));
+console.log(testObj.manageProcedures(objectsArray));
+console.log(testObj.message);
+/* expressionType = "INST"
+instName = "PROC"
+operands = 1 element and type = "VAR"
+expressionType = INST && instName = "ENDP" 
 
-sub.onclick = function() {
-
-    code = text.value; 
-    console.log(PreProcessor.executeDefine(code, op));
-}
 */
+
