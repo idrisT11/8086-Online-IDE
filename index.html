@@ -1,3 +1,4 @@
+
 <head>
     <link rel="stylesheet" href="style.css">
   </head>
@@ -64,8 +65,9 @@
 <script>
 
 
-  let registers = /\bAX[^a-z0-9]|\bBX[^a-z0-9]|\bCX[^a-z0-9]|\bDX[^a-z0-9]|\bCS[^a-z0-9]|\bDS[^a-z0-9]|\bES[^a-z0-9]|\bSS[^a-z0-9]|\bDI[^a-z0-9]|\bSI[^a-z0-9]|\bSP[^a-z0-9]|\bBP[^a-z0-9]|\bIP[^a-z0-9]/ig
-  let re = /(;.*ax)/igy
+  let registers = /\bAX[^a-z0-9\]]|\bBX[^a-z0-9\]]|\bCX[^a-z0-9\]]|\bDX[^a-z0-9\]]|\bCS[^a-z0-9\]]|\bDS[^a-z0-9\]]|\bES[^a-z0-9\]]|\bSS[^a-z0-9\]]|\bDI[^a-z0-9\]]|\bSI[^a-z0-9\]]|\bSP[^a-z0-9\]]|\bBP[^a-z0-9\]]|\bIP[^a-z0-9\]]|\bAH[^a-z0-9\]]|\bal[^a-z0-9\]]|\bbh[^a-z0-9\]]|\bbl[^a-z0-9\]]|\bch[^a-z0-9\]]|\bcl[^a-z0-9\]]|\bdl[^a-z0-9\]]|\bdh[^a-z0-9\]]|\bbx|\bbl|\bbh|\bdi|\bsi|\bbp/ig;
+
+  
 
 let directives = /\bORG[^a-z0-9]|\bDEFINE[^a-z0-9]|\bEQU[^a-z0-9]|\bPROC[^a-z0-9]|\bLOCAL[^a-z0-9]|\bENDM[^a-z0-9]|\bENDP[^a-z0-9]|\bOFFSET[^a-z0-9]/gi
 
@@ -88,7 +90,7 @@ textArea.addEventListener("input", function(e)
 
   customArea.innerHTML =applyColors(textArea.value)
 
-  console.log(getText(textArea.value))
+//  console.log(customArea.innerHTML)
 
     })
 
@@ -130,6 +132,9 @@ return text.replace(registers, function(m)
    
         return `<span class="ins">${m}</span>`;
 
+    }).replace(/0x[0-9a-f]+|[a-f0-9]+h|0b[0-1]+|\d+/gi, function(m){
+      
+         return `<span class="digit">${m}</span>`
     }).replace(/(\;(.*)\n?)/gi, function(m){
       let c = "yellow"
        if(m.match(/\;{1,}<span class="ins">/giy)) m = m.replaceAll(/<span class="ins">/gi,`<span class="comments">`)
@@ -141,6 +146,8 @@ return text.replace(registers, function(m)
         m = m.replaceAll(/<span class="ins">/gi,`<span class="comments">`)}
         if(m.match(/\s*<span class="re">/gi)) m = m.replaceAll(/<span class="re">/gi,`<span class="comments">`)
           if(m.match(/\s*<span class="dir">/gi)) m = m.replaceAll(/<span class="dir">/gi,`<span class="comments">`)
+
+          if(m.match(/\;.*<span class="digit">/giy)) m = m.replace(/<span class="digit">/gi,`<span class="comments">` );
 
   
       
@@ -155,13 +162,17 @@ return text.replace(registers, function(m)
 
        if(m.match(/\s*<span class="ins">/gi)) m = m.replaceAll(/<span class="ins">/gi,`<span class="strings">`)
         if(m.match(/\s*<span class="re">/gi)) m = m.replaceAll(/<span class="re">/gi,`<span class="strings">`)
-          if(m.match(/\s*<span class="dir">/gi)) m = m.replac
+          if(m.match(/\s*<span class="dir">/gi)) m = m.replaceAll(/<span class="dir">/gi,`<span class="strings">` );
+
+         if(m.match(/\s*<span class="digit">/gi)) m = m.replaceAll(/<span class="digit">/gi,`<span class="strings">` );
+
+
           return `<span class="strings">${m}</span>`;
-        }).replace(/0x[0-9a-f]+|[a-f0-9]+h|0b[0-1]+|\d+/gi, function(m){
+        }).replace(/\".*"/giy, function(m){
       
-         return `<span class="digit">${m}</span>`
-    })
-}
+         return `<span class="strings">${m}</span>`
+})
+      }
 
 
 function getText(text){
