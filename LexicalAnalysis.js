@@ -300,8 +300,8 @@ class LexicalAnalysis{
     dupcheck(str){
         
 
-        let tableSize=str.match(/.*?(?=(dup))/);
-        let tableValue=str.match(/(?<=(dup\s*\()).*?(?=\))/);
+        let tableSize=str.match(/.*?(?=(dup))/i);
+        let tableValue=str.match(/(?<=(dup\s*\()).*?(?=\))/i);
         
         
         if ((tableSize==null) || !(this.isNumber(tableSize[0].trim()))){
