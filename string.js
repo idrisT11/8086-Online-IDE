@@ -1324,4 +1324,8 @@ console.log(testing(inst+" "+"[5h+bx]"+",cs"));*/
 
 // creating a new object for testing 
 var execution = new Encode(); 
+<<<<<<< HEAD
 console.log(execution.execute("MOV AX, BX"));
+=======
+console.log(execution.execute("MOV AX, BX"));
+>>>>>>> 09339fbac805293ae39c425c50e72a8845196ead
