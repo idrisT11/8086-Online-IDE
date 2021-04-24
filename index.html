@@ -1,6 +1,7 @@
 
 <head>
     <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
   </head>
 
   <div class="template">
@@ -16,7 +17,7 @@
       </div>
     </div>
 
-    <textarea id="myTextArea" onkeydown="if(event.keyCode===9){
+    <textarea id="myTextArea" spellcheck="false" onkeydown="if(event.keyCode===9){
       var v=this.value,
       s=this.selectionStart,
       e=this.selectionEnd;
@@ -36,6 +37,11 @@
       if(nb == 1) nb=2;
       else nb+=1
     count.value = count.value+'\n'+nb.toString();
+
+
+ 
+
+
 }
 "  onkeyup ="
       var count = document.getElementById('count');
@@ -43,7 +49,7 @@
       var nb=1;
           for(let i = 0; i<=this.value.length; i++)
       if(this.value[i] == '\n')nb++;
-    console.log(nb);
+    
     if(event.keyCode == 8){
       if(nb >= 9){
         var last_line = count.value.substring(count.value.length -2);
@@ -64,31 +70,54 @@
 
 <script>
 
+let textArea = document.getElementById("myTextArea");
+let customArea = document.querySelector(".custom-area");
+let backdrop = document.querySelector(".backdrop");
 
-  let registers = /\bAX[^a-z0-9\]]|\bBX[^a-z0-9\]]|\bCX[^a-z0-9\]]|\bDX[^a-z0-9\]]|\bCS[^a-z0-9\]]|\bDS[^a-z0-9\]]|\bES[^a-z0-9\]]|\bSS[^a-z0-9\]]|\bDI[^a-z0-9\]]|\bSI[^a-z0-9\]]|\bSP[^a-z0-9\]]|\bBP[^a-z0-9\]]|\bIP[^a-z0-9\]]|\bAH[^a-z0-9\]]|\bal[^a-z0-9\]]|\bbh[^a-z0-9\]]|\bbl[^a-z0-9\]]|\bch[^a-z0-9\]]|\bcl[^a-z0-9\]]|\bdl[^a-z0-9\]]|\bdh[^a-z0-9\]]|\bbx|\bbl|\bbh|\bdi|\bsi|\bbp/ig;
 
+ let registers = /\bAX[^a-z0-9\]]|\bBX[^a-z0-9\]]|\bCX[^a-z0-9\]]|\bDX[^a-z0-9\]]|\bCS[^a-z0-9\]]|\bDS[^a-z0-9\]]|\bES[^a-z0-9\]]|\bSS[^a-z0-9\]]|\bDI[^a-z0-9\]]|\bSI[^a-z0-9\]]|\bSP[^a-z0-9\]]|\bBP[^a-z0-9\]]|\bIP[^a-z0-9\]]|\bAH[^a-z0-9\]]|\bal[^a-z0-9\]]|\bbh[^a-z0-9\]]|\bbl[^a-z0-9\]]|\bch[^a-z0-9\]]|\bcl[^a-z0-9\]]|\bdl[^a-z0-9\]]|\bdh[^a-z0-9\]]|\bbx|\bbl|\bbh|\bdi|\bsi|\bbp/ig;
+
+  
+  textArea.addEventListener("keyup", function(event){
+    var count = 0, string, index = 2;
+    if(event.keyCode === 13)
+    {
+      let value = textArea.value;
+      for(var i = 0; i < value.length; i++){
+        if(value[i] == '\n') {
+          count++; 
+          string += value[i];}
+        if(index == count) break;
+
+      }
+
+
+  
+
+}}
+    
+  )
   
 
 let directives = /\bORG[^a-z0-9]|\bDEFINE[^a-z0-9]|\bEQU[^a-z0-9]|\bPROC[^a-z0-9]|\bLOCAL[^a-z0-9]|\bENDM[^a-z0-9]|\bENDP[^a-z0-9]|\bOFFSET[^a-z0-9]/gi
 
-var instructions = /\bMOV[^a-z0-9]|\bPUSH[^a-z0-9]|\bPOP[^a-z0-9]|\bXCHG[^a-z0-9]|\bLEA[^a-z0-9]|\bLAHF[^a-z0-9]|\bSAHF[^a-z0-9]|\bPUSHF[^a-z0-9]|\bPOPF[^a-z0-9]|\bADD[^a-z0-9]|\bADC[^a-z0-9]|\bDEC[^a-z0-9]|\bINC[^a-z0-9]|\bAAA[^a-z0-9]|\bSUB[^a-z0-9]|\bSSB[^a-z0-9]|\bNEG[^a-z0-9]|\bCMP[^a-z0-9]|\bMUL[^a-z0-9]|\bIMUL[^a-z0-9]|\bDIV[^a-z0-9]|\bIDIV[^a-z0-9]|\bCBW[^a-z0-9]|\bCWD[^a-z0-9]|\bNOT[^a-z0-9]|\bSHL[^a-z0-9]|\bSAL[^a-z0-9]|\bSHR[^a-z0-9]|\bSAR[^a-z0-9]|\bROL[^a-z0-9]|\bROR[^a-z0-9]|\bRCL[^a-z0-9]|\bRCR[^a-z0-9]|\bAND[^a-z0-9]|\bTEST[^a-z0-9]|\bOR[^a-z0-9]|\bXOR[^a-z0-9]|\bREP[^a-z0-9]|\bMOVSB[^a-z0-9]|\bCMPSB[^a-z0-9]|\bSCASB[^a-z0-9]|\bLODSB[^a-z0-9]|\bSTOSB[^a-z0-9]|\bMOVSW[^a-z0-9]|\bCMPSW[^a-z0-9]|\bSCASW[^a-z0-9]|\bLODSW[^a-z0-9]|\bSTOSW[^a-z0-9]|\bCALL[^a-z0-9]|\bJMP[^a-z0-9]|\bRET[^a-z0-9]|\bJE[^a-z0-9]|\bJZ[^a-z0-9]|\bJL[^a-z0-9]|\bJNGE[^a-z0-9]|\bJLE[^a-z0-9]|\bJNG[^a-z0-9]|\bJB[^a-z0-9]|\bJNAE[^a-z0-9]|\bJBE[^a-z0-9]|\bJNA[^a-z0-9]|\bJP[^a-z0-9]|\bJPE[^a-z0-9]|\bJO[^a-z0-9]|\bJS[^a-z0-9]|\bJNE[^a-z0-9]|\bJNZ[^a-z0-9]|\bJNL[^a-z0-9]|\bJGE[^a-z0-9]|\bJNLE[^a-z0-9]|\bJG[^a-z0-9]|\bJNB[^a-z0-9]|\bJAE[^a-z0-9]|\bJNBE[^a-z0-9]|\bJA[^a-z0-9]|\bJNP[^a-z0-9]|\bJPO[^a-z0-9]|\bJNO[^a-z0-9]|\bJNS[^a-z0-9]|\bLOOP[^a-z0-9]|\bLOOPZ[^a-z0-9]|\bLOOPE[^a-z0-9]|\bLOOPNZ[^a-z0-9]|\bLOOPNE[^a-z0-9]|\bJCXZ[^a-z0-9]|\bINT[^a-z0-9]/ig
+var instructions = /\bMOV[^a-z0-9]|\bPUSH[^a-z0-9]|\bPOP[^a-z0-9]|\bXCHG[^a-z0-9]|\bLEA[^a-z0-9]|\bLAHF[^a-z0-9]|\bSAHF[^a-z0-9]|\bPUSHF[^a-z0-9]|\bPOPF[^a-z0-9]|\bADD[^a-z0-9]|\bADC[^a-z0-9]|\bDEC[^a-z0-9]|\bINC[^a-z0-9]|\bAAA[^a-z0-9]|\bSUB[^a-z0-9]|\bSSB[^a-z0-9]|\bNEG[^a-z0-9]|\bCMP[^a-z0-9]|\bMUL[^a-z0-9]|\bIMUL[^a-z0-9]|\bDIV[^a-z0-9]|\bIDIV[^a-z0-9]|\bCBW[^a-z0-9]|\bCWD[^a-z0-9]|\bNOT[^a-z0-9]|\bSHL[^a-z0-9]|\bSAL[^a-z0-9]|\bSHR[^a-z0-9]|\bSAR[^a-z0-9]|\bROL[^a-z0-9]|\bROR[^a-z0-9]|\bRCL[^a-z0-9]|\bRCR[^a-z0-9]|\bAND[^a-z0-9]|\bTEST[^a-z0-9]|\bOR[^a-z0-9]|\bXOR[^a-z0-9]|\bREP[^a-z0-9]|\bMOVSB[^a-z0-9]|\bCMPSB[^a-z0-9]|\bSCASB[^a-z0-9]|\bLODSB[^a-z0-9]|\bSTOSB[^a-z0-9]|\bMOVSW[^a-z0-9]|\bCMPSW[^a-z0-9]|\bSCASW[^a-z0-9]|\bLODSW[^a-z0-9]|\bSTOSW[^a-z0-9]|\bCALL[^a-z0-9]|\bJMP[^a-z0-9]|\bRET[^a-z0-9]|\bJE[^a-z0-9]|\bJZ[^a-z0-9]|\bJL[^a-z0-9]|\bJNGE[^a-z0-9]|\bJLE[^a-z0-9]|\bJNG[^a-z0-9]|\bJB[^a-z0-9]|\bJNAE[^a-z0-9]|\bJBE[^a-z0-9]|\bJNA[^a-z0-9]|\bJP[^a-z0-9]|\bJPE[^a-z0-9]|\bJO[^a-z0-9]|\bJS[^a-z0-9]|\bJNE[^a-z0-9]|\bJNZ[^a-z0-9]|\bJNL[^a-z0-9]|\bJGE[^a-z0-9]|\bJNLE[^a-z0-9]|\bJG[^a-z0-9]|\bJNB[^a-z0-9]|\bJAE[^a-z0-9]|\bJNBE[^a-z0-9]|\bJA[^a-z0-9]|\bJNP[^a-z0-9]|\bJPO[^a-z0-9]|\bJNO[^a-z0-9]|\bJNS[^a-z0-9]|\bLOOP[^a-z0-9]|\bLOOPZ[^a-z0-9]|\bLOOPE[^a-z0-9]|\bLOOPNZ[^a-z0-9]|\bLOOPNE[^a-z0-9]|\bJCXZ[^a-z0-9]|\bINT[^a-z0-9]|\bdb[^a-z0-9]|\bdw[^a-z0-9]/ig
 
 
 
 
 
-let textArea = document.getElementById("myTextArea");
-let customArea = document.querySelector(".custom-area");
-let backdrop = document.querySelector(".backdrop");
-let count = document.getElementById("count");
+
 
 
 // Event listeners.
 
 textArea.addEventListener("input", function(e)
 {
+  let index = 1;
 
   customArea.innerHTML =applyColors(textArea.value)
+ 
 
 //  console.log(customArea.innerHTML)
 
@@ -115,7 +144,7 @@ function applyColors(text)
 
 
 
-return text.replace(registers, function(m)
+text = text.replace(registers, function(m)
     {  
       //console.log(all_regex)
       let c = "orange"
@@ -132,7 +161,7 @@ return text.replace(registers, function(m)
    
         return `<span class="ins">${m}</span>`;
 
-    }).replace(/0x[0-9a-f]+|[a-f0-9]+h|0b[0-1]+|\d+/gi, function(m){
+    }).replace(/\b0x[0-9a-f]+[^a-z0-9]|\b[a-f0-9][^a-z0-9]+h|\b0b[0-1][^a-z0-9]+|\b\d+[^a-z0-9]/gi, function(m){
       
          return `<span class="digit">${m}</span>`
     }).replace(/(\;(.*)\n?)/gi, function(m){
@@ -168,16 +197,35 @@ return text.replace(registers, function(m)
 
 
           return `<span class="strings">${m}</span>`;
-        }).replace(/\".*"/giy, function(m){
+        }).replace(/(?<=\s+)".*"/gi, function(m){ 
       
          return `<span class="strings">${m}</span>`
 })
-      }
+
+        text = applyhighliting(text, 5)
 
 
-function getText(text){
-  text  = text.replace(/<span .+>/, '').replace(/<\/span>/, '');
-  return text;
+
+return text;
+
 }
+function applyhighliting(text, index){
+  let a  = text.split("\n")
+
+  //here you can apply highliting 
+  if(a.length > index){
+  let c = a[index]
+  c = `<span class="highliting">${c}</span>`
+  
+    a[index] = c;
+    text= a.join("\n");
+
+
+}
+
+  return text
+  }
+
+
 
 </script>
