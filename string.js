@@ -6,7 +6,9 @@ var _justNumbers = false;
 
 class Encode {
 
+    //if its a number between brackets its set to true and regmem gives r/m b110 and mod =0
  
+
     getOps(str) {
 
     let operands = [];
