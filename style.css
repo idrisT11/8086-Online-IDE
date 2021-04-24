@@ -1,5 +1,4 @@
 
-
 /* here you can change the width + the height*/
 
 .backdrop, #myTextArea {
@@ -106,4 +105,8 @@ main{
 }
 
 
+.highliting{
+  
+  background-color: rgba(214,0,0,0.6)
+}
 
