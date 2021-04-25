@@ -1,17 +1,21 @@
 
-shl word ptr [bx-300],cl      ;     210,167,212,254
-shl byte ptr [bx-300],cl      ;     210,167,212,254
-
-sar byte ptr [bx],cl      ;     210,63
-sar word ptr [bx],cl      ;     210,63
-sar  [bx],cl      ;     210,63
-
-ror   [bx],cl :result: ror [bx],cl      ;     210,15
-ror word ptr [bx],cl result: ror word ptr [bx],cl      ;     210,15
-ror byte ptr [bx],cl result: ror byte ptr [bx],cl      ;     210,15
-
-rcl byte ptr [bx],cl    =>rcl byte ptr [bx],cl      ;     210,23
-rcl word ptr [bx],cl    =>rcl word ptr [bx],cl      ;     210,23
-rcl [bx],cl             => rcl [bx],cl      ;     210,23
-
+ org(table){
+        let arr=table
+        let find=false;
+        let operand=0;
+        for (let index = 0; index < array.length; index++) {
+            const element = array[index];
+            if (!find ) 
+                if (element.instName='ORG') {
+                    operand=element.operand[0];
+                    find=true;
+                }
+            
+            else 
+                if (element.instName='ORG'){
+                    arr.splice(index,index);
+                }
+        }
+        return {table:arr,op:operand};
+    }
 
