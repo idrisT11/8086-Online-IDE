@@ -1,12 +1,16 @@
-head>
+<head>
+    <!-- linking with the styling file .css -->
+    
     <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
   </head>
 
   <div class="template">
   <main>
-
+<!-- the line bare here we display the number of lines on the code -->
 <textArea class="list" id="count">1 </textArea>
+      
+    <!-- here you write the student or the teacher can write his/her code  -->
   <div class="container">
 
     <div class="backdrop">
@@ -15,7 +19,8 @@ head>
   
       </div>
     </div>
-
+    
+      <!-- the place where really write + controll the process of adding line or remove it from the code -->
     <textarea id="myTextArea" spellcheck="false" onkeydown="if(event.keyCode===9){
       var v=this.value,
       s=this.selectionStart,
@@ -67,9 +72,17 @@ head>
   </main> 
 </div>
 
+<!-- a button to highliting a specific line on the code -->
+
 <button id="btn">click</button>
 
+
+<!-- end designing the template -->
+
+<!-- begining of the script -->
 <script>
+    
+    // pointing on the element of the page
 
 let textArea = document.getElementById("myTextArea");
 let customArea = document.querySelector(".custom-area");
@@ -78,8 +91,12 @@ var index = 0;
 
  let registers = /(?<=\s+)ax(?!\w)|(?<=(\s+|\[))bx(?!\w)|(?<=\s+)cx(?!\w)|(?<=\s+)dx(?!\w)|(?<=\s+)sp(?!\w)|(?<=\s+)bp(?!\w)|(?<=\s+)si(?!\w)|(?<=\s+)di(?!\w)|(?<=\s+)al(?!\w)|(?<=\s+)ah(?!\w)|(?<=\s+)bh(?!\w)|(?<=\s+)bl(?!\w)|(?<=\s+)cl(?!\w)|(?<=\s+)ch(?!\w)|(?<=\s+)dh(?!\w)|(?<=\s+)dl(?!\w)|(?<=\s+)ip(?!\w)/ig
 
-  
-  textArea.addEventListener("keyup", function(event){
+ let directives = /(?<=\s+)org(?!\w)|(?<=\s+)define(?!\w)|(?<=\s+)equ(?!\w)|(?<=\s+)proc(?!\w)|(?<=\s+)local(?!\w)|(?<=\s+)endm(?!\w)|(?<=\s+)endp(?!\w)|(?<=\s+)offset(?!\w)/ig
+
+ let instructions = /(?<=\s*)MOV(?!\w)|(?<=\s+)PUSH(?!\w)|(?<=\s+)POP(?!\w)|(?<=\s+)XCHG(?!\w)|(?<=\s+)LEA(?!\w)|(?<=\s+)LAHF(?!\w)|(?<=\s+)SAHF(?!\w)|(?<=\s+)PUSHF(?!\w)|(?<=\s+)POPF(?!\w)|(?<=\s+)ADD(?!\w)|(?<=\s+)ADC(?!\w)|(?<=\s+)DEC(?!\w)|(?<=\s+)INC(?!\w)|(?<=\s+)AAA(?!\w)|(?<=\s+)SUB(?!\w)|(?<=\s+)SSB(?!\w)|(?<=\s+)NEG(?!\w)|(?<=\s+)CMP(?!\w)|(?<=\s+)MUL(?!\w)|(?<=\s+)IMUL(?!\w)|(?<=\s+)DIV(?!\w)|(?<=\s+)IDIV(?!\w)|(?<=\s+)CBW(?!\w)|(?<=\s+)CWD(?!\w)|(?<=\s+)NOT(?!\w)|(?<=\s+)SHL(?!\w)|(?<=\s+)SAL(?!\w)|(?<=\s+)SHR(?!\w)|(?<=\s+)SAR(?!\w)|(?<=\s+)ROL(?!\w)|(?<=\s+)ROR(?!\w)|(?<=\s+)RCL(?!\w)|(?<=\s+)RCR(?!\w)|(?<=\s+)AND(?!\w)|(?<=\s+)TEST(?!\w)|(?<=\s+)OR(?!\w)|(?<=\s+)XOR(?!\w)|(?<=\s+)REP(?!\w)|(?<=\s+)MOVSB(?!\w)|(?<=\s+)CMPSB(?!\w)|(?<=\s+)SCASB(?!\w)|(?<=\s+)LODSB(?!\w)|(?<=\s+)STOSB(?!\w)|(?<=\s+)MOVSW(?!\w)|(?<=\s+)CMPSW(?!\w)|(?<=\s+)SCASW(?!\w)|(?<=\s+)LODSW(?!\w)|(?<=\s+)STOSW(?!\w)|(?<=\s+)CALL(?!\w)|(?<=\s+)JMP(?!\w)|(?<=\s+)RET(?!\w)|(?<=\s+)JE(?!\w)|(?<=\s+)JZ(?!\w)|(?<=\s+)JL(?!\w)|(?<=\s+)JNGE(?!\w)|(?<=\s+)JLE(?!\w)|(?<=\s+)JNG(?!\w)|(?<=\s+)JB(?!\w)|(?<=\s+)JNAE(?!\w)|(?<=\s+)JBE(?!\w)|(?<=\s+)JNA(?!\w)|(?<=\s+)JP(?!\w)|(?<=\s+)JPE(?!\w)|(?<=\s+)JO(?!\w)|(?<=\s+)JS(?!\w)|(?<=\s+)JNE(?!\w)|(?<=\s+)JNZ(?!\w)|(?<=\s+)JNL(?!\w)|(?<=\s+)JGE(?!\w)|(?<=\s+)JNLE(?!\w)|(?<=\s+)JG(?!\w)|(?<=\s+)JNB(?!\w)|(?<=\s+)JAE(?!\w)|(?<=\s+)JNBE(?!\w)|(?<=\s+)JA(?!\w)|(?<=\s+)JNP(?!\w)|(?<=\s+)JPO(?!\w)|(?<=\s+)JNO(?!\w)|(?<=\s+)JNS(?!\w)|(?<=\s+)LOOP(?!\w)|(?<=\s+)LOOPZ(?!\w)|(?<=\s+)LOOPE(?!\w)|(?<=\s+)LOOPNZ(?!\w)|(?<=\s+)LOOPNE(?!\w)|(?<=\s+)JCXZ(?!\w)|(?<=\s+)INT(?!\w)|(?<=\s+)db(?!\w)|(?<=\s+)dw(?!\w)/ig
+
+
+textArea.addEventListener("keyup", function(event){
     var count = 0, string, index = 2;
     if(event.keyCode === 13)
     {
@@ -99,41 +116,44 @@ var index = 0;
     
   )
   
-
-let directives = /(?<=\s+)org(?!\w)|(?<=\s+)define(?!\w)|(?<=\s+)equ(?!\w)|(?<=\s+)proc(?!\w)|(?<=\s+)local(?!\w)|(?<=\s+)endm(?!\w)|(?<=\s+)endp(?!\w)|(?<=\s+)offset(?!\w)/ig
-
-
-
-var instructions = /(?<=\s*)MOV(?!\w)|(?<=\s+)PUSH(?!\w)|(?<=\s+)POP(?!\w)|(?<=\s+)XCHG(?!\w)|(?<=\s+)LEA(?!\w)|(?<=\s+)LAHF(?!\w)|(?<=\s+)SAHF(?!\w)|(?<=\s+)PUSHF(?!\w)|(?<=\s+)POPF(?!\w)|(?<=\s+)ADD(?!\w)|(?<=\s+)ADC(?!\w)|(?<=\s+)DEC(?!\w)|(?<=\s+)INC(?!\w)|(?<=\s+)AAA(?!\w)|(?<=\s+)SUB(?!\w)|(?<=\s+)SSB(?!\w)|(?<=\s+)NEG(?!\w)|(?<=\s+)CMP(?!\w)|(?<=\s+)MUL(?!\w)|(?<=\s+)IMUL(?!\w)|(?<=\s+)DIV(?!\w)|(?<=\s+)IDIV(?!\w)|(?<=\s+)CBW(?!\w)|(?<=\s+)CWD(?!\w)|(?<=\s+)NOT(?!\w)|(?<=\s+)SHL(?!\w)|(?<=\s+)SAL(?!\w)|(?<=\s+)SHR(?!\w)|(?<=\s+)SAR(?!\w)|(?<=\s+)ROL(?!\w)|(?<=\s+)ROR(?!\w)|(?<=\s+)RCL(?!\w)|(?<=\s+)RCR(?!\w)|(?<=\s+)AND(?!\w)|(?<=\s+)TEST(?!\w)|(?<=\s+)OR(?!\w)|(?<=\s+)XOR(?!\w)|(?<=\s+)REP(?!\w)|(?<=\s+)MOVSB(?!\w)|(?<=\s+)CMPSB(?!\w)|(?<=\s+)SCASB(?!\w)|(?<=\s+)LODSB(?!\w)|(?<=\s+)STOSB(?!\w)|(?<=\s+)MOVSW(?!\w)|(?<=\s+)CMPSW(?!\w)|(?<=\s+)SCASW(?!\w)|(?<=\s+)LODSW(?!\w)|(?<=\s+)STOSW(?!\w)|(?<=\s+)CALL(?!\w)|(?<=\s+)JMP(?!\w)|(?<=\s+)RET(?!\w)|(?<=\s+)JE(?!\w)|(?<=\s+)JZ(?!\w)|(?<=\s+)JL(?!\w)|(?<=\s+)JNGE(?!\w)|(?<=\s+)JLE(?!\w)|(?<=\s+)JNG(?!\w)|(?<=\s+)JB(?!\w)|(?<=\s+)JNAE(?!\w)|(?<=\s+)JBE(?!\w)|(?<=\s+)JNA(?!\w)|(?<=\s+)JP(?!\w)|(?<=\s+)JPE(?!\w)|(?<=\s+)JO(?!\w)|(?<=\s+)JS(?!\w)|(?<=\s+)JNE(?!\w)|(?<=\s+)JNZ(?!\w)|(?<=\s+)JNL(?!\w)|(?<=\s+)JGE(?!\w)|(?<=\s+)JNLE(?!\w)|(?<=\s+)JG(?!\w)|(?<=\s+)JNB(?!\w)|(?<=\s+)JAE(?!\w)|(?<=\s+)JNBE(?!\w)|(?<=\s+)JA(?!\w)|(?<=\s+)JNP(?!\w)|(?<=\s+)JPO(?!\w)|(?<=\s+)JNO(?!\w)|(?<=\s+)JNS(?!\w)|(?<=\s+)LOOP(?!\w)|(?<=\s+)LOOPZ(?!\w)|(?<=\s+)LOOPE(?!\w)|(?<=\s+)LOOPNZ(?!\w)|(?<=\s+)LOOPNE(?!\w)|(?<=\s+)JCXZ(?!\w)|(?<=\s+)INT(?!\w)|(?<=\s+)db(?!\w)|(?<=\s+)dw(?!\w)/ig
-
-
-
-
-
-
-
-
 // Event listeners.
 
+ // highliting the code    
+    
+    
 textArea.addEventListener("input", function(e)
 {
   let bool = false;
 
-  customArea.innerHTML =applyColors(textArea.value, bool)
+  customArea.innerHTML =applyColors(textArea.value, bool);
+    
+   // here we update the line bar  
+    
+  let lignes = textArea.value.split("\n");
+  var count = document.getElementById('count');
+  var a = count.value.substring(count.value.length-1)
   
+  // updating the line bar
 
+if (parseInt(a) < lignes.length){
+  for(let i =1; i <= lignes.length - parseInt(a); i++){
+      count.value += '\n'+(parseInt(a)+i).toString();
+  }
+}
+    
+else{
+    count.value = count.value.substring(0, lignes.length*2) ;
+}
 
- 
-
-//  console.log(customArea.innerHTML)
-
-    })
+})
+    
+    
 
 var s1 = document.getElementById('myTextArea');
 var s2 = document.getElementById('count');
 
 
-
+// control scroll bar of the two text areas
 
 function select_scroll_1(e) { s2.scrollTop = s1.scrollTop; }
 function select_scroll_2(e) { s1.scrollTop = s2.scrollTop; }
@@ -158,6 +178,7 @@ btn.addEventListener("click", function(){
 
 })
 
+    // applying colors on instructions, registers, numbers,..
 
 
 function applyColors(text, bool)
@@ -183,7 +204,7 @@ text = text.applyhighliting(text, bool).replace(registers, function(m)
    
         return `<span class="ins">${m}</span>`;
 
-    }).replace(/(?<=\s+)0x[0-9a-f]+(?!\w)|(?<=\s+)[a-f0-9](?!\w)+h|(?<=\s+)0b[0-1](?!\w)+|(?<=\s+)\d+(?!\w)/gi, function(m){
+    }).replace(/(?<=\s*)0x[0-9a-f]+(?!\w)|(?<=\s+)[a-f0-9](?!\w)+h|(?<=\s+)0b[0-1](?!\w)+|(?<=\s+)\d+(?!\w)/gi, function(m){
       
          return `<span class="digit">${m}</span>`
     }).replace(/(\;(.*)\n?)/gi, function(m){
