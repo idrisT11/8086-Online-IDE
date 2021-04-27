@@ -109,7 +109,63 @@ class Processor{
     {
         this.register.initReg();
     }
-	
+     decodeInterrupt(instruction)
+    {
+         
+        if(instruction===INT)
+        {
+            var current_ip = this.register.readReg(IP_REG),
+            current_code_seg = this.register.readReg(CS_REG);
+           var secondByte = this.RAM.readByte( (current_code_seg<<4) + current_ip+1 );
+        //    if(secondByte==0x21)
+        //    {
+                if(((this.register.readReg(AX_REG)&0xff00)>>8)==0x01)
+                {
+                    console.log("int21_01 has been executed");
+                    this.cnsl.readChar();
+                    this.int21_01=true;
+                
+                
+                
+                    
+                }
+                else if(((this.register.readReg(AX_REG)&0xff00)>>8)==0x02)
+                {
+                    console.log("int21_02 has been executed");
+                    let ch=String.fromCharCode((this.register.readReg(DX_REG)&0x00ff));
+                    this.cnsl.writeChar(ch);
+                }
+                else if(((this.register.readReg(AX_REG)&0xff00)>>8)==0x09)
+                {
+                    let addr=this.register.readReg(DX_REG);
+                    let val=this.RAM.readByte(addr);
+                    let char="$";
+                while(val!=36)
+                {
+                    this.cnsl.writeChar(String.fromCharCode(val));
+                    addr++;
+                    val=this.RAM.readByte(addr);
+                }
+                }
+                else if(((this.register.readReg(AX_REG)&0xff00)>>8)==0xa)
+                {
+                    console.log("int21_0a has been executed");
+                this.cnsl.readChar();
+                this.int21_0a=true;
+                waitEnter();
+                    
+                }
+        //    } //end int 21h
+            
+           
+        
+            this.register.incIP(2);
+            return 0;
+            
+        }
+        else return -1;
+
+    }
     decodeMov(instruction){
 		        var current_ip = this.register.readReg(IP_REG),
 		            current_code_seg = this.register.readReg(CS_REG),
