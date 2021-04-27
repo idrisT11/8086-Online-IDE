@@ -1,6 +1,5 @@
 <head>
-    <!-- linking with the styling file .css -->
-    
+
     <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
   </head>
@@ -126,14 +125,10 @@ textArea.addEventListener("input", function(e)
   let bool = false;
 
   customArea.innerHTML =applyColors(textArea.value, bool);
-    
-   // here we update the line bar  
-    
+
   let lignes = textArea.value.split("\n");
   var count = document.getElementById('count');
   var a = count.value.substring(count.value.length-1)
-  
-  // updating the line bar
 
 if (parseInt(a) < lignes.length){
   for(let i =1; i <= lignes.length - parseInt(a); i++){
@@ -146,8 +141,11 @@ else{
 }
 
 })
+
     
+
     
+
 
 var s1 = document.getElementById('myTextArea');
 var s2 = document.getElementById('count');
