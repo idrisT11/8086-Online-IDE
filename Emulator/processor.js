@@ -4,20 +4,112 @@ import "OPCODES.js"
 
 class Processor{
     constructor(){
-        this.RAM = new Memory(MEMORY_SIZE);
+         this.RAM = new Memory(MEMORY_SIZE);
         this.register = new Registers();
-
+        this.cnsl=new ConsoleW(this);
+        this.pause=false;
+        this.int21_01=false;
+        this.readNum=1;
+        
         this.activeSegment = 0b11; // Par defaut on travail sur le DATA SEGMENT (ds_id = 0b11)
     }
 
     decode(){
-        var current_ip = this.register.readReg(IP_REG),
+         var current_ip = this.register.readReg(IP_REG),
             current_code_seg = this.register.readReg(CS_REG),
             instruction = this.RAM.readByte( (current_code_seg<<4) + current_ip );
 
-        let gut = this.decodeMov(instruction);
+           
+        if( !this.pause && this.decodeMov(instruction)===0)
+        {
+            console.log("decode mov has been executed!");
+        }
+        else if(!this.pause && this.decodeAdd(instruction)===0)
+        {
+            console.log("decode add has been executed!");
+        }
+        else if(!this.pause && this.decodeMul(instruction)===0)
+        {
+            console.log("decode mul has been executed!");
+        }
+        else if(!this.pause && this.decodeDiv(instruction)===0)
+        {
+            console.log("decode div has been executed!");
+        }
+        else if(!this.pause && this.decodeSub(instruction)===0)
+        {
+            console.log("decode sub has been executed!");
+        }
+        else if(!this.pause && this.decodeShl(instruction)===0)
+        {
+            console.log("decode shl has been executed!");
+        }
+        else if(!this.pause && this.decodeShr(instruction)===0)
+        {
+            console.log("decode shr has been executed!");
+        }
+        else if(!this.pause && this.decodeRcr(instruction)===0)
+        {
+            console.log("decode rcr has been executed!");
+        }
+        else if(!this.pause && this.decodeRcl(instruction)===0)
+        {
+            console.log("decode rcl has been executed!");
+        }
+        else if(!this.pause && this.decodeRol(instruction)===0)
+        {
+            console.log("decode rol has been executed!");
+        }
+        else if(!this.pause && this.decodeSar(instruction)===0)
+        {
+            console.log("decode sar has been executed!");
+        }
+        else if(!this.pause && this.decodeAnd(instruction)===0)
+        {
+            console.log("decode and has been executed!");
+        }
+        else if(!this.pause && this.decodeOr(instruction)===0)
+        {
+            console.log("decode or has been executed!");
+        }
+        else if(!this.pause && this.decodeXor(instruction)===0)
+        {
+            console.log("decode xor has been executed!");
+        }
+        else if(!this.pause && this.decodeTest(instruction)===0)
+        {
+            console.log("decode test has been executed!");
+        }
+        else if(!this.pause && this.decodeImmARIT(instruction)===0)
+        {
+            console.log("decode ImmARIT has been executed!");
+        }
+        else if(!this.pause && this.decodeInterrupt(instruction)===0)
+        {
+            console.log("decode Interrupt has been executed!");
+        }
+       
+        else if(!this.pause && this. decodeJmpCall(instruction)===0)
+        {
+            console.log("decodeJmpCall has been executed!");
+        }
+        else{
+            console.log("can't find anything to execute");
+        }
+        this.activeSegment=3;
     }
-
+ initRam()
+    {
+        
+      this.RAM.initRam();
+      
+    }
+	
+    initReg()
+    {
+        this.register.initReg();
+    }
+	
     decodeMov(instruction){
 		        var current_ip = this.register.readReg(IP_REG),
 		            current_code_seg = this.register.readReg(CS_REG),
