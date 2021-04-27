@@ -88,14 +88,16 @@ let customArea = document.querySelector(".custom-area");
 let backdrop = document.querySelector(".backdrop");
 var index = 0;
 
- let registers = /(?<=\s+)ax(?!\w)|(?<=(\s+|\[))bx(?!\w)|(?<=\s+)cx(?!\w)|(?<=\s+)dx(?!\w)|(?<=\s+)sp(?!\w)|(?<=\s+)bp(?!\w)|(?<=\s+)si(?!\w)|(?<=\s+)di(?!\w)|(?<=\s+)al(?!\w)|(?<=\s+)ah(?!\w)|(?<=\s+)bh(?!\w)|(?<=\s+)bl(?!\w)|(?<=\s+)cl(?!\w)|(?<=\s+)ch(?!\w)|(?<=\s+)dh(?!\w)|(?<=\s+)dl(?!\w)|(?<=\s+)ip(?!\w)/ig
 
  let directives = /(?<=\s+)org(?!\w)|(?<=\s+)define(?!\w)|(?<=\s+)equ(?!\w)|(?<=\s+)proc(?!\w)|(?<=\s+)local(?!\w)|(?<=\s+)endm(?!\w)|(?<=\s+)endp(?!\w)|(?<=\s+)offset(?!\w)/ig
 
  let instructions = /(?<=\s*)MOV(?!\w)|(?<=\s+)PUSH(?!\w)|(?<=\s+)POP(?!\w)|(?<=\s+)XCHG(?!\w)|(?<=\s+)LEA(?!\w)|(?<=\s+)LAHF(?!\w)|(?<=\s+)SAHF(?!\w)|(?<=\s+)PUSHF(?!\w)|(?<=\s+)POPF(?!\w)|(?<=\s+)ADD(?!\w)|(?<=\s+)ADC(?!\w)|(?<=\s+)DEC(?!\w)|(?<=\s+)INC(?!\w)|(?<=\s+)AAA(?!\w)|(?<=\s+)SUB(?!\w)|(?<=\s+)SSB(?!\w)|(?<=\s+)NEG(?!\w)|(?<=\s+)CMP(?!\w)|(?<=\s+)MUL(?!\w)|(?<=\s+)IMUL(?!\w)|(?<=\s+)DIV(?!\w)|(?<=\s+)IDIV(?!\w)|(?<=\s+)CBW(?!\w)|(?<=\s+)CWD(?!\w)|(?<=\s+)NOT(?!\w)|(?<=\s+)SHL(?!\w)|(?<=\s+)SAL(?!\w)|(?<=\s+)SHR(?!\w)|(?<=\s+)SAR(?!\w)|(?<=\s+)ROL(?!\w)|(?<=\s+)ROR(?!\w)|(?<=\s+)RCL(?!\w)|(?<=\s+)RCR(?!\w)|(?<=\s+)AND(?!\w)|(?<=\s+)TEST(?!\w)|(?<=\s+)OR(?!\w)|(?<=\s+)XOR(?!\w)|(?<=\s+)REP(?!\w)|(?<=\s+)MOVSB(?!\w)|(?<=\s+)CMPSB(?!\w)|(?<=\s+)SCASB(?!\w)|(?<=\s+)LODSB(?!\w)|(?<=\s+)STOSB(?!\w)|(?<=\s+)MOVSW(?!\w)|(?<=\s+)CMPSW(?!\w)|(?<=\s+)SCASW(?!\w)|(?<=\s+)LODSW(?!\w)|(?<=\s+)STOSW(?!\w)|(?<=\s+)CALL(?!\w)|(?<=\s+)JMP(?!\w)|(?<=\s+)RET(?!\w)|(?<=\s+)JE(?!\w)|(?<=\s+)JZ(?!\w)|(?<=\s+)JL(?!\w)|(?<=\s+)JNGE(?!\w)|(?<=\s+)JLE(?!\w)|(?<=\s+)JNG(?!\w)|(?<=\s+)JB(?!\w)|(?<=\s+)JNAE(?!\w)|(?<=\s+)JBE(?!\w)|(?<=\s+)JNA(?!\w)|(?<=\s+)JP(?!\w)|(?<=\s+)JPE(?!\w)|(?<=\s+)JO(?!\w)|(?<=\s+)JS(?!\w)|(?<=\s+)JNE(?!\w)|(?<=\s+)JNZ(?!\w)|(?<=\s+)JNL(?!\w)|(?<=\s+)JGE(?!\w)|(?<=\s+)JNLE(?!\w)|(?<=\s+)JG(?!\w)|(?<=\s+)JNB(?!\w)|(?<=\s+)JAE(?!\w)|(?<=\s+)JNBE(?!\w)|(?<=\s+)JA(?!\w)|(?<=\s+)JNP(?!\w)|(?<=\s+)JPO(?!\w)|(?<=\s+)JNO(?!\w)|(?<=\s+)JNS(?!\w)|(?<=\s+)LOOP(?!\w)|(?<=\s+)LOOPZ(?!\w)|(?<=\s+)LOOPE(?!\w)|(?<=\s+)LOOPNZ(?!\w)|(?<=\s+)LOOPNE(?!\w)|(?<=\s+)JCXZ(?!\w)|(?<=\s+)INT(?!\w)|(?<=\s+)db(?!\w)|(?<=\s+)dw(?!\w)/ig
 
 
-textArea.addEventListener("keyup", function(event){
+ let registers = /(?<=\s+|,)ax(?!\w)|(?<=(\s+|\[|,))bx(?!\w)|(?<=\s+)cx(?!\w)|(?<=\s+|,)dx(?!\w)|(?<=\s+|,)sp(?!\w)|(?<=\s+|,)bp(?!\w)|(?<=\s+|,)si(?!\w)|(?<=\s+|,)di(?!\w)|(?<=\s+|,)al(?!\w)|(?<=\s+|,)ah(?!\w)|(?<=\s+|,)bh(?!\w)|(?<=\s+|,)bl(?!\w)|(?<=\s+|,)cl(?!\w)|(?<=\s+|,)ch(?!\w)|(?<=\s+|,)dh(?!\w)|(?<=\s+|,)dl(?!\w)|(?<=\s+|,)ip(?!\w)/ig
+
+ 
+ textArea.addEventListener("keyup", function(event){
     var count = 0, string, index = 2;
     if(event.keyCode === 13)
     {
