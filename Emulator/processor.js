@@ -2562,7 +2562,25 @@ decodeNot(instruction)
         return 0;
 }
 
+//YANIS_MAN
+	//###########################################################################################
+    decodeCLC(instruction) {
 
+		var currentIp = this.Register.readReg(IP_REG),
+		currentCodeSegment = this.Register.readReg(CS_REG);
+
+		if((instruction & 0b11111111) == CLS_INS){
+
+			this.register.setFlag('C', 0);
+
+			this.register.incIP(1);
+
+			return 0;
+		 }
+
+		return -1;
+	}
+	
 decodeRet(instruction)
 {
     var current_ip = this.register.readReg(IP_REG),
