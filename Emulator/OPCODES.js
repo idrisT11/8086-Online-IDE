@@ -40,7 +40,8 @@ const   MOV_RM_RM = 0x88,
         JMP_IND_SEG 	= 0xFF,
         JMP_DIR_INTSEG	= 0b11101010,
         CALL_DIR_SEG	= 0b11101000,
-        CALL_DIR_INTSEG = 0b10011010;
+        CALL_DIR_INTSEG = 0b10011010,
+      	SEG_OVER_PREF	= 0b00100110;
 
       
 const   HIGH_REGISTER = 1,
