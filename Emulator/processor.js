@@ -2652,7 +2652,7 @@ class Processor{
 	}
 
     decodeSegOverride(instruction){
-        if ( instruction & 0b00100110 == SEG_OVER_PREF ) {
+        if ( (instruction & 0b11100111) == SEG_OVER_PREF ) {
             let segRegId = (instruction >> 3) % 4;
 
             this.activeSegment = segRegId;
