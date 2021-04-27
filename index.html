@@ -1,4 +1,4 @@
-head>
+<head>
     <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
   </head>
@@ -119,15 +119,22 @@ textArea.addEventListener("input", function(e)
 {
   let bool = false;
 
-  customArea.innerHTML =applyColors(textArea.value, bool)
-  
+  customArea.innerHTML =applyColors(textArea.value, bool);
+  let lignes = textArea.value.split("\n");
+  var count = document.getElementById('count');
+  var a = count.value.substring(count.value.length-1)
 
+if (parseInt(a) < lignes.length){
+  for(let i =1; i <= lignes.length - parseInt(a); i++){
+      count.value += '\n'+(parseInt(a)+i).toString();
+  }
+}
+    
+else{
+    count.value = count.value.substring(0, lignes.length*2) ;
+}
 
- 
-
-//  console.log(customArea.innerHTML)
-
-    })
+})
 
 var s1 = document.getElementById('myTextArea');
 var s2 = document.getElementById('count');
@@ -183,7 +190,7 @@ text = text.applyhighliting(text, bool).replace(registers, function(m)
    
         return `<span class="ins">${m}</span>`;
 
-    }).replace(/(?<=\s+)0x[0-9a-f]+(?!\w)|(?<=\s+)[a-f0-9](?!\w)+h|(?<=\s+)0b[0-1](?!\w)+|(?<=\s+)\d+(?!\w)/gi, function(m){
+    }).replace(/(?<=\s*)0x[0-9a-f]+(?!\w)|(?<=\s+)[a-f0-9](?!\w)+h|(?<=\s+)0b[0-1](?!\w)+|(?<=\s+)\d+(?!\w)/gi, function(m){
       
          return `<span class="digit">${m}</span>`
     }).replace(/(\;(.*)\n?)/gi, function(m){
