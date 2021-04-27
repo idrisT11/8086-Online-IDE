@@ -2544,13 +2544,13 @@ class Processor{
         }
     }
 
-    decodeUncJump(instruction)
+    decodeConJump(instruction)
     {
         var current_ip = this.register.readReg(IP_REG),
             current_code_seg = this.register.readReg(CS_REG);
 
 
-        if ( instruction & 0xF0 == UNC_JUMP ) 
+        if ( (instruction & 0xF0) == UNC_JUMP ) 
         {
             let executeJump = false;//If True, the jump instruction shall be executed
 
@@ -2621,10 +2621,9 @@ class Processor{
 
             if (executeJump) 
             {
-                let disp = this.RAM.readByte(current_code_seg<<4 + current_ip);
-                disp |= (this.register.readReg(IP_REG) & 0xFF00);
-
-                this.register.writeReg(IP_REG, disp);
+                let disp = this.RAM.readByte((current_code_seg<<4) + current_ip);
+		    
+                this.register.incIP(2 + disp);
             }
 
             return 0;
