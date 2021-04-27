@@ -11,7 +11,11 @@ class Registers{
         for (let i = 0; i < 14; i++) 
             this.R[i] = 0;
     }
-
+    initReg()
+    {
+        for (let i = 0; i < 14; i++) 
+        this.R[i] = 0;
+    }
     readReg(registerId){
         
         return this.R[registerId];
@@ -172,7 +176,6 @@ class Registers{
 
     }
     //division
-   //division
     divReg(registerId,type)
     {
         if(type==SEGMENT_REGISTER )
@@ -201,38 +204,38 @@ class Registers{
     }
     extractFlag(flagName)
     {
-        let val=this.R[FLAG_REG];//123456789
+        let val=this.R[FLAG_REG]&0b111111111;//123456789
 
         switch(flagName)
         {
             case 'O':  
-                val=val>>11;
+                val=val>>8;
                 break;
 
             case 'D': 
-                val=val>>10%2;
+                val=(val>>7)%2;
                 break;
 
             case 'I':  
-                val=val>>9%2;
+                val=(val>>6)%2;
                 break;
 
             case 'T':  
-                val=val>>8%2;
+                val=(val>>5)%2;
                 break;
             case 'S':
-                val=val>>7%2;
+                val=(val>>4)%2;
                 break;
             case 'Z':
-                val=val>>6%2;
+                val=(val>>3)%2;
                 break;
             
             case 'A':
-                val=val>>4%2;
+                val=(val>>2)%2;
                 break;
             
             case 'P':
-                val=val>>2%2;
+                val=(val>>1)%2;
                 break;
             
             case 'C': //less significant bit
@@ -240,64 +243,64 @@ class Registers{
                 break;
           
         }
-       return val;
+       return val&0b111111111;
     }
     //
     setFlag(flagName,bit)
     {
-        let val=this.R[FLAG_REG];//123456789
+        let val=this.R[FLAG_REG]&0b111111111;//123456789
         switch(flagName)
         {
             case 'O':  //most segnificant bit
-               if(bit) val|=0b100000000;
+               if(bit==1) val|=0b100000000;
                else val &=0b011111111;
                 break;
 
             case 'D':
-                if(bit) val|=0b010000000;
+                if(bit==1) val|=0b010000000;
                else val &=0b101111111;
                 break;
 
             case 'I':
-                if(bit) val|=0b001000000;
+                if(bit==1) val|=0b001000000;
                 else val &=0b110111111;
                 break;
 
             case 'T':
-                if(bit) val|=0b000100000;
+                if(bit==1) val|=0b000100000;
                 else val &=0b111011111;
                 break;
 
             case 'S':
-                if(bit) val|=0b000010000;
+                if(bit==1) val|=0b000010000;
                 else val &=0b111101111;
                 break;
 
             case 'Z':
-                if(bit) val|=0b000001000;
+                if(bit==1) val|=0b000001000;
                 else val &=0b111110111;
                 break;
 
             case 'A':
-                if(bit) val|=0b000000100;
+                if(bit==1) val|=0b000000100;
                 else val &=0b111111011;
                 break;
             
             case 'P':
-                if(bit) val|=0b000000010;
+                if(bit==1) val|=0b000000010;
                   else val &=0b111111101;
                   break;
 
             
 
             case 'C': //less significant bit
-            if(bit) val|=0b000000001;
+            if(bit==1) val|=0b000000001;
             else val &=0b111111110;
                 break;
 
           
         }
-       this.writeReg(FLAG_REG,val);
+       this.writeReg(FLAG_REG,val&0b111111111);
        
     }
         //
