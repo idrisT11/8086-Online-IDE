@@ -21,13 +21,24 @@ const labels = ["JE", "JC", "JNC", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE
 const shift = ["SHL", "SAL", "SHR", "SAR", "ROL", "ROR", "RCL", "RCR"];
 
 class SyntaxAnalysis {
-       analyse(arr) {
-       for (let index = 0; index < arr.length; index++) {
-           const element = arr[index];
-           let temp = this.excute(element);
-           if (!temp.good) break;
+    analyse(arr) {
+        let i;
+
+        for (i = 0; i < arr.length; i++) 
+        {
+
+            const element = arr[i];
+            let temp = this.excute(element);
+
+            if (!temp.good) 
+                break;
         }
-        return { message: temp.message, good: temp.good, index: arr[index].index };
+
+        return {
+            message: temp.message,
+            good: temp.good, 
+            errorLine: arr[i].index 
+        };
     }
 
     excute(Obj) {
