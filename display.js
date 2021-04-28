@@ -15,8 +15,10 @@
      var ramStatesManager=[];
      p.register.writeReg(SS_REG,0x700);
      p.register.writeReg(SP_REG,0xfffe);
+     var compileRes;
      
      ramStatesManager[t]=[];
+     
      
     //
   setInterval(updateStack,1000);
@@ -224,46 +226,65 @@
   code_compile_btn.addEventListener("click",
   function(e)
   {
+     compileRes=Compiler.compile(textArea.value);
+     console.log(compileRes)
+     if(compileRes.status)
+     {
+      for(let i=0;i<compileRes.finalView.length;i++)
+      {
+      
+        if(compileRes.finalView[i].executableLine)
+        {
+         for(let j=0;j<compileRes.finalView[i].opcodes.length;j++)
+            {
+              p.RAM.writeByte(compileRes.finalView[i].instructionAddr+j,compileRes.finalView[i].opcodes[j]);
+            
+            }
+        }
+      }
+     }
+     else alert(compileRes.message);
+
     
     compiled=true;
-    //hidding the comments
-    text= textArea.value;
+  //   //hidding the comments
+  //   text= textArea.value;
     
-    let tmp=text.match(/[^\r\n]+/g);
-    text="";
-    for(let i=0;i<tmp.length;i++)
-    {
-      text+=hide_comment(tmp[i])+"\n";
-    }
+  //   let tmp=text.match(/[^\r\n]+/g);
+  //   text="";
+  //   for(let i=0;i<tmp.length;i++)
+  //   {
+  //     text+=hide_comment(tmp[i])+"\n";
+  //   }
    
    
     
    
    
-     arrayOfLines = text.match(/[^\r\n]+/g);
+  //    arrayOfLines = text.match(/[^\r\n]+/g);
     
-     var k=0;
+  //    var k=0;
     
-   for(let i=0;i<arrayOfLines.length;i++)
-   {
-     let opCodeLine=arrayOfLines[i];
+  //  for(let i=0;i<arrayOfLines.length;i++)
+  //  {
+  //    let opCodeLine=arrayOfLines[i];
      
-     if(opCodeLine.length>3)
-     {
-       opCodeLine=toBcode(arrayOfLines[i]);
-       numInstructions++;
+  //    if(opCodeLine.length>3)
+  //    {
+  //      opCodeLine=toBcode(arrayOfLines[i]);
+  //      numInstructions++;
         
        
-     for(let j=0;j<opCodeLine.length;j++)
-     {
-       p.RAM.writeByte(k,opCodeLine[j]);
-       k++;
-     }
+  //    for(let j=0;j<opCodeLine.length;j++)
+  //    {
+  //      p.RAM.writeByte(k,opCodeLine[j]);
+  //      k++;
+  //    }
        
-     }
+  //    }
      
     
-   }
+  //  }
    updateStates();
 
    
@@ -851,7 +872,7 @@ function singleStepHandler()
   updateRegState();
   //for the states table
   updateStates();
-  customArea.innerHTML =applyColors(textArea1.value);
+ 
 }
 function stepBackHandler()
 {
@@ -871,7 +892,7 @@ function stepBackHandler()
   }
   deleteAfterStepBack();
   //ram handling
-  console.log(ramStatesManager[t].length);
+ 
   for(i=0;i<ramStatesManager[t].length;i++)//looping through all the addresses 
   //in the current state
   {
@@ -888,7 +909,7 @@ function stepBackHandler()
   RegStatesManager.splice(t,1);
   updateRegState();
  
-  customArea.innerHTML =applyColors(textArea1.value);
+ 
 }
 function applyRegsStateAt(t1)
 {
