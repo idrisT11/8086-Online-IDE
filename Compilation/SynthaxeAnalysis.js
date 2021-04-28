@@ -34,6 +34,7 @@ class SyntaxAnalysis {
                     break;
                 }
             }
+
         }
         return { message: temp.message, good: temp.good, index: arr[index].index };
     }
