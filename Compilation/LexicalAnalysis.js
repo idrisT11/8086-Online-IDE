@@ -1,8 +1,8 @@
-const wordRegisters = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP'];
-const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
-const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
-const Registers = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP', 'AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH', 'CS', 'DS', 'ES', 'SS'];
-const instructions=["ENDM","JMP","CLC","RET","EQU","DEFINE","ORG","ENDP","MOV","PUSH", "POP", "XCHG","LEA","LAHF","SAHF","PUSHF","POPF" ,"ADD","ADC","DEC" ,"INC","AAA","SUB","SSB" ,"NEG" ,"CMP" ,"MUL","IMUL","DIV","IDIV","CBW","CWD","NOT","SHL","SAL","SHR", "SAR","ROL","ROR", "RCL","RCR","AND","TEST","OR","XOR","REP","MOVSB", "CMPSB", "SCASB","LODSB","STOSB","MOVSW", "CMPSW", "SCASW","LODSW","STOSW","CALL"]
+const wordRegisters_Lexical = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP'];
+const byteRegisters_Lexical = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
+const segmentRegisters_Lexical = ['CS', 'DS', 'ES', 'SS'];
+const Registers_Lexical = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP', 'AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH', 'CS', 'DS', 'ES', 'SS'];
+const instructions=["JNE", "JE", "ENDM","JMP","CLC","RET","EQU","DEFINE","ORG","ENDP","MOV","PUSH", "POP", "XCHG","LEA","LAHF","SAHF","PUSHF","POPF" ,"ADD","ADC","DEC" ,"INC","AAA","SUB","SSB" ,"NEG" ,"CMP" ,"MUL","IMUL","DIV","IDIV","CBW","CWD","NOT","SHL","SAL","SHR", "SAR","ROL","ROR", "RCL","RCR","AND","TEST","OR","XOR","REP","MOVSB", "CMPSB", "SCASB","LODSB","STOSB","MOVSW", "CMPSW", "SCASW","LODSW","STOSW","CALL"]
 const keywords=["MACRO","PROC"] ;
 const BracketRegister = ['BX', 'BP', 'SI', 'DI'];
 const preProIns = ["ORG", "DEFINE", "EQU", "PROC", "LOCAL", "ENDM", "ENDP", "OFFSET"];
@@ -45,21 +45,22 @@ class LexicalAnalysis{
         for (let index = 0; index < tab.length; index++) 
         {
             
-            const element = tab[index];
+            const element = this.hide_comment(tab[index]);
+            
             temp = this.execute(element);
             temp.index = index;
             x.push(temp);
 
             if (!temp.good) 
                 return {
-                    state: false,
+                    status: false,
                     lexicalView: x,
                 };
             
         }
 
         return {
-            state: true,
+            status: true,
             lexicalView: x
         };
     }
@@ -115,7 +116,7 @@ class LexicalAnalysis{
  //check if the name is legal
  legalName(str){
      str = str.toUpperCase().trim();
-     if (keywords.includes(str)||str==="" ||(/\W/.test(str))||(/^\d|^\-\-/.test(str)) || instructions.includes(str) || wordRegisters.includes(str) || byteRegisters.includes(str)) 
+     if (keywords.includes(str)||str==="" ||(/\W/.test(str))||(/^\d|^\-\-/.test(str)) || instructions.includes(str) || wordRegisters_Lexical.includes(str) || byteRegisters_Lexical.includes(str)) 
          return false;
      return true;
  }
@@ -300,10 +301,10 @@ class LexicalAnalysis{
     dupcheck(str){
         
 
-        let tableSize=str.match(/.*?(?=(dup))/i);
-        let tableValue=str.match(/(?<=(dup\s*\()).*?(?=\))/i);
+        let tableSize = str.match(/.*?(?=(dup))/i);
+        let tableValue = str.match(/(?<=(dup\s*\()).*?(?=\))/i);
         
-        
+
         if ((tableSize==null) || !(this.isNumber(tableSize[0].trim()))){
             this.lexical.good=false;
             this.message="ERROR : WRONG DUP PAREMETER";
@@ -347,7 +348,7 @@ class LexicalAnalysis{
     Num(str) {
         if ((str==null)) return false 
         let v = str.replace(/(?<=\-)\s*(?=\w)/g, "");
-            return /^0x[a-f0-9]$|^0[A-F][A-Fa-f0-9]*h$|^\d+[A-Fa-f0-9]*h$|^[0-1]+(b$)|^\d+$|^"."$|^'.'$/i.test(str[0] === "-" ? v.replace("-", "") : str);
+            return /^0x[a-f0-9]+$|^0[A-F][A-Fa-f0-9]*h$|^\d+[A-Fa-f0-9]*h$|^[0-1]+(b$)|^\d+$|^"."$|^'.'$/i.test(str[0] === "-" ? v.replace("-", "") : str);
     }
     chartoascii(str) {
         if (/"."|'.'/i.test(str))
@@ -448,7 +449,7 @@ class LexicalAnalysis{
             }
 
             else if ( !(op[0] == '"' || op[0] == "'") && 
-                    !this.legalName(op) && !this.isNumber(op) && Registers.indexOf(op) == -1 ) 
+                    !this.legalName(op) && !this.isNumber(op) && Registers_Lexical.indexOf(op) == -1 ) 
             {
 
                 this.lexical.good = false;
@@ -461,7 +462,7 @@ class LexicalAnalysis{
                 this.lexical.operands[i].type = 'INT';
             else if ( this.legalName(op) )
                 this.lexical.operands[i].type = 'VAR';
-            else if ( Registers.indexOf(op) != -1)
+            else if ( Registers_Lexical.indexOf(op) != -1)
                 this.lexical.operands[i].type = 'RX';
 
 
@@ -493,7 +494,7 @@ class LexicalAnalysis{
 
     isOffsetV(str) {
         let v=str.trim().match((/(?<=\s)\w+/));
-        return (/OFFSET\s+\w/i.test(str.trim()) && legalVarName(v[0]));
+        return (/OFFSET\s+\w/i.test(str.trim()) && this.legalVarName(v[0]));
     }
      //no spaces behind or after the backets
     isNumber(str)
@@ -510,7 +511,7 @@ class LexicalAnalysis{
 
     legalVarName(str) {
         str = str.toUpperCase().trim();
-        if ((/\W/.test(str)) || (/^\d|^\-\-/.test(str)) || (/\w\s\w/.test(str)) || instructions.includes(str) ||Registers.includes(str)  || (str === "")) {
+        if ((/\W/.test(str)) || (/^\d|^\-\-/.test(str)) || (/\w\s\w/.test(str)) || instructions.includes(str) ||Registers_Lexical.includes(str)  || (str === "")) {
             return false;
         }
         return true;
@@ -519,9 +520,9 @@ class LexicalAnalysis{
     opsType(str) {
         let v = str.trim();
         if (this.isNumber(v)) return "INT";
-        else if (segmentRegisters.includes(v.toUpperCase())) return "RS";
-        else if (byteRegisters.includes(v.toUpperCase())) return "RL";
-        else if(wordRegisters.includes(v.toUpperCase())) return "RX"
+        else if (segmentRegisters_Lexical.includes(v.toUpperCase())) return "RS";
+        else if (byteRegisters_Lexical.includes(v.toUpperCase())) return "RL";
+        else if(wordRegisters_Lexical.includes(v.toUpperCase())) return "RX"
         else if (/(w\.|word)\s*\[/i.test(v)) return "MW";
         else if (/(b\.|byte)\s*\[/i.test(v)) return "MB";
         else if (/\[/.test(v)) return "MU";
@@ -533,7 +534,7 @@ class LexicalAnalysis{
  verifyOps(operand){
 
     operand = operand.trim();
-    if (Registers.includes(operand.toUpperCase())) {//register
+    if (Registers_Lexical.includes(operand.toUpperCase())) {//register
         return true;
     }
     else if (/\[/.test(operand)) 
@@ -558,7 +559,7 @@ class LexicalAnalysis{
          operand = operand.trim();
          
          
-         if (legalVarName(operand)) {
+         if (this.legalVarName(operand)) {
              return true;
          }
          else {
@@ -685,7 +686,7 @@ class LexicalAnalysis{
                          break;
                      }
                  }
-                 if (correct)//check if the registers have the correct combination inside brackets
+                 if (correct)//check if the Registers_Lexical have the correct combination inside brackets
                  {
                      if (array.includes("SI") && array.includes("DI")) correct = false;
                      else if (array.includes("BP") && array.includes("BX")) correct = false;
@@ -728,8 +729,8 @@ class LexicalAnalysis{
     }
     
     hide_comment(str) {//deletes comments from a string
-    
-        for ( var i = 0 ; i < str.length && (str[i] === ";" ? this.instring(str, i) : true ) ; i++ ){ }
+        var i;
+        for (  i = 0 ; i < str.length && (str[i] === ";" ? this.instring(str, i) : true ) ; i++ ){ }
        
         return str.substring(0, i);
     
