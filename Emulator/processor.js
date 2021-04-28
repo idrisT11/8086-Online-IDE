@@ -8,7 +8,7 @@ class Processor{
         this.pause=false;
         this.int21_01=false;
         this.readNum=1;
-        this.spStart=true;
+     
         
         this.activeSegment = 0b11; // Par defaut on travail sur le DATA SEGMENT (ds_id = 0b11)
     }
