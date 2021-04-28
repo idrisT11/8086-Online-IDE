@@ -609,7 +609,7 @@ class SyntaxAnalysis {
 
                         // that operand can be a memory or register(16 or 8)
 
-                        if (/M|RL|RX/.test(Obj.operands[0]))
+                        if (/M|RL|RX/.test(Obj.operands[0].type))
 
                             return { message: null, good: true }
 
