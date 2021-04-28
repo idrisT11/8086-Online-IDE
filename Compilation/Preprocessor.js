@@ -77,7 +77,8 @@ class PreProcessor {
 
         if (this.verifyOrigin(this.lexicalView) == -1) 
             return this.generatePrepoError();
-        
+	    
+        this.addEmpyLine();
 
         return {
             status : true, // no errors
@@ -339,6 +340,21 @@ class PreProcessor {
         }
 
         return str;   
+    }
+	
+    addEmpyLine(){
+        this.lexicalView.push({
+            label: null,
+            expressionType: 'NULL',
+            instructionType: null,
+            instName: null,
+            good: true,
+            operands: [],
+            variableName: null,
+            variableClass: null,
+
+            index: null
+        });
     }
 
 
