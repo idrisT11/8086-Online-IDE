@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>bs5 template</title>
+    <title>emu8086</title>
     <link rel="stylesheet" href="bs5/css/bootstrap.css">
     <link rel="stylesheet" href="style_textarea.css">
     <link rel="stylesheet" href="styles.css">
@@ -103,9 +103,9 @@
            
             <div class="row-1 control_box">
               <button class="btn btn-success" id="reload_btn">reload</button>
-              <button class="btn btn-secondary">step back</button>
-              <button class="btn btn-secondary">single step</button>
-              <button class="btn btn-success" >run</button>
+              <button class="btn btn-secondary" onclick="stepBackHandler()">step back</button>
+              <button class="btn btn-secondary" onClick="singleStepHandler()">single step</button>
+              <button class="btn btn-success"  onclick="runHandler()">run</button>
            </div>
           <div class="row-1 search_box">
           <input  id="input_search" placeholder="0000:0000">
@@ -131,10 +131,10 @@
              <!--table------------------->
             
              <div class="row-1 dialog_box_btns">
-              <button class="btn btn-success" onclick="displayStack()">stack</button>
-              <button class="btn btn-dark ">flags</button>
+              <button class="btn btn-success" click="modal_stack" data-bs-toggle="modal" data-bs-target="#modal_stack">stack</button>
+              <button class="btn btn-dark " data-bs-toggle="modal" data-bs-target="#modal_flags" >flags</button>
               
-              <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#console">console</button>
+              <button class="btn btn-dark"   id="console_btn" data-bs-toggle="modal" data-bs-target="#modal_states" >States</button>
               <button class="btn btn-success">vars </button>
            </div>
 
@@ -148,7 +148,7 @@
   <div class="template row-10">
     <main>
   
-  <textArea class="list" id="count"  disabled >1 </textArea>
+  <textArea class="list" id="count"  disabled >1</textArea>
     <div class="container_ninis">
   
       <div class="backdrop">
@@ -158,7 +158,7 @@
         </div>
       </div>
   
-      <textarea id="myTextArea" onkeydown="if(event.keyCode===9){
+      <textarea id="myTextArea"  onkeydown="if(event.keyCode===9){
         var v=this.value,
         s=this.selectionStart,
         e=this.selectionEnd;
@@ -179,13 +179,13 @@
         else nb+=1
       count.value = count.value+'\n'+nb.toString();
   }
-  "  onkeyup ="
+  
         var count = document.getElementById('count');
         var count1 = document.getElementById('myTextArea')
         var nb=1;
             for(let i = 0; i<=this.value.length; i++)
         if(this.value[i] == '\n')nb++;
-      console.log(nb);
+     
       if(event.keyCode == 8){
         if(nb >= 9){
           var last_line = count.value.substring(count.value.length -2);
@@ -219,9 +219,140 @@
  
  <!--the text area--------------------------------------------------------------->
  
+ <!--modal_flags------------------------------------------------------------------------>
+ <div id="s">
+
+ </div>
+ <div class="modal fade" id="modal_flags" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Flags</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" ></button>
+      </div>
+      <div class="modal-body">
+        <table class="table  table-bordered table-hover table-dark"  >
+                
+          <thead  style="color: white;border-bottom:#6d6d6d">
+            <tr >
+              <th scope="col-6">O</th>
+              <th scope="col-6">D</th>
+              <th scope="col-6">I</th>
+              <th scope="col-6">T</th>
+              <th scope="col-6">S</th>
+              <th scope="col-6">Z</th>
+              <th scope="col-6">A</th>
+              <th scope="col-6">P</th>
+              <th scope="col-6">C</th>
+        
+            </tr>
+            <thead  style="color: white;border-bottom:#6d6d6d" >
+              <tr >
+                <th scope="col-6" id="flag_O">&nbsp;</th>
+                <th scope="col-6" id="flag_D">&nbsp;</th>
+                <th scope="col-6" id="flag_I">&nbsp;</th>
+                <th scope="col-6" id="flag_T">&nbsp;</th>
+                <th scope="col-6" id="flag_S">&nbsp;</th>
+                <th scope="col-6" id="flag_Z">&nbsp;</th>
+                <th scope="col-6" id="flag_A">&nbsp;</th>
+                <th scope="col-6" id="flag_P">&nbsp;</th>
+                <th scope="col-6" id="flag_C">&nbsp;</th>
+               
+          
+              </tr>
+          </thead>
+          <tbody >
+            <!--the trs-->
+            <!--the trs-->
+          </tbody>
+        </table>
+      </div>
+    
+    </div>
+  </div>
+</div>
+
+ <!--modal_flags------------------------------------------------------------------------>
+
+<!--modal_states------------------------------------------------------------------------>
+
+<div class="modal fade" id="modal_states" tabindex="-1" aria-labelledby="statesModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+ <div class="modal-dialog">
+   <div class="modal-content">
+     <div class="modal-header">
+       <h5 class="modal-title" id="statesModalLabel">states table</h5>
+       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" ></button>
+     </div>
+     <div class="modal-body scroll_it_states" >
+       <table class="table  table-bordered table-hover table-dark"  >
+        <thead  style="color: white;border-bottom:#6d6d6d" >
+          <tr id="states_index_tr">
+           <td scope="col-3" >States:</th>
+          
+          </tr>
+      </thead>
+        <thead  style="color: white;border-bottom:#6d6d6d" >
+          <tr id="states_addresse_tr">
+           <td scope="col-3" >adresse:</th>
+          
+          </tr>
+      </thead>
+         <thead  style="color: white;border-bottom:#6d6d6d">
+           <tr id="states_prevVal_tr">
+             <th>previous value:</th>
+           </tr>
+           <thead  style="color: white;border-bottom:#6d6d6d" >
+             <tr id="states_newVal_tr">
+              <td scope="col-3">new value:</th>
+             </tr>
+         </thead>
+         <tbody >
+           <!--the trs-->
+           <!--the trs-->
+         </tbody>
+       </table>
+     </div>
+   
+   </div>
+ </div>
+</div>
+
+<!--modal_states------------------------------------------------------------------------>
+<!--modal_stack------------------------------------------------------------------------>
+
+<div class="modal fade" id="modal_stack" tabindex="-1" aria-labelledby="statesModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="statesModalLabel">stack table</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" ></button>
+      </div>
+      <div class="modal-body scroll_it_stack" >
+        <table class="table   table-dark"  id="table_stack" >
+          <thead  style="color: white;border-bottom:#6d6d6d" id="table_header">
+            <tr >
+              <th scope="col-6">Adresse</th>
+              <th scope="col-6">val_Base16</th>
+              <th scope="col-6">val_ascii</th>
+
+            </tr>
+          </thead>
+          <tbody >
+            <!--the trs-->
+                
+             
+           
+
+            <!--the trs-->
+          </tbody>
+        </table>
+      </div>
+    
+    </div>
+  </div>
+ </div>
  
-
-
+ <!--modal_stack------------------------------------------------------------------------>
  <!--scripts------------------------------------------------------------------------------------------------>
     <script src="bs5/js/bootstrap.js"></script>
     <script src="ConsoleW.js"></script>
@@ -230,7 +361,7 @@
     <script src="Memory.js"></script>
     <script src="Registers.js"></script>
     <script src="processor.js"> </script>
-    <script src="displayer.js">
+    <script src="display.js">
   
       //
     </script>
