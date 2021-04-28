@@ -13,7 +13,7 @@ class Compiler{
         if (lexicalOutput.status == false) 
         {
 
-            let errorLine = lexicalView[i].length-1,
+            let errorLine = lexicalView.length-1,
                 message = lexicalView[errorLine].message;
 
             return this.manageErrors(errorLine, message);
