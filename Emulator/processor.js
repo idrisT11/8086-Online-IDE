@@ -8,6 +8,7 @@ class Processor{
         this.pause=false;
         this.int21_01=false;
         this.readNum=1;
+        this.spStart=true;
         
         this.activeSegment = 0b11; // Par defaut on travail sur le DATA SEGMENT (ds_id = 0b11)
     }
@@ -91,6 +92,14 @@ class Processor{
         {
             console.log("decode ImmARIT has been executed!");
         }
+        else if(!this.pause && this.decodePUSH(instruction)===0)
+        {
+            console.log(" decodePUSH has been executed!");
+        }
+        else if(!this.pause && this.decodePop(instruction)===0)
+        {
+            console.log(" decodePop has been executed!");
+        }
         else if(!this.pause && this.decodeInterrupt(instruction)===0)
         {
             console.log("decode Interrupt has been executed!");
@@ -104,15 +113,175 @@ class Processor{
         {
             console.log("decodeJmpCall has been executed!");
         }
-        else if(!this.pause && this.  decodeSegOverride(instruction)===0)
-        {
-            console.log(" decodeSegOverride has been executed!");
-        }
+        // else if(!this.pause && this.  decodeSegOverride(instruction)===0)
+        // {
+        //     console.log(" decodeSegOverride has been executed!");
+        // }
+       
         else{
             console.log("can't find anything to execute");
         }
         this.activeSegment=3;
     }
+decodePop(instruction){
+        var currentIp = this.register.readReg(IP_REG),
+            currentCodeSegment = this.register.readReg(CS_REG);
+           var  value = (currentCodeSegment << 4) + currentIp;
+    
+        var currentStackSegment = this.register.readReg(SS_REG),
+            currentStackPointer = this.register.readReg(SP_REG);
+          
+        var    adressStack = (currentStackSegment << 4) + currentStackPointer;
+        
+          
+          
+            // if the stack is already empty
+    
+            if(adressStack == 0xFFFFE) {  // FFFFE
+                
+                console.log("the stack is empty ERROR !!!!");
+                
+                  return -1;
+            }
+         
+         
+    
+             if((instruction & 0b11111111) == POP_REG_MEM) 
+             {  
+                var operandes = this.extractOperand(this.RAM.readWord((currentCodeSegment << 4) + currentIp + 1));
+                // R / M
+                   
+                
+                     if(operandes.addr==null)
+                     {
+                        
+                         var R=operandes.opRegister[1];
+                         this.register.writeWordReg(R, this.RAM.readWord(adressStack));
+                         this.RAM.writeWord(adressStack,0);
+                         this.register.writeReg(SP_REG, currentStackPointer + 2)
+                         this.register.incIP(2 + operandes.dispSize);
+                     }
+                     
+                    else {
+                      this.RAM.writeWord(operandes.addr,this.RAM.readWord(adressStack));
+                      this.RAM.writeWord(adressStack, 0);
+                      this.register.writeReg(SP_REG, currentStackPointer + 2)
+                      this.register.incIP(2 + operandes.dispSize);
+                     
+                         }
+               return 0;
+             }
+             else if (((instruction %8)==0b111)&&(((instruction >>5)==0))){
+    
+               
+    
+                let reg = (instruction >> 3 ) % 4 ;
+                 
+                 
+                   
+                  
+                    
+                    this.register.writeSegReg(reg,this.RAM.readWord(adressStack));
+                    this.RAM.writeWord(adressStack, 0);
+                    this.register.writeReg(SP_REG, currentStackPointer + 2)
+                    this.register.incIP(1);
+                    return 0;
+            }
+             
+            else return -1;
+            
+            
+                      
+        
+       
+    
+       return -1;
+    
+}
+
+     decodePUSH(instruction){
+
+        // get the current SS:SP position
+    
+    
+        var currentIp = this.register.readReg(IP_REG),
+            currentCodeSegment = this.register.readReg(CS_REG);
+        let currentStackSegment = this.register.readReg(SS_REG),
+            currentStackPointer = this.register.readReg(SP_REG),
+             contentStack = 0;
+            var adressStack = (currentStackSegment << 4) + currentStackPointer;
+            
+            
+          
+        //     if ((instruction) == PUSH_REG){
+        //         // REGISTER
+    
+        //         let reg = instruction  % 8 ;
+            
+        //        console.log(adressStack.toString(16),p.register.readWordReg(reg))
+        //         this.RAM.writeWord((currentStackSegment << 4) + this.register.readReg(SP_REG), p.register.readWordReg(reg));
+        //         this.register.writeReg(SP_REG, currentStackPointer - 2)
+        //         this.register.incIP(2);
+        //    }
+    
+             if((instruction & 0b11111111) == PUSH_REG_MEM) {  
+    
+               var operandes = this.extractOperand(this.RAM.readWord((currentCodeSegment << 4) + currentIp + 1));
+               // R / M
+    
+               
+                    if(operandes.addr==null)
+                    {
+                       
+                        var R=operandes.opRegister[1];
+                       
+                            this.register.writeReg(SP_REG, currentStackPointer - 2)
+                            adressStack = (currentStackSegment << 4) + currentStackPointer-2;
+                            this.RAM.writeWord(adressStack, this.register.readWordReg(R));
+                        
+                     
+                     this.register.incIP(2 + operandes.dispSize);
+                    }
+                    
+                   else {
+                    this.register.writeReg(SP_REG, currentStackPointer - 2)
+                    adressStack = (currentStackSegment << 4) + currentStackPointer-2;
+                     this.RAM.writeWord(adressStack, this.RAM.readWord(operandes.addr));
+                    
+                    
+                     this.register.incIP(2 + operandes.dispSize);
+                   
+                        }
+           
+        
+           
+            
+    
+            
+            return 0;
+    
+       }
+       else if (((instruction%8)==0b110)&&(((instruction >>5)==0))){
+    
+               
+    
+        let reg = (instruction >> 3 ) % 4 ;
+         
+         
+           
+           this.register.writeReg(SP_REG, currentStackPointer - 2)
+           console.log((currentStackPointer - 2).toString(16),p.register.readSegReg(reg).toString(16));
+           adressStack = (currentStackSegment << 4) + currentStackPointer-2;
+            this.RAM.writeWord(adressStack, p.register.readSegReg(reg));
+
+            this.register.incIP(1);
+            return 0;
+    }
+    
+       return -1;
+    
+    }
+    
     decodeInterrupt(instruction)
     {
          
@@ -2562,25 +2731,7 @@ decodeNot(instruction)
         return 0;
 }
 
-//YANIS_MAN
-	//###########################################################################################
-    decodeCLC(instruction) {
 
-		var currentIp = this.Register.readReg(IP_REG),
-		currentCodeSegment = this.Register.readReg(CS_REG);
-
-		if((instruction & 0b11111111) == CLS_INS){
-
-			this.register.setFlag('C', 0);
-
-			this.register.incIP(1);
-
-			return 0;
-		 }
-
-		return -1;
-	}
-	
 decodeRet(instruction)
 {
     var current_ip = this.register.readReg(IP_REG),
