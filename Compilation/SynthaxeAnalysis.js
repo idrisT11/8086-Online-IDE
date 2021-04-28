@@ -1,5 +1,5 @@
 "use strict";
-
+/*
 const wordRegisters = ['AX', 'BX', 'CX', 'DX'];
 
 const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
@@ -7,7 +7,7 @@ const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
 const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
 
 const Registers = ['DI', 'SI', 'SP', 'BP', 'IP'];
-
+*/
 const arithmetic = ["ADD", "ADC", "SUB", "SSB", "CMP", "AND", "TEST", "OR", "XOR"];
 
 const oneops = ["INC", "DEC", "MUL", "DIV", "IDIV", "IMUL", "NEG", "NOT"];
@@ -36,6 +36,7 @@ class SyntaxAnalysis {
             }
 
         }
+        index--;
         return { message: temp.message, good: temp.good, index: arr[index].index };
     }
 
