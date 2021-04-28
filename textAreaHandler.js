@@ -4,7 +4,7 @@
  
 let directives = /\bORG[^a-z0-9]|\bDEFINE[^a-z0-9]|\bEQU[^a-z0-9]|\bPROC[^a-z0-9]|\bLOCAL[^a-z0-9]|\bENDM[^a-z0-9]|\bENDP[^a-z0-9]|\bOFFSET[^a-z0-9]/gi
 
-var instructions = /\bMOV[^a-z0-9]|\bPUSH[^a-z0-9]|\bPOP[^a-z0-9]|\bXCHG[^a-z0-9]|\bLEA[^a-z0-9]|\bLAHF[^a-z0-9]|\bSAHF[^a-z0-9]|\bPUSHF[^a-z0-9]|\bPOPF[^a-z0-9]|\bADD[^a-z0-9]|\bADC[^a-z0-9]|\bDEC[^a-z0-9]|\bINC[^a-z0-9]|\bAAA[^a-z0-9]|\bSUB[^a-z0-9]|\bSSB[^a-z0-9]|\bNEG[^a-z0-9]|\bCMP[^a-z0-9]|\bMUL[^a-z0-9]|\bIMUL[^a-z0-9]|\bDIV[^a-z0-9]|\bIDIV[^a-z0-9]|\bCBW[^a-z0-9]|\bCWD[^a-z0-9]|\bNOT[^a-z0-9]|\bSHL[^a-z0-9]|\bSAL[^a-z0-9]|\bSHR[^a-z0-9]|\bSAR[^a-z0-9]|\bROL[^a-z0-9]|\bROR[^a-z0-9]|\bRCL[^a-z0-9]|\bRCR[^a-z0-9]|\bAND[^a-z0-9]|\bTEST[^a-z0-9]|\bOR[^a-z0-9]|\bXOR[^a-z0-9]|\bREP[^a-z0-9]|\bMOVSB[^a-z0-9]|\bCMPSB[^a-z0-9]|\bSCASB[^a-z0-9]|\bLODSB[^a-z0-9]|\bSTOSB[^a-z0-9]|\bMOVSW[^a-z0-9]|\bCMPSW[^a-z0-9]|\bSCASW[^a-z0-9]|\bLODSW[^a-z0-9]|\bSTOSW[^a-z0-9]|\bCALL[^a-z0-9]|\bJMP[^a-z0-9]|\bRET[^a-z0-9]|\bJE[^a-z0-9]|\bJZ[^a-z0-9]|\bJL[^a-z0-9]|\bJNGE[^a-z0-9]|\bJLE[^a-z0-9]|\bJNG[^a-z0-9]|\bJB[^a-z0-9]|\bJNAE[^a-z0-9]|\bJBE[^a-z0-9]|\bJNA[^a-z0-9]|\bJP[^a-z0-9]|\bJPE[^a-z0-9]|\bJO[^a-z0-9]|\bJS[^a-z0-9]|\bJNE[^a-z0-9]|\bJNZ[^a-z0-9]|\bJNL[^a-z0-9]|\bJGE[^a-z0-9]|\bJNLE[^a-z0-9]|\bJG[^a-z0-9]|\bJNB[^a-z0-9]|\bJAE[^a-z0-9]|\bJNBE[^a-z0-9]|\bJA[^a-z0-9]|\bJNP[^a-z0-9]|\bJPO[^a-z0-9]|\bJNO[^a-z0-9]|\bJNS[^a-z0-9]|\bLOOP[^a-z0-9]|\bLOOPZ[^a-z0-9]|\bLOOPE[^a-z0-9]|\bLOOPNZ[^a-z0-9]|\bLOOPNE[^a-z0-9]|\bJCXZ[^a-z0-9]|\bINT[^a-z0-9]/ig
+var instructions1 = /\bMOV[^a-z0-9]|\bPUSH[^a-z0-9]|\bPOP[^a-z0-9]|\bXCHG[^a-z0-9]|\bLEA[^a-z0-9]|\bLAHF[^a-z0-9]|\bSAHF[^a-z0-9]|\bPUSHF[^a-z0-9]|\bPOPF[^a-z0-9]|\bADD[^a-z0-9]|\bADC[^a-z0-9]|\bDEC[^a-z0-9]|\bINC[^a-z0-9]|\bAAA[^a-z0-9]|\bSUB[^a-z0-9]|\bSSB[^a-z0-9]|\bNEG[^a-z0-9]|\bCMP[^a-z0-9]|\bMUL[^a-z0-9]|\bIMUL[^a-z0-9]|\bDIV[^a-z0-9]|\bIDIV[^a-z0-9]|\bCBW[^a-z0-9]|\bCWD[^a-z0-9]|\bNOT[^a-z0-9]|\bSHL[^a-z0-9]|\bSAL[^a-z0-9]|\bSHR[^a-z0-9]|\bSAR[^a-z0-9]|\bROL[^a-z0-9]|\bROR[^a-z0-9]|\bRCL[^a-z0-9]|\bRCR[^a-z0-9]|\bAND[^a-z0-9]|\bTEST[^a-z0-9]|\bOR[^a-z0-9]|\bXOR[^a-z0-9]|\bREP[^a-z0-9]|\bMOVSB[^a-z0-9]|\bCMPSB[^a-z0-9]|\bSCASB[^a-z0-9]|\bLODSB[^a-z0-9]|\bSTOSB[^a-z0-9]|\bMOVSW[^a-z0-9]|\bCMPSW[^a-z0-9]|\bSCASW[^a-z0-9]|\bLODSW[^a-z0-9]|\bSTOSW[^a-z0-9]|\bCALL[^a-z0-9]|\bJMP[^a-z0-9]|\bRET[^a-z0-9]|\bJE[^a-z0-9]|\bJZ[^a-z0-9]|\bJL[^a-z0-9]|\bJNGE[^a-z0-9]|\bJLE[^a-z0-9]|\bJNG[^a-z0-9]|\bJB[^a-z0-9]|\bJNAE[^a-z0-9]|\bJBE[^a-z0-9]|\bJNA[^a-z0-9]|\bJP[^a-z0-9]|\bJPE[^a-z0-9]|\bJO[^a-z0-9]|\bJS[^a-z0-9]|\bJNE[^a-z0-9]|\bJNZ[^a-z0-9]|\bJNL[^a-z0-9]|\bJGE[^a-z0-9]|\bJNLE[^a-z0-9]|\bJG[^a-z0-9]|\bJNB[^a-z0-9]|\bJAE[^a-z0-9]|\bJNBE[^a-z0-9]|\bJA[^a-z0-9]|\bJNP[^a-z0-9]|\bJPO[^a-z0-9]|\bJNO[^a-z0-9]|\bJNS[^a-z0-9]|\bLOOP[^a-z0-9]|\bLOOPZ[^a-z0-9]|\bLOOPE[^a-z0-9]|\bLOOPNZ[^a-z0-9]|\bLOOPNE[^a-z0-9]|\bJCXZ[^a-z0-9]|\bINT[^a-z0-9]/ig
 
 
 
@@ -59,7 +59,7 @@ text = text.replace(registers, function(m)
    
         return `<span class="dir">${m}</span>`;
 
-    }).replace(instructions, function(m){
+    }).replace(instructions1, function(m){
       let c = "violet"
    
         return `<span class="ins">${m}</span>`;
