@@ -1,12 +1,12 @@
 "use strict";
 
-const wordRegisters = ['AX', 'BX', 'CX', 'DX'];
+//const wordRegisters = ['AX', 'BX', 'CX', 'DX'];
 
-const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
+//const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
 
-const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
+//const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
 
-const Registers = ['DI', 'SI', 'SP', 'BP', 'IP'];
+//const Registers = ['DI', 'SI', 'SP', 'BP', 'IP'];
 
 const arithmetic = ["ADD", "ADC", "SUB", "SSB", "CMP", "AND", "TEST", "OR", "XOR"];
 
@@ -19,12 +19,27 @@ const labels = ["JE", "JC", "JNC", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE
 const shift = ["SHL", "SAL", "SHR", "SAR", "ROL", "ROR", "RCL", "RCR"];
 
 class SyntaxAnalysis {
-       analyse(arr) {
-       for (let index = 0; index < arr.length; index++) {
-           const element = arr[index];
-           let temp = this.excute(element);
-           if (!temp.good) break;
+    
+    analyse(arr) {
+        let temp, index;
+
+        for (index = 0; index < arr.length; index++) 
+        {
+            const element = arr[index];
+            if (element.expressionType != 'NULL') 
+            {
+                temp = this.excute(element);
+                if (!temp.good)
+                {
+                    index++;
+                    break;
+                }
+            }
+            
         }
+        
+        index--;
+
         return { message: temp.message, good: temp.good, index: arr[index].index };
     }
 
@@ -317,6 +332,7 @@ class SyntaxAnalysis {
                 else
 
                     return { message: "Illegal Number Of Paremeters", good: false };
+                    
             case "JMP": case "CALL":
 
 
@@ -729,36 +745,4 @@ function getNum(str) {//turn a string number BETWEEN BRACKETS to number
     }
     else { return 0 }
 }
-
-
-
-
-
-
-
-let sy = new SyntaxAnalysis;
-
-console.log(sy.excute({
-
-    good: true,
-
-    expressionType: 'INST',
-
-    instructionType: 'InsSIM',
-
-    label: null,
-
-    message: null,
-
-    instName: 'MOV',
-
-    variableName: null,
-
-    variableClass: null,
-
-    operands: [{ name: '[bx+6700]', type: 'RX' }, { name: '[bx+4655464]', type: 'RX' }]
-
-}
-
-));
 
