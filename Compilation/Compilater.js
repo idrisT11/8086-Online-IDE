@@ -73,7 +73,9 @@ class Compiler{
             status: true,
             message: '',
             errorLine: null,
-            finalView: finalView
+            finalView: finalView,
+            varArray: varArray,
+            labelArray: labelArray
         }
 
         /*
@@ -98,7 +100,9 @@ class Compiler{
             status: false,
             message: '',
             errorLine: errorLine,
-            finalView: message
+            finalView: message,
+            varArray: null,
+            labelArray: null
         }
     }
 }
