@@ -1,9 +1,7 @@
 //verifie ligne avec juste un commentaire
 
 class Compiler{
-    static manageErrors(){
 
-    }
 
     static compile(brute_code){
 
