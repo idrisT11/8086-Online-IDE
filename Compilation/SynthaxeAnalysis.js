@@ -20,10 +20,21 @@ const shift = ["SHL", "SAL", "SHR", "SAR", "ROL", "ROR", "RCL", "RCR"];
 
 class SyntaxAnalysis {
        analyse(arr) {
-       for (let index = 0; index < arr.length; index++) {
-           const element = arr[index];
-           let temp = this.excute(element);
-           if (!temp.good) break;
+        let temp, index;
+
+        for (index = 0; index < arr.length; index++) 
+        {
+            const element = arr[index];
+            if (element.expressionType != 'NULL') 
+            {
+                temp = this.excute(element);
+                if (!temp.good)
+                {
+                    index++;
+                    break;
+                }
+            }
+
         }
         return { message: temp.message, good: temp.good, index: arr[index].index };
     }
