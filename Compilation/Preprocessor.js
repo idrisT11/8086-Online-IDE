@@ -319,13 +319,13 @@ class PreProcessor {
     }
 
     hexBinAcceptable(str){
-        let tabHex = str.match(/[0-9]+[a-f0-9]*h/ig),
-            tabBin = str.match(/[0-1]+b/ig);
+        let tabHex = str.match(/[0-9]+[a-f0-9]*(h|H)/ig),
+            tabBin = str.match(/[0-1]+(b|B)/ig);
             
         if(tabHex != null)
         {
             for (let i = 0; i < tabHex.length; i++) {
-                str = str.replace(/[0-9]+[a-f0-9]*h/, '0x' + tabHex[i].slice(0, tabHex[0].length-1));
+                str = str.replace(/[0-9]+[a-f0-9]*(h|H)/, '0x' + tabHex[i].slice(0, tabHex[0].length-1));
                 
             }
         }
@@ -333,7 +333,7 @@ class PreProcessor {
         if(tabBin != null)
         {
             for (let i = 0; i < tabBin.length; i++) {
-                str = str.replace(/[0-1]+b/, '0b' + tabBin[i].slice(0, tabBin[0].length-1));
+                str = str.replace(/[0-1]+(b|B)/, '0b' + tabBin[i].slice(0, tabBin[0].length-1));
                 
             }
         }
