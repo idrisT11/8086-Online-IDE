@@ -1,12 +1,12 @@
 "use strict";
 
-//const wordRegisters = ['AX', 'BX', 'CX', 'DX'];
+const wordRegisters = ['AX', 'BX', 'CX', 'DX'];
 
-//const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
+const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
 
-//const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
+const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
 
-//const Registers = ['DI', 'SI', 'SP', 'BP', 'IP'];
+const Registers = ['DI', 'SI', 'SP', 'BP', 'IP'];
 
 const arithmetic = ["ADD", "ADC", "SUB", "SSB", "CMP", "AND", "TEST", "OR", "XOR"];
 
@@ -19,27 +19,12 @@ const labels = ["JE", "JC", "JNC", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE
 const shift = ["SHL", "SAL", "SHR", "SAR", "ROL", "ROR", "RCL", "RCR"];
 
 class SyntaxAnalysis {
-    
-    analyse(arr) {
-        let temp, index;
-
-        for (index = 0; index < arr.length; index++) 
-        {
-            const element = arr[index];
-            if (element.expressionType != 'NULL') 
-            {
-                temp = this.excute(element);
-                if (!temp.good)
-                {
-                    index++;
-                    break;
-                }
-            }
-            
+       analyse(arr) {
+       for (let index = 0; index < arr.length; index++) {
+           const element = arr[index];
+           let temp = this.excute(element);
+           if (!temp.good) break;
         }
-        
-        index--;
-
         return { message: temp.message, good: temp.good, index: arr[index].index };
     }
 
@@ -332,7 +317,6 @@ class SyntaxAnalysis {
                 else
 
                     return { message: "Illegal Number Of Paremeters", good: false };
-                    
             case "JMP": case "CALL":
 
 
@@ -344,8 +328,16 @@ class SyntaxAnalysis {
                     if (Obj.operands.length === 0 && Obj.instName == "JMP") return { message:null, good: true };//no operands
 
                     else if (Obj.operands.length === 1) {//one operand
+                        if (Obj.operands[0].type === "INT")
+                        {
+                          
+                            if (this.range(Obj.operands[0].name) )
+                                return { message:null, good: true };
+                            else return { message: "OUT OF BOUND OPERAND", good: false };
+  
+                        }
 
-                        if (Obj.operands[0].type === "LBL" || Obj.operands[0].type === "OFF" ) {//if it's a label or offset
+                        else if (Obj.operands[0].type === "LBL" || Obj.operands[0].type === "OFF" ) {//if it's a label or offset
 
                             return { message:null, good: true }
 
@@ -745,4 +737,36 @@ function getNum(str) {//turn a string number BETWEEN BRACKETS to number
     }
     else { return 0 }
 }
+
+
+
+
+
+
+
+let sy = new SyntaxAnalysis;
+
+console.log(sy.excute({
+
+    good: true,
+
+    expressionType: 'INST',
+
+    instructionType: 'InsSIM',
+
+    label: null,
+
+    message: null,
+
+    instName: 'JMP',
+
+    variableName: null,
+
+    variableClass: null,
+
+    operands: [{ name: '1352', type: 'INT' }]
+
+}
+
+));
 
