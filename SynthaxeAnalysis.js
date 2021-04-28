@@ -8,11 +8,9 @@ const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
 
 const Registers = ['DI', 'SI', 'SP', 'BP', 'IP'];
 
-const instructions = ["MOV", "PUSH", "POP", "XCHG", "LEA", "LAHF", "SAHF", "PUSHF", "POPF", "ADD", "ADC", "DEC", "INC", "AAA", "SUB", "SSB", "NEG", "CMP", "MUL", "IMUL", "DIV", "IDIV", "CBW", "CWD", "NOT", "SHL", "SAL", "SHR", "SAR", "ROL", "ROR", "RCL", "RCR", "AND", "TEST", "OR", "XOR", "REP", "REPE", "REPNE", "MOVSB", "CMPSB", "SCASB", "LODSB", "STOSB", "MOVSW", "CMPSW", "SCASW", "LODSW", "STOSW", "CALL", "JMP", "RET", "JE", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE", "JBE", "JNA", "JP", "JPE", "JO", "JS", "JNE", "JNZ", "JNL", "JGE", "JNLE", "JG", "JNB", "JAE", "JNBE", "JA", "JNS", "LOOP", "LOOPZ", "LJNP", "JPO", "JNO", "OOPE", "LOOPNZ", "LOOPNE", "JCXZ", "INT"]
-
 const arithmetic = ["ADD", "ADC", "SUB", "SSB", "CMP", "AND", "TEST", "OR", "XOR"];
 
-const oneops = ["INC", "DEC", "MUL", "DIV", "IDIV", "IMUL", "NEG", "NOT", "LEA"];
+const oneops = ["INC", "DEC", "MUL", "DIV", "IDIV", "IMUL", "NEG", "NOT"];
 
 const noops = ["MOVSB", "CMPSB", "SCASB", "LODSB", "STOSB", "MOVSW", "CMPSW", "SAHF", "SCASW", "LODSW", "STOSW", "CBW", "CLC", "CLD", "CLI", "CMC", "STC", "STD", "STI", "CWD", "HLT", "LAHF", "PUSHF", "POPF"];
 
@@ -21,24 +19,13 @@ const labels = ["JE", "JC", "JNC", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE
 const shift = ["SHL", "SAL", "SHR", "SAR", "ROL", "ROR", "RCL", "RCR"];
 
 class SyntaxAnalysis {
-    analyse(arr) {
-        let i;
-
-        for (i = 0; i < arr.length; i++) 
-        {
-
-            const element = arr[i];
-            let temp = this.excute(element);
-
-            if (!temp.good) 
-                break;
+       analyse(arr) {
+       for (let index = 0; index < arr.length; index++) {
+           const element = arr[index];
+           let temp = this.excute(element);
+           if (!temp.good) break;
         }
-
-        return {
-            message: temp.message,
-            good: temp.good, 
-            errorLine: arr[i].index 
-        };
+        return { message: temp.message, good: temp.good, index: arr[index].index };
     }
 
     excute(Obj) {
@@ -200,9 +187,7 @@ class SyntaxAnalysis {
 
                     // as above in move deplacementcheck is required
 
-                    let z = (/M/.test(type1)) ? 0 : (/M/.test(type2)) ? 1 : -1;
-
-                    if (z != -1 && !this.range(getNum(Obj.operands[z].name)))
+                    if ((/M/.test(Obj.operands[0].type)) && !this.range(getNum(Obj.operands[0].name)))
 
                         return { message: "DEPLACEMENT OVERFLLOW", good: false };
 
@@ -234,17 +219,17 @@ class SyntaxAnalysis {
 
                 if (Obj.operands.length == 1) {
 
-                    let z = (/M/.test(type1)) ? 0 : (/M/.test(type2)) ? 1 : -1;
-
-                    if (z != -1 && !this.range(getNum(Obj.operands[z].name)))
+               
+                    if ((/M/.test(Obj.operands[0].type)) && !this.range(getNum(Obj.operands[0].name)))
 
                         return { message: "DEPLACEMENT OVERFLLOW", good: false };
+
 
                     switch (Obj.operands[0].type) {
 
 
 
-                        case "RX": case "RS": case "MW": case "MU": case "VAR16": case "LBL":
+                        case "RX": case "RS": case "MW": case "MU": case "VAR16": case "LBL": case "OFF":
 
 
 
@@ -340,19 +325,19 @@ class SyntaxAnalysis {
 
 
 
-                    if (Obj.operands.length === 0 && Obj.instName == "JMP") return { message: "", good: true };//no operands
+                    if (Obj.operands.length === 0 && Obj.instName == "JMP") return { message:null, good: true };//no operands
 
                     else if (Obj.operands.length === 1) {//one operand
 
-                        if (Obj.operands[0].type === "LBL") {//if it's a label
+                        if (Obj.operands[0].type === "LBL" || Obj.operands[0].type === "OFF" ) {//if it's a label or offset
 
-                            return { message: "", good: true }
+                            return { message:null, good: true }
 
 
 
                         }
 
-                        else if ((Obj.operands[0].type === "DIS")) {//if it's a memory
+                        else if ((Obj.operands[0].type === "DIS")) {//if it's a memory adress 
 
                             let num1 = Obj.operands[0].name.match(/\w+(?=\s*\:)/);
 
@@ -361,7 +346,7 @@ class SyntaxAnalysis {
 
                             if (this.range(num1.trim()) && this.range(num2.trim())) {
 
-                                return { message: "", good: true };
+                                return { message:null, good: true };
 
                             }
 
@@ -384,6 +369,39 @@ class SyntaxAnalysis {
                 }
 
 
+            case "LEA":
+
+                if (Obj.operands.length > 1) {
+
+                    let type1 = Obj.operands[0].type;
+
+                    let type2 = Obj.operands[1].type;
+
+                    let comp = type1 + " " + type2;
+
+                    let exist = comp=="RX MU"||comp=="RX MB"||comp=="RX MW"||comp=="RX VAR8"||comp=="RX VAR16";
+
+                    // deplacement sizecheck
+
+                    if (/M/.test(Obj.operands[1].type) && !this.range(getNum(Obj.operands[1].name)))
+
+                        return { message: "DEPLACEMENT OVERFLLOW", good: false };
+
+                    if (!exist)
+
+                        return { message: "unmatched operands", good: false }
+
+                    return { message: null, good: true }
+
+
+
+                }
+
+                else
+
+                    return { message: "Illegal Number Of Paremeters", good: false };
+    
+
 
             default:
 
@@ -401,7 +419,7 @@ class SyntaxAnalysis {
 
                         let exist = false;
 
-                        for (let index = 0; index < 3; index++) {
+                        for (let index = 0; index < 4; index++) {
 
                             const element = opsCompinision[index];
 
@@ -422,6 +440,8 @@ class SyntaxAnalysis {
                         if (z != -1 && !this.range(getNum(Obj.operands[z].name)))
 
                             return { message: "DEPLACEMENT OVERFLLOW", good: false };
+
+
 
 
 
@@ -501,23 +521,23 @@ class SyntaxAnalysis {
 
                             //deplacementcheck
 
-                            let z = (/M/.test(type1)) ? 0 : (/M/.test(type2)) ? 1 : -1;
-
-                            if (z != -1 && !this.range(getNum(Obj.operands[z].name)))
+                           
+                            if ((/M/.test(Obj.operands[0].type)) && !this.range(getNum(Obj.operands[0].name)))
 
                                 return { message: "DEPLACEMENT OVERFLLOW", good: false };
+
 
                             //the right operand could be int in one byte  
 
                             if (type2 == "INT" && this.range(Obj.operands[1].name) && getS(Obj.operands[1].name))
 
-                                return { message: "", good: true }
+                                return { message: null, good: true }
 
                             // or the register CL     
 
                             if (type2 == "RL" && Obj.operands[1].name == "CL")
 
-                                return { message: "", good: true }
+                                return { message: null, good: true }
 
                         } // if not return false
 
@@ -555,11 +575,11 @@ class SyntaxAnalysis {
 
                         // deplacementcheck
 
-                        let z = (/M/.test(type1)) ? 0 : (/M/.test(type2)) ? 1 : -1;
-
-                        if (z != -1 && !this.range(getNum(Obj.operands[z].name)))
+                        
+                        if ((/M/.test(Obj.operands[0].type)) && !this.range(getNum(Obj.operands[0].name)))
 
                             return { message: "DEPLACEMENT OVERFLLOW", good: false };
+
 
                         // that operand can be a memory or register(16 or 8)
 
@@ -585,7 +605,7 @@ class SyntaxAnalysis {
 
                         // accept only label as a operand
 
-                        if (Obj.operands[0].type = "LBL") return { message: "", good: true }
+                        if (Obj.operands[0].type = "LBL") return { message: null, good: true }
 
                         else return { message: "WRONG PARAMETER", good: false }
 
@@ -612,20 +632,21 @@ class SyntaxAnalysis {
 }
 const opsCompinision = [
 
-    { type: ("RR"), cases: ["RL RL", "RX RX"] }
+    ["RL RL", "RX RX"] 
 
-    , { type: ("MR"), cases: ["MU RX", "MU RL", "MB RL", "MW RX", "VAR8 RL", "VAR16 RX"] }
+    ,["MU RX", "MU RL", "MB RL", "MW RX", "VAR8 RL", "VAR16 RX"] 
 
-    , { type: ("RM"), cases: ["RX MU", "RL MU", "RL MB", "RX MW", "RL VAR8", "RX VAR16"] }
+    ,["RX MU", "RL MU", "RL MB", "RX MW", "RL VAR8", "RX VAR16"] 
 
-    , { type: ("RSM"), cases: ["RS MU", "RS MW"] }
+    ,["RX OFF","MU OFF","MW OFF"] 
 
-    , { type: ("MRS"), cases: ["MU RS", "MW RS"] }
+    , ["RS MU", "RS MW"] 
 
-    , { type: ("RRS"), cases: ["RX RS"] }
+    ,["MU RS", "MW RS"] 
 
-    , { type: ("RSR"), cases: ["RS RX"] }
+    ,["RX RS"] 
 
+    , ["RS RX"] 
 ]
 
 
@@ -719,8 +740,6 @@ let sy = new SyntaxAnalysis;
 
 console.log(sy.excute({
 
-
-
     good: true,
 
     expressionType: 'INST',
@@ -731,18 +750,15 @@ console.log(sy.excute({
 
     message: null,
 
-    instName: 'MOV',
+    instName: 'LEA',
 
     variableName: null,
 
     variableClass: null,
 
-    operands: [{ name: '[bx+6700]', type: 'MU' }, { name: '670', type: 'INT' }]
+    operands: [{ name: '[bx+6700]', type: 'RL' }, { name: '[bx+4655464]', type: 'VAR8' }]
 
 }
 
 ));
-
-
-console.log(("[bx+670000]"));
 
