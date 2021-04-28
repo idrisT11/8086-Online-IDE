@@ -123,10 +123,11 @@ class Processor{
         }
         this.activeSegment=3;
     }
-decodePop(instruction){
+
+    decodePop(instruction){
         var currentIp = this.register.readReg(IP_REG),
             currentCodeSegment = this.register.readReg(CS_REG);
-           var  value = (currentCodeSegment << 4) + currentIp;
+        var  value = (currentCodeSegment << 4) + currentIp;
     
         var currentStackSegment = this.register.readReg(SS_REG),
             currentStackPointer = this.register.readReg(SP_REG);
@@ -197,9 +198,9 @@ decodePop(instruction){
     
        return -1;
     
-}
+    }
 
-     decodePUSH(instruction){
+    decodePUSH(instruction){
 
         // get the current SS:SP position
     
@@ -276,20 +277,18 @@ decodePop(instruction){
 
             this.register.incIP(1);
             return 0;
-    }
+        }
     
        return -1;
-    
     }
     
-    decodeInterrupt(instruction)
-    {
+    decodeInterrupt(instruction){
          
         if(instruction===INT)
         {
             var current_ip = this.register.readReg(IP_REG),
             current_code_seg = this.register.readReg(CS_REG);
-           var secondByte = this.RAM.readByte( (current_code_seg<<4) + current_ip+1 );
+            var secondByte = this.RAM.readByte( (current_code_seg<<4) + current_ip+1 );
         //    if(secondByte==0x21)
         //    {
                 if(((this.register.readReg(AX_REG)&0xff00)>>8)==0x01)
@@ -338,8 +337,8 @@ decodePop(instruction){
             
         }
         else return -1;
-
     }
+
     decodeMov(instruction){
      
 		        var current_ip = this.register.readReg(IP_REG),
@@ -534,7 +533,7 @@ decodePop(instruction){
 		            return -1;
 
 		        return 0;
-		}
+	}
 
 	decodeAdd(instruction){
 		        var current_ip = this.register.readReg(IP_REG),
@@ -651,8 +650,6 @@ decodePop(instruction){
 
 		        return 0;
 	}
-	
-	
 	
 	decodeSub(instruction){
 		        var current_ip = this.register.readReg(IP_REG),
@@ -892,10 +889,10 @@ decodePop(instruction){
 	
 	
 	decodeByteToWord(instruction){
-		   if ( instruction == CBW ) {
+		if ( instruction == CBW ) {
 		    	let value = this.register.readReg(AX_REG);
 		    	this.register.writeReg(AX_REG, this._convertByteToWord(value & 0xFF));
-		   }
+		}
 	 	else
 			return -1;
 
@@ -1057,19 +1054,16 @@ decodePop(instruction){
                 }
 		     this.register.incIP(operandes.dispSize + 2);
            return 0;
-        }else return -1;
-		
-
-      
+        }else return -1;   
     }
 
       //and
   	decodeAnd(instruction)
-   {
-      
-            var current_ip = this.register.readReg(IP_REG),
-            current_code_segement = this.register.readReg(CS_REG);
-            var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+    {
+        var current_ip = this.register.readReg(IP_REG),
+        current_code_segement = this.register.readReg(CS_REG);
+        var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+        
         if (instruction >>2 == AND_RM_RM ) 
         {
                
@@ -1170,80 +1164,74 @@ decodePop(instruction){
 
             this.register.incIP(operandes.dispSize + (instruction % 2) + 3);
         }    
-        else return -1;
-
-       
-       
-       
-       
-   }
-
-//decodeNot
-decodeNot(instruction)
-{
-    var current_ip = this.register.readReg(IP_REG),
-    current_code_segement = this.register.readReg(CS_REG);
- let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
-
-    if((instruction>>1)==NOT &&(operandes.opRegister[0]==0b010))
-    {
-    
-     if(operandes.addr==null) // not reg
-     {
-         let R=operandes.opRegister[1];
-
-         if(instruction%2==1)//w
-         {
-             let val=this.register.readWordReg(R);
-             val=~val;
-             this.register.writeWordReg(R,val&0xffff);
-
-         }else 
-         {
-             let val=this.register.readByteReg(R);
-             val=~val;
-             this.register.writeByteReg(R,val&0xff);
-
-         }
-     }
-     else  //NOT [addr]
-     {
-         if(instruction%2==1)//w
-         {
-             let val=this.RAM.readWord(operandes.addr);
-             val=~val;
-             this.RAM.writeWord(operandes.addr,val&0xffff);
-
-         }else //8 bits
-         {
-            
-             let val=this.RAM.readByte(operandes.addr);
-             val=~(val);
-            
-             this.RAM.writeWord(operandes.addr,val&0xffff);
-
-
-         }
-
-     }
-     this.register.incIP(operandes.dispSize + (instruction % 2) +1);
-     return 0;
+        else return -1;    
     }
-    else return -1;
-    
-}
+
+    //decodeNot
+    decodeNot(instruction)
+    {
+        var current_ip = this.register.readReg(IP_REG),
+        current_code_segement = this.register.readReg(CS_REG);
+        let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
+
+        if((instruction>>1)==NOT &&(operandes.opRegister[0]==0b010))
+        {
+        
+         if(operandes.addr==null) // not reg
+         {
+             let R=operandes.opRegister[1];
+
+             if(instruction%2==1)//w
+             {
+                 let val=this.register.readWordReg(R);
+                 val=~val;
+                 this.register.writeWordReg(R,val&0xffff);
+
+             }else 
+             {
+                 let val=this.register.readByteReg(R);
+                 val=~val;
+                 this.register.writeByteReg(R,val&0xff);
+
+             }
+         }
+         else  //NOT [addr]
+         {
+             if(instruction%2==1)//w
+             {
+                 let val=this.RAM.readWord(operandes.addr);
+                 val=~val;
+                 this.RAM.writeWord(operandes.addr,val&0xffff);
+
+             }else //8 bits
+             {
+                
+                 let val=this.RAM.readByte(operandes.addr);
+                 val=~(val);
+                
+                 this.RAM.writeWord(operandes.addr,val&0xffff);
+
+
+             }
+
+         }
+         this.register.incIP(operandes.dispSize + (instruction % 2) +1);
+         return 0;
+        }
+        else return -1;   
+    }
 //
 
    
      
     //Test
-   decodeTest(instruction)
-   {
+    decodeTest(instruction)
+    {
       
-            var current_ip = this.register.readReg(IP_REG),
-            current_code_segement = this.register.readReg(CS_REG);
-            var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
-            let test=0;
+        var current_ip = this.register.readReg(IP_REG),
+        current_code_segement = this.register.readReg(CS_REG);
+        var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+        let test=0;
         if ((instruction >>2) == TEST_RM_RM ) 
         {
                
@@ -1320,16 +1308,16 @@ decodeNot(instruction)
            //...
        }
        
-   }
+    }
      //or
-     decodeOr(instruction)
-     {
+    decodeOr(instruction)
+    {
         
-              var current_ip = this.register.readReg(IP_REG),
-              current_code_segement = this.register.readReg(CS_REG);
-              var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
-          if (instruction >>2 == OR_RM_RM ) 
-          {
+        var current_ip = this.register.readReg(IP_REG),
+        current_code_segement = this.register.readReg(CS_REG);
+        var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+        if (instruction >>2 == OR_RM_RM ) 
+        {
               
   
                   
@@ -1399,18 +1387,16 @@ decodeNot(instruction)
               //(pour passer a la prochaine instruction)
               return 0;
           }
-          else return -1;
-         
-         
-     }
+          else return -1;   
+    }
   
    //xor
-   decodeXor(instruction)
-   {
+    decodeXor(instruction)
+    {
       
-            var current_ip = this.register.readReg(IP_REG),
-            current_code_segement = this.register.readReg(CS_REG);
-            var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
+        var current_ip = this.register.readReg(IP_REG),
+        current_code_segement = this.register.readReg(CS_REG);
+        var operandes = this.extractOperand(this.RAM.readByte((current_code_segement<<4) + current_ip+1));
         if (instruction >>2 == XOR_RM_RM ) 
         {
               
@@ -1480,11 +1466,8 @@ decodeNot(instruction)
             this.register.incIP(operandes.dispSize + 2);//2 étant la taille de base de l'instruction
             //(pour passer a la prochaine instruction)
             return 0;
-        }else return -1;
-       
-       
-       
-   }
+        }else return -1;   
+    }
  
    decodeRol(instruction)
    {
@@ -1640,7 +1623,7 @@ decodeNot(instruction)
        return 0;
    }
    else return -1;
-   }
+    }
     //
     decodeRor(instruction)
     {
@@ -1794,8 +1777,8 @@ decodeNot(instruction)
     //////////////////////////////////////////////////////////////////////////////////////
     //rcl
    //rcl
-   decodeRcl(instruction)
-   {
+    decodeRcl(instruction)
+    {
        let current_ip=this.register.readReg(IP_REG);
        let current_code_segement=this.register.readReg(CS_REG);
        let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
@@ -1959,7 +1942,7 @@ decodeNot(instruction)
        return 0;
        //
    } else return -1;
-   }
+    }
     //rcr
     //rcr
     decodeRcr(instruction)
@@ -2128,8 +2111,8 @@ decodeNot(instruction)
     }else return -1;
     }
      //shr
-		 decodeShr(instruction)
-		 {
+	decodeShr(instruction)
+	{
 			 let current_ip=this.register.readReg(IP_REG);
 			 let current_code_segement=this.register.readReg(CS_REG);
 			 let operandes=this.extractOperand(this.RAM.readByte((current_code_segement<<4)+current_ip+1));
@@ -2275,7 +2258,7 @@ decodeNot(instruction)
 		      return 0;
 			 }
 			 else return -1;
-		 }
+	}
 		 //
 
     //
@@ -2587,6 +2570,8 @@ decodeNot(instruction)
         }
         else return -1;
     }
+
+    //================================================================================
 	//
     decodeJmpCall(instruction){
         var current_ip = this.register.readReg(IP_REG),
@@ -2732,124 +2717,126 @@ decodeNot(instruction)
 }
 
 
-decodeRet(instruction)
-{
-    var current_ip = this.register.readReg(IP_REG),
-        current_code_seg = this.register.readReg(CS_REG),
-        current_data_segement = this.register.readReg(DS_REG);
-
-    if ( instruction & 0xFF == RET_SEG ) 
-    {
-        let new_IP = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
-                                      + this.register.readReg( SP_REG ));
-        this.register.decSP();
-
-        this.register.writeReg(IP_REG, new_IP);
-    }
-
-    else if ( instruction & 0xFF == RET_INTERSEG ) 
-    {
-        let new_IP = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
-                                      + this.register.readReg( SP_REG ));
-        this.register.decSP();
-
-        let new_CS = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
-                                      + this.register.readReg( SP_REG ));
-        
-        this.register.decSP();
-
-        this.register.writeReg(IP_REG, new_IP);
-        this.register.writeReg(CS_REG, new_CS);
-    }
-}
-decodeConJump(instruction)
+    decodeRet(instruction)
     {
         var current_ip = this.register.readReg(IP_REG),
-            current_code_seg = this.register.readReg(CS_REG);
-       
+            current_code_seg = this.register.readReg(CS_REG),
+            current_data_segement = this.register.readReg(DS_REG);
 
-        if ( (instruction & 0xF0) == UNC_JUMP ) 
+        if ( instruction & 0xFF == RET_SEG ) 
         {
-            let executeJump = false;//If True, the jump instruction shall be executed
+            let new_IP = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
+                                        + this.register.readReg( SP_REG ));
+            this.register.decSP();
 
-            switch(instruction)
-            {
-                case JE:
-                    executeJump = this.register.extractFlag('Z')==1;
-                    break;
-
-                case JL:
-                    executeJump = this.register.extractFlag('S') != this.register.extractFlag('O');
-                    break;
-
-                case JLE:
-                    executeJump = (this.register.extractFlag('Z')==1) || (this.register.extractFlag('S') != this.register.extractFlag('O'));
-                    break;
-
-                case JB:
-                    executeJump = (this.register.extractFlag('C')==1);
-                    break;
-
-                case JBE:
-                    executeJump = (this.register.extractFlag('Z')==1 )|| (this.register.extractFlag('C')==1);
-                    break;
-
-                case JP:
-                    executeJump = this.register.extractFlag('P')==1;
-                    break;
-
-                case JO:
-                    executeJump = this.register.extractFlag('O')==1;
-                    break;
-
-                case JS:
-                    executeJump = this.register.extractFlag('S')==1;
-                    break;
-
-                case JNE:
-                    executeJump = this.register.extractFlag('Z') == 0;
-                    break;
-
-                case JNL:
-                    executeJump = this.register.extractFlag('S') == this.register.extractFlag('O');
-                    break;
-
-                case JNLE:
-                    executeJump = (this.register.extractFlag('Z') == 0) && (this.register.extractFlag('S') == this.register.extractFlag('O'));
-                    break;
-
-                case JNB:
-                    executeJump = this.register.extractFlag('C') == 0;
-                    break;
-
-                case JNBE:
-                    executeJump = (this.register.extractFlag('Z') == 0) && (this.register.extractFlag('C') == 0);
-                    break;
-
-                case JNP:
-                    executeJump = this.register.extractFlag('P') == 0;
-                    break;
-                case JNO:
-                    executeJump = this.register.extractFlag('O') == 0;
-                    break;
-                case JNS:
-                    executeJump = this.register.extractFlag('S') == 0;
-                    break;
-            }
-
-            if (executeJump) 
-            {
-                let disp = this.RAM.readByte((current_code_seg<<4) + current_ip+1);
-		    
-                this.register.incIP(2 + disp);
-            }
-
-            return 0;
+            this.register.writeReg(IP_REG, new_IP);
         }
-        else
-            return -1;
-        
+
+        else if ( instruction & 0xFF == RET_INTERSEG ) 
+        {
+            let new_IP = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
+                                        + this.register.readReg( SP_REG ));
+            this.register.decSP();
+
+            let new_CS = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
+                                        + this.register.readReg( SP_REG ));
+            
+            this.register.decSP();
+
+            this.register.writeReg(IP_REG, new_IP);
+            this.register.writeReg(CS_REG, new_CS);
+        }
     }
+
+    decodeConJump(instruction)
+    {
+            var current_ip = this.register.readReg(IP_REG),
+                current_code_seg = this.register.readReg(CS_REG);
+        
+
+            if ( (instruction & 0xF0) == UNC_JUMP ) 
+            {
+                let executeJump = false;//If True, the jump instruction shall be executed
+
+                switch(instruction)
+                {
+                    case JE:
+                        executeJump = this.register.extractFlag('Z')==1;
+                        break;
+
+                    case JL:
+                        executeJump = this.register.extractFlag('S') != this.register.extractFlag('O');
+                        break;
+
+                    case JLE:
+                        executeJump = (this.register.extractFlag('Z')==1) || (this.register.extractFlag('S') != this.register.extractFlag('O'));
+                        break;
+
+                    case JB:
+                        executeJump = (this.register.extractFlag('C')==1);
+                        break;
+
+                    case JBE:
+                        executeJump = (this.register.extractFlag('Z')==1 )|| (this.register.extractFlag('C')==1);
+                        break;
+
+                    case JP:
+                        executeJump = this.register.extractFlag('P')==1;
+                        break;
+
+                    case JO:
+                        executeJump = this.register.extractFlag('O')==1;
+                        break;
+
+                    case JS:
+                        executeJump = this.register.extractFlag('S')==1;
+                        break;
+
+                    case JNE:
+                        executeJump = this.register.extractFlag('Z') == 0;
+                        break;
+
+                    case JNL:
+                        executeJump = this.register.extractFlag('S') == this.register.extractFlag('O');
+                        break;
+
+                    case JNLE:
+                        executeJump = (this.register.extractFlag('Z') == 0) && (this.register.extractFlag('S') == this.register.extractFlag('O'));
+                        break;
+
+                    case JNB:
+                        executeJump = this.register.extractFlag('C') == 0;
+                        break;
+
+                    case JNBE:
+                        executeJump = (this.register.extractFlag('Z') == 0) && (this.register.extractFlag('C') == 0);
+                        break;
+
+                    case JNP:
+                        executeJump = this.register.extractFlag('P') == 0;
+                        break;
+                    case JNO:
+                        executeJump = this.register.extractFlag('O') == 0;
+                        break;
+                    case JNS:
+                        executeJump = this.register.extractFlag('S') == 0;
+                        break;
+                }
+
+                if (executeJump) 
+                {
+                    let disp = this.RAM.readByte((current_code_seg<<4) + current_ip+1);
+                
+                    this.register.incIP(2 + disp);
+                }
+
+                return 0;
+            }
+            else
+                return -1;
+            
+    }
+
     decodeSegOverride(instruction){
         if ( (instruction & 0b00100110) == SEG_OVER_PREF ) {
             let segRegId = (instruction >> 3) % 4;
@@ -2863,7 +2850,8 @@ decodeConJump(instruction)
         else
             return -1;
     }
-extractOperand(addrModeByte, segmentEnabled=true){
+
+    extractOperand(addrModeByte, segmentEnabled=true){
 		        /*
 		            |m|m|r|r|r|/|/|/|
 		            m: mode byte
@@ -2977,6 +2965,7 @@ extractOperand(addrModeByte, segmentEnabled=true){
 		return  (val >> 7) == 1 ?
 		         (val | 0xFF00): val;
 	}
+
     generateFlag(value, op1, op2, w=1, Flag=0b11111){
 
         if ( (Flag & CARRY_FLAG) != 0 ) 
@@ -3032,7 +3021,7 @@ extractOperand(addrModeByte, segmentEnabled=true){
 
         }
 
-}
+    }
 
 }
 
