@@ -19,9 +19,12 @@ const labels = ["JE", "JC", "JNC", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE
 const shift = ["SHL", "SAL", "SHR", "SAR", "ROL", "ROR", "RCL", "RCR"];
 
 class SyntaxAnalysis {
-       analyse(arr) {
-        let temp, index;
-
+      analyse(arr) {
+        let temp = {
+            good: true,
+            message: ''
+        }, index;
+        
         for (index = 0; index < arr.length; index++) 
         {
             const element = arr[index];
