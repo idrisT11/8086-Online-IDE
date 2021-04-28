@@ -25,7 +25,8 @@ class SyntaxAnalysis {
         for (index = 0; index < arr.length; index++) 
         {
             const element = arr[index];
-            if (element.expressionType != 'NULL') 
+
+            if (element.expressionType == 'INST') 
             {
                 temp = this.excute(element);
                 if (!temp.good)
@@ -36,7 +37,9 @@ class SyntaxAnalysis {
             }
 
         }
-        index--;
+
+        index --;
+
         return { message: temp.message, good: temp.good, index: arr[index].index };
     }
 
@@ -756,29 +759,5 @@ function getNum(str) {//turn a string number BETWEEN BRACKETS to number
 
 
 
-let sy = new SyntaxAnalysis;
 
-console.log(sy.excute({
-
-    good: true,
-
-    expressionType: 'INST',
-
-    instructionType: 'InsSIM',
-
-    label: null,
-
-    message: null,
-
-    instName: 'JMP',
-
-    variableName: null,
-
-    variableClass: null,
-
-    operands: [{ name: '1352', type: 'INT' }]
-
-}
-
-));
 
