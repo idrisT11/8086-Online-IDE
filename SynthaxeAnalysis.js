@@ -59,7 +59,7 @@ class SyntaxAnalysis {
 
 
 
-                        if (element.cases.includes(comp)) {
+                        if (element.includes(comp)) {
 
                             exist = true;
 
@@ -286,7 +286,7 @@ class SyntaxAnalysis {
 
                         const element = opsCompinision[index];
 
-                        if (element.cases.includes(comp)) {
+                        if (element.includes(comp)) {
 
                             exist = true;
 
@@ -423,7 +423,7 @@ class SyntaxAnalysis {
 
                             const element = opsCompinision[index];
 
-                            if (element.cases.includes(comp)) {
+                            if (element.includes(comp)) {
 
                                 exist = true;
 
@@ -750,13 +750,13 @@ console.log(sy.excute({
 
     message: null,
 
-    instName: 'LEA',
+    instName: 'MOV',
 
     variableName: null,
 
     variableClass: null,
 
-    operands: [{ name: '[bx+6700]', type: 'RL' }, { name: '[bx+4655464]', type: 'VAR8' }]
+    operands: [{ name: '[bx+6700]', type: 'RX' }, { name: '[bx+4655464]', type: 'RX' }]
 
 }
 
