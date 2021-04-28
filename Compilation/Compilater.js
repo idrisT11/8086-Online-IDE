@@ -91,6 +91,16 @@ class Compiler{
                 instructionSize: int,
                 instructionAddr: int
             }
+            
+            varArry => Array of variablesObject
+            
+            variablesObject = {
+
+                line : null,
+                size: null, 
+                varName: null, 
+                addr: 0,
+            }
 
         */
     }
