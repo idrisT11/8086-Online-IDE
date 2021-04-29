@@ -135,7 +135,7 @@
               <button class="btn btn-dark " data-bs-toggle="modal" data-bs-target="#modal_flags" >flags</button>
               
               <button class="btn btn-dark"   id="console_btn" data-bs-toggle="modal" data-bs-target="#modal_states" >States</button>
-              <button class="btn btn-success">vars </button>
+              <button class="btn btn-success"  data-bs-toggle="modal" data-bs-target="#modal_variables">vars </button>
            </div>
 
           </div>
@@ -335,6 +335,41 @@
               <th scope="col-6">val_Base16</th>
               <th scope="col-6">val_ascii</th>
 
+            </tr>
+          </thead>
+          <tbody >
+            <!--the trs-->
+                
+             
+           
+
+            <!--the trs-->
+          </tbody>
+        </table>
+      </div>
+    
+    </div>
+  </div>
+ </div>
+ 
+ <!--modal_stack------------------------------------------------------------------------>
+ <!--modal_variables------------------------------------------------------------------------>
+
+<div class="modal fade" id="modal_variables" tabindex="-1" aria-labelledby="statesModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="statesModalLabel">variable table</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" ></button>
+      </div>
+      <div class="modal-body scroll_it_stack" >
+        <table class="table   table-dark"  id="table_variables" >
+          <thead  style="color: white;border-bottom:#6d6d6d" id="table_header">
+            <tr >
+              <th scope="col-6">Name:</th>
+              <th scope="col-6">Adresse</th>
+              <th scope="col-6">val_Base16</th>
+              <th scope="col-6">Ascii:</th>
             </tr>
           </thead>
           <tbody >
