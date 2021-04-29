@@ -218,6 +218,63 @@
     
      updateRegs();     
       setInterval(updateRegs,100);
+ //highlighting ram
+  function highlightingRam()
+  {
+    if(compiled)
+    {
+      if(compileRes.status)
+      {
+        for(let i=0;i<compileRes.finalView.length;i++)
+        {
+        
+          if(compileRes.finalView[i].executableLine)
+          {
+               let addr=compileRes.finalView[i].instructionAddr;
+               let size=compileRes.finalView[i].instructionSize;
+               let row;
+              
+               if(p.register.readReg(IP_REG)==addr)
+               {
+                let physicalAddresse=addr;
+                let num=physicalAddresse;
+                let i=0;
+                while(num>=0x144)
+                {
+                     num-=0x144;
+                   
+                     i++;
+                }
+                goToSubSeg(i);
+                if(num<=0x13f)
+                table_ram.scrollTop=num*41;
+                else table_ram.scrollTop=0x13f*41;
+                 
+                 for(let j=0;j<size;j++)
+                 {
+                  row=getTrRam(addr+1+j);
+                  row.className+=" table-active";
+                 
+                 }
+               }
+               else
+              {
+                for(let j=0;j<size;j++)
+                 {
+                  row=getTrRam(addr+1+j);
+                  row.className="tr_ram";
+               
+                 }
+              }
+              
+          }
+        }
+
+      }
+     
+    }
+  }
+  setInterval(highlightingRam,300);
 
   //getting textArea value
   var compiled=false;
@@ -254,11 +311,12 @@
       }
       deleteVars();
       displayVars(compileRes);
+      compiled=true;
      }
      else alert(compileRes.finalView+"at line: "+compileRes.errorLine+1);
 
     
-    compiled=true;
+   
   //   //hidding the comments
   //   text= textArea.value;
     
@@ -580,6 +638,11 @@ function upadateTable(r,c,content)
 {
  x=document.getElementById("table_ram").rows[r].cells;
  x[c].innerHTML=content;
+}
+function getTrRam(r)
+{
+ r=document.getElementById("table_ram").rows[r];
+ return r;
 }
 //updateTableStack
 function upadateTableStack(r,c,content)
