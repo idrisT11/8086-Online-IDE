@@ -353,10 +353,10 @@ class Linkage{
                     if (this.labelArray[j].labelName.toUpperCase() == op.name.toUpperCase()) 
                     {
                         //We form our number
-                        let modulo = ((virtualIP - this.labelArray[j].addr > 128)||(virtualIP - this.labelArray[j].addr <= -128)) ? 1 : 0,
+                        let modulo = ((this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) ? 1 : 0,
                             jumpValue = (this.labelArray[j].addr - virtualIP - 2 - modulo) & 0xFFFF;
 
-                        
+                        console.log(virtualIP - this.labelArray[j].addr);
                         
                         newLine.operands[0].name =  jumpValue.toString();  
                         newLine.operands[0].type = 'INT';
@@ -374,7 +374,7 @@ class Linkage{
                     if (this.varArray[j].varName == varOffseted) 
                     {
                         //We form our number
-                        let modulo = ((virtualIP - this.varArray[j].addr > 128)||(virtualIP - this.varArray[j].addr <= -128)) ? 1 : 0,
+                        let modulo = ((this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) ? 1 : 0,
                             jumpValue = (this.varArray[j].addr - virtualIP - 2 - modulo) & 0xFFFF;
 
                         
