@@ -15,7 +15,7 @@
      var ramStatesManager=[];
      p.register.writeReg(SS_REG,0x700);
      p.register.writeReg(SP_REG,0xfffe);
-     p.register.writeReg(CS_REG,0x100);
+   //  p.register.writeReg(CS_REG,0x100);
      var compileRes;
      
      ramStatesManager[t]=[];
@@ -235,7 +235,10 @@
     
      if(compileRes.status)
      {
-      p.register.writeReg(IP_REG,compileRes.finalView[0].instructionAddr);
+      var k=0;
+      while(!compileRes.finalView[k].executableLine) k++;
+      p.register.writeReg(IP_REG,compileRes.finalView[k].instructionAddr);
+      
       for(let i=0;i<compileRes.finalView.length;i++)
       {
       
