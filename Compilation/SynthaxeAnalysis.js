@@ -437,6 +437,8 @@ class SyntaxAnalysis {
                 }
                 else
                     return { message: "Illegal Number Of Paremeters", good: false };
+
+
             case "REP":
                 if (Obj.operands.length==1){
                     if (Obj.operands[0].type=="INS")
@@ -446,6 +448,7 @@ class SyntaxAnalysis {
                 }
                 else
                     return { message: "Illegal Number Of Paremeters", good: false };
+
 
 
             default:
