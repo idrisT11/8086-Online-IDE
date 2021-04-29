@@ -12,7 +12,7 @@ const arithmetic = ["ADD", "ADC", "SUB", "SSB", "CMP", "AND", "TEST", "OR", "XOR
 
 const oneops = ["INC", "DEC", "MUL", "DIV", "IDIV", "IMUL", "NEG", "NOT"];
 
-const noops = ["MOVSB", "CMPSB", "SCASB", "LODSB", "STOSB", "MOVSW", "CMPSW", "SAHF", "SCASW", "LODSW", "STOSW", "CBW", "CLC", "CLD", "CLI", "CMC", "STC", "STD", "STI", "CWD", "HLT", "LAHF", "PUSHF", "POPF"];
+const noops = ["RET","MOVSB", "CMPSB", "SCASB", "LODSB", "STOSB", "MOVSW", "CMPSW", "SAHF", "SCASW", "LODSW", "STOSW", "CBW", "CLC", "CLD", "CLI", "CMC", "STC", "STD", "STI", "CWD", "HLT", "LAHF", "PUSHF", "POPF"];
 
 const labels = ["JE", "JC", "JNC", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE", "JBE", "JNA", "JP", "JPE", "JO", "JS", "JNE", "JNZ", "JNL", "JGE", "JNLE", "JG", "JNB", "JAE", "JNBE", "JA", "JNP", "JPO", "JNO", "JNS", "LOOP", "LOOPZ", "LOOPE", "LOOPNZ", "LOOPNE", "JCXZ"];
 
@@ -437,6 +437,18 @@ class SyntaxAnalysis {
                 }
                 else
                     return { message: "Illegal Number Of Paremeters", good: false };
+
+
+            case "REP":
+                if (Obj.operands.length==1){
+                    if (Obj.operands[0].type=="INS")
+                            return  { message: null, good: true }
+                    else     
+                        return { message: "WRONG TYPE OF PARAMETER", good: false };
+                }
+                else
+                    return { message: "Illegal Number Of Paremeters", good: false };
+
 
 
             default:

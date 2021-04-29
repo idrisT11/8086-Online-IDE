@@ -15,10 +15,11 @@
      var ramStatesManager=[];
      p.register.writeReg(SS_REG,0x700);
      p.register.writeReg(SP_REG,0xfffe);
+     p.register.writeReg(CS_REG,0x100);
      var compileRes;
      
      ramStatesManager[t]=[];
-     
+  
      
     //
   setInterval(updateStack,1000);
@@ -226,10 +227,15 @@
   code_compile_btn.addEventListener("click",
   function(e)
   {
+   
      compileRes=Compiler.compile(textArea.value);
-     console.log(compileRes)
+     
+    console.log(compileRes)
+    
+    
      if(compileRes.status)
      {
+      p.register.writeReg(IP_REG,compileRes.finalView[0].instructionAddr);
       for(let i=0;i<compileRes.finalView.length;i++)
       {
       
@@ -242,8 +248,10 @@
             }
         }
       }
+      deleteVars();
+      displayVars(compileRes);
      }
-     else alert(compileRes.message);
+     else alert(compileRes.finalView+"at line: "+compileRes.errorLine+1);
 
     
     compiled=true;
@@ -503,7 +511,36 @@ let ascii=String.fromCharCode(value);
  if(value===0) ascii="NULL";
 cell3.innerHTML=ascii;
 }
+//addRowVars
+function addRowVars(name,addresse,value)
+{
+  let table = document.getElementById("table_variables").getElementsByTagName('tbody')[0];
+let row = table.insertRow(-1);
 
+
+let cell0 = row.insertCell(0);
+let cell1 = row.insertCell(1);
+let cell2 = row.insertCell(2);
+let cell3 = row.insertCell(3);
+cell1.className="td_vars";
+cell0.innerHtml=name;
+
+// Add some text to the new cells:
+
+
+if(getlength(addresse.toString(16))===1) cell1.innerHTML="@000"+addresse.toString(16);
+else if(getlength(addresse.toString(16))===2) cell1.innerHTML="@00"+addresse.toString(16);
+else if(getlength(addresse.toString(16))===3) cell1.innerHTML="@0"+addresse.toString(16);
+else cell1.innerHTML="@"+addresse.toString(16);
+let ch;
+if(displayigBase==2) ch="0b";
+else if(displayigBase==16) ch="0x";
+else if(displayigBase==10)ch="0d";
+cell2.innerHTML =ch+value.toString(displayigBase);
+let ascii=String.fromCharCode(value);
+ if(value===0) ascii="NULL";
+cell3.innerHTML=ascii;
+}
 //addRowStack
 function addRowStack(addresse,value)
 {
@@ -547,6 +584,7 @@ function upadateTableStack(r,c,content)
  x=document.getElementById("table_stack").rows[r].cells;
  x[c].innerHTML=content;
 }
+
 function updateRam()
 {
  for(let i=0;i<(0xffff)*persentageSeg;i++)
@@ -998,9 +1036,62 @@ function swipeIt(e) {
 
 
 
+function displayVars()
+{
+  //diplaying the states table
 
-// let cell2 = row.insertCell(1);
-// let cell3 = row.insertCell(2);
+    let table=document.getElementById("table_variables").getElementsByTagName("tbody")[0];
+  
+    var arr=compileRes.varArray;
+   
+    for(let i=0;i<arr.length;i++)
+    {
+      
+      let row = table.insertRow(-1);
+      let cell0 = row.insertCell(0);
+      let cell1 = row.insertCell(1);
+      let cell2 = row.insertCell(2);
+      let cell3 = row.insertCell(3);
+      let name=compileRes.varArray[i].varName;
+      let size=compileRes.varArray[i].size;
+      console.log(size)
+      cell0.innerHTML=name;
+      cell1.innerHTML=arr[i].addr;
+      let ascii;
+      if(size=="BYTE")
+      {
+        cell2.innerHTML=p.RAM.readByte(arr[i].addr).toString(16);
+         ascii=String.fromCharCode(p.RAM.readByte(arr[i].addr));
+      }
+      else if(size=="WORD")
+      {
+        cell2.innerHTML=p.RAM.readWord(arr[i].addr).toString(16);
+        ascii=String.fromCharCode(p.RAM.readByte(arr[i].addr+1))+String.fromCharCode(p.RAM.readByte(arr[i].addr));
+      }
+     
+     
+      if( cell3.innerHTML===0) ascii="NULL";
+      cell3.innerHTML=ascii;
+      
+
+    }
+   
+  }
+  //
+  function deleteVars()
+{
+  //diplaying the states table
+
+    let table=document.getElementById("table_variables").getElementsByTagName("tbody")[0];
+    let trs=table.getElementsByTagName("tr");
+    for(let i=0;i<trs.length;i++)
+    {
+      table.deleteRow(-1);
+      console.log("sss",i)
+    } 
+ 
+   
+  }
 function updateStates()
 {
   //diplaying the states table
