@@ -281,7 +281,7 @@ class Linkage{
                 
                 for (let j = 0; j < this.varArray.length; j++) 
 
-                    if (this.varArray[j].varName == op.name) 
+                    if (this.varArray[j].varName.toUpperCase() == op.name.toUpperCase()) 
                     {
                         
                         //We form our number
@@ -296,11 +296,11 @@ class Linkage{
             }
             else if ( op.type == 'OFF' ) 
             {
-                let varOffseted = op.name.trim().split(' ')[1]; // "offset moh" ==> "moh"
+                let varOffseted = op.name.trim().split(' ')[1].toUpperCase(); // "offset moh" ==> "moh"
 
                 for (let j = 0; j < this.varArray.length; j++) 
 
-                    if (this.varArray[j].varName == varOffseted) 
+                    if (this.varArray[j].varName.toUpperCase() == varOffseted) 
                     {
                         //We form our number
                         newLine.operands[i].name =  (this.varArray[j].addr& 0xFFFF).toString();  
