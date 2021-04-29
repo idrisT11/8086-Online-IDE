@@ -1,5 +1,5 @@
 "use strict";
-/*
+
 const wordRegisters = ['AX', 'BX', 'CX', 'DX'];
 
 const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
@@ -7,7 +7,7 @@ const byteRegisters = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
 const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
 
 const Registers = ['DI', 'SI', 'SP', 'BP', 'IP'];
-*/
+
 const arithmetic = ["ADD", "ADC", "SUB", "SSB", "CMP", "AND", "TEST", "OR", "XOR"];
 
 const oneops = ["INC", "DEC", "MUL", "DIV", "IDIV", "IMUL", "NEG", "NOT"];
@@ -19,17 +19,13 @@ const labels = ["JE", "JC", "JNC", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE
 const shift = ["SHL", "SAL", "SHR", "SAR", "ROL", "ROR", "RCL", "RCR"];
 
 class SyntaxAnalysis {
-      analyse(arr) {
-        let temp = {
-            good: true,
-            message: ''
-        }, index;
-        
+       analyse(arr) {
+        let temp, index;
+
         for (index = 0; index < arr.length; index++) 
         {
             const element = arr[index];
-
-            if (element.expressionType == 'INST') 
+            if (element.expressionType != 'NULL') 
             {
                 temp = this.excute(element);
                 if (!temp.good)
@@ -38,16 +34,14 @@ class SyntaxAnalysis {
                     break;
                 }
             }
-
         }
-
-        index --;
-
         return { message: temp.message, good: temp.good, index: arr[index].index };
     }
 
     excute(Obj) {
-
+        console.log("hh");
+        if(Obj.expressionType== "VAR" || Obj.instructionType == "prePropIns") return { message: null, good: true }
+        console.log("hh");
         switch (Obj.instName) {
 
             case "MOV":
@@ -366,11 +360,11 @@ class SyntaxAnalysis {
                         else if ((Obj.operands[0].type === "DIS")) {//if it's a memory adress 
 
                             let num1 = Obj.operands[0].name.match(/\w+(?=\s*\:)/);
-
+                            console.log(num1);
                             let num2 = Obj.operands[0].name.match(/(?<=\:\s*)\w+/);
 
 
-                            if (this.range(num1.trim()) && this.range(num2.trim())) {
+                            if (this.range(num1[0].trim()) && this.range(num2[0].trim())) {
 
                                 return { message:null, good: true };
 
@@ -427,6 +421,22 @@ class SyntaxAnalysis {
 
                     return { message: "Illegal Number Of Paremeters", good: false };
     
+            case "INT":
+                if (Obj.operands.length==1){
+                    if (Obj.operands[0].type=="INT")
+                    {
+                        console.log(getS(Obj.operands[0].name) );
+                        if (this.range(Obj.operands[0].name) && getS(Obj.operands[0].name))
+                            return  { message: null, good: true }
+                        else 
+                            return  { message: "NUMBER OVERFLLOW", good: false };
+
+                    }
+                    else     
+                        return { message: "WRONG TYPE OF PARAMETER", good: false };
+                }
+                else
+                    return { message: "Illegal Number Of Paremeters", good: false };
 
 
             default:
@@ -609,7 +619,7 @@ class SyntaxAnalysis {
 
                         // that operand can be a memory or register(16 or 8)
 
-                        if (/M|RL|RX/.test(Obj.operands[0].type))
+                        if (/M|RL|RX/.test(Obj.operands[0]))
 
                             return { message: null, good: true }
 
@@ -620,6 +630,10 @@ class SyntaxAnalysis {
                             return { message: "Illegal Paremeters", good: false };
 
                     }
+                    
+                    else 
+                        return { message: "WRONG NUMBER OF PARAMETERS", good: false };
+
 
                 }
 
@@ -762,5 +776,29 @@ function getNum(str) {//turn a string number BETWEEN BRACKETS to number
 
 
 
+let sy = new SyntaxAnalysis;
 
+console.log(sy.excute({
+
+    good: true,
+
+    expressionType: 'INST',
+
+    instructionType: 'InsSIM',
+
+    label: null,
+
+    message: null,
+
+    instName: 'INT',
+
+    variableName: null,
+
+    variableClass: null,
+
+    operands: [{name: "155" , type :"INT"}]
+
+}
+
+));
 
