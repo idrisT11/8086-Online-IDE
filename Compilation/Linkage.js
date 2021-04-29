@@ -353,8 +353,17 @@ class Linkage{
                     if (this.labelArray[j].labelName.toUpperCase() == op.name.toUpperCase()) 
                     {
                         //We form our number
-                        let modulo = ((this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) ? 1 : 0,
-                            jumpValue = (this.labelArray[j].addr - virtualIP - 2 - modulo) & 0xFFFF;
+                        let modulo = 0;
+                        if (newLine.instName == 'JMP' && (this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) 
+                           modulo = 3;
+                        else if (newLine.instName == 'JMP' && !(this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) 
+                            modulo = 2;
+                        else if (newLine.instName == 'CALL')
+                            modulo = 3;
+                        else
+                            modulo = 2;
+                        
+                        let jumpValue = (this.labelArray[j].addr - virtualIP - modulo) & 0xFFFF;
 
                         console.log(virtualIP - this.labelArray[j].addr);
                         
@@ -374,8 +383,17 @@ class Linkage{
                     if (this.varArray[j].varName == varOffseted) 
                     {
                         //We form our number
-                        let modulo = ((this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) ? 1 : 0,
-                            jumpValue = (this.varArray[j].addr - virtualIP - 2 - modulo) & 0xFFFF;
+                        let modulo = 0;
+                        if (newLine.instName == 'JMP' && (this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) 
+                           modulo = 3;
+                        else if (newLine.instName == 'JMP' && !(this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) 
+                            modulo = 2;
+                        else if (newLine.instName == 'CALL')
+                            modulo = 3;
+                        else
+                            modulo = 2;
+                        
+                        let jumpValue = (this.varArray[j].addr - virtualIP - modulo) & 0xFFFF;
 
                         
                         //We form our number
