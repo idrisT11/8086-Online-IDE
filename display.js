@@ -15,10 +15,11 @@
      var ramStatesManager=[];
      p.register.writeReg(SS_REG,0x700);
      p.register.writeReg(SP_REG,0xfffe);
+     p.register.writeReg(CS_REG,0x100);
      var compileRes;
      
      ramStatesManager[t]=[];
-     
+  
      
     //
   setInterval(updateStack,1000);
