@@ -1110,7 +1110,7 @@ class PreProcessor {
                     {
                         //Si le padding est plus petit qu'un byte, alors on aura un short jump(2bytes)
                         //Sinon, ça sera un long jump (3bytes)
-                        jmpPadding = ((jmpPadding+2) & 0xFF)3;
+                        jmpPadding = ((jmpPadding+2) & 0xFF);
 
                         macroCode.unshift({
                             label: null,
