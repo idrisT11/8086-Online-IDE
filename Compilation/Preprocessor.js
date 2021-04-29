@@ -500,7 +500,7 @@ class PreProcessor {
                 else if (/OFF/.test(objectsArray[i].operands[j].type)) {
 
                     let opsVars = objectsArray[i].operands[j].name.split(" "); 
-                    if (!this._checkVariable(opsVars[1])) {
+                    if (!this._checkVariable(opsVars[1].trim().toUpperCase())) {
 
                         this.good = false; 
                         this.errorLine = objectsArray[i].index; 
