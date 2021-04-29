@@ -206,6 +206,7 @@ function segSepcification(operands, arr) {
 function splitNum(num, s = 1) {
     var disp = [];
     if (num > 255) {
+        console.log("hh");
         disp.push(num & (0b0000000011111111));
         num >>= 8;
         disp.push(num);
@@ -299,6 +300,8 @@ function toBcode(str) // original function to be class later
             break;
 
         case "PUSH":
+
+            console.log(operands);
             if (/RS/.test(operands[1])) {
                 arr.push((((regToId(operands[0])) << 3) + 0b110));
             }
@@ -306,6 +309,20 @@ function toBcode(str) // original function to be class later
                 arr.push(0b11111111);
                 arr.push(((mode) << 6) + (0b110000) + regmem);
                 if (/M/.test(operands[1])) arr = byteConcat(str, arr);
+
+                //********** */
+            }
+            else if (/I/.test(operands[1])){
+                if (getS(operands[0],1))
+                {
+                    arr.push(106);
+                    arr.push(operands[0]);
+                }
+                else
+                    arr.push(104);
+                    console.log(splitNum(convert(operands[0]),0));
+                    arr=arr.concat(splitNum(convert(operands[0]),0));
+                
             }
             break;
         case "POP":
