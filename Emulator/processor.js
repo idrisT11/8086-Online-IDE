@@ -132,6 +132,10 @@ class Processor{
         {
             console.log("decodeDEC has been executed!");
         }
+        else if(!this.pause && this.decodeRet(instruction)===0)
+        {
+            console.log("decodeRet has been executed!");
+        }
         
         // else if(!this.pause && this.  decodeSegOverride(instruction)===0)
         // {
@@ -2961,28 +2965,26 @@ class Processor{
     }
 
 
+ 
     decodeRet(instruction)
     {
-        var current_ip = this.register.readReg(IP_REG),
-            current_code_seg = this.register.readReg(CS_REG),
-            current_data_segement = this.register.readReg(DS_REG);
-
-        if ( instruction & 0xFF == RET_SEG ) 
+        
+        if ( (instruction & 0xFF) == RET_SEG ) 
         {
-            let new_IP = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
+            let new_IP = this.RAM.readWord( (this.register.readReg( SS_REG )<<4) 
                                         + this.register.readReg( SP_REG ));
             this.register.decSP();
 
             this.register.writeReg(IP_REG, new_IP);
         }
 
-        else if ( instruction & 0xFF == RET_INTERSEG ) 
+        else if ( (instruction & 0xFF) == RET_INTERSEG ) 
         {
-            let new_IP = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
+            let new_IP = this.RAM.readWord( (this.register.readReg( SS_REG )<<4) 
                                         + this.register.readReg( SP_REG ));
             this.register.decSP();
 
-            let new_CS = this.RAM.readWord( this.register.readReg( SS_REG )<<4 
+            let new_CS = this.RAM.readWord( (this.register.readReg( SS_REG )<<4) 
                                         + this.register.readReg( SP_REG ));
             
             this.register.decSP();
