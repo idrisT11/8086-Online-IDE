@@ -24,6 +24,8 @@ const   MOV_RM_RM = 0x88,
         INT=0b11001101,
         PUSH_REG_MEM=0xFF,
         POP_REG_MEM=0b10001111,
+	RET_SEG=0b11000011,
+        RET_INTERSEG=0b11001011,
 
         NOT=0b1111011,
         SHR=0b110100,
