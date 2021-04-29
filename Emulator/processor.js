@@ -2926,7 +2926,7 @@ class Processor{
                               + this.register.readReg( SP_REG ),
                                 old_IP );
             this.register.incIP(3 + disp);
-            this.register.writeReg(IP_REG, disp);
+            
 
             return 0;
         }
