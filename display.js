@@ -229,11 +229,12 @@
    
      compileRes=Compiler.compile(textArea.value);
      
-     console.log(compileRes,"ddd ",compileRes.varArray[0].varName)
+    console.log(compileRes)
     
     
      if(compileRes.status)
      {
+      p.register.writeReg(IP_REG,compileRes.finalView[0].instructionAddr);
       for(let i=0;i<compileRes.finalView.length;i++)
       {
       
