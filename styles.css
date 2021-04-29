@@ -151,7 +151,7 @@ body > div > div > div.col-2.h-100 > div > div:nth-child(1) /*the ax unit box*/
 .tr_ram{
     font-weight: bold;
     color:white;
-    /* border: 1px solid  #14ffec; */
+    
 }
 body{
     background-color:#323232;
@@ -234,8 +234,12 @@ input{
       pointer-events: all;
   }
   .tr_stack_1{
-     border-top: 1px solid green;
+  
+    opacity: 0.7;
+   
+    
+   
   }
   .tr_stack_2{
-    background-color: rgb(7, 124, 66);
+  
 }
