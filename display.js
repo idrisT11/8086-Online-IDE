@@ -94,6 +94,22 @@
      );
         
      //search
+       function searchRam(physicalAddresse)
+       {
+     
+        let num=physicalAddresse;
+        let i=0;
+        while(num>=0x144)
+        {
+             num-=0x144;
+           
+             i++;
+        }
+        goToSubSeg(i);
+        if(num<=0x13f)
+        table_ram.scrollTop=num*41;
+        else table_ram.scrollTop=0x13f*41;
+       }
       let input = document.getElementById("input_search");
      function goToSubSeg(num)
      {
@@ -236,20 +252,7 @@
               
                if(p.register.readReg(IP_REG)==addr)
                {
-                let physicalAddresse=addr;
-                let num=physicalAddresse;
-                let i=0;
-                while(num>=0x144)
-                {
-                     num-=0x144;
-                   
-                     i++;
-                }
-                goToSubSeg(i);
-                if(num<=0x13f)
-                table_ram.scrollTop=num*41;
-                else table_ram.scrollTop=0x13f*41;
-                 
+               
                  for(let j=0;j<size;j++)
                  {
                   row=getTrRam(addr+1+j);
@@ -285,7 +288,7 @@
   code_compile_btn.addEventListener("click",
   function(e)
   {
-   
+     
      compileRes=Compiler.compile(textArea.value);
      
     console.log(compileRes)
@@ -356,7 +359,7 @@
     
   //  }
    updateStates();
-
+   searchRam(p.register.readReg(IP_REG));
    
   }
   )
@@ -365,7 +368,7 @@ function runHandler()
 {
   if(compiled)
   {
-    for(let i=0;i<numInstructions;i++)
+    for(let i=0;i<compileRes.finalView.length;i++)
      {
 
     
@@ -977,6 +980,8 @@ function singleStepHandler()
   updateRegState();
   //for the states table
   updateStates();
+  searchRam(p.register.readReg(IP_REG));
+ 
  
 }
 function stepBackHandler()
@@ -1014,7 +1019,7 @@ function stepBackHandler()
   RegStatesManager.splice(t,1);
   updateRegState();
  
- 
+  searchRam(p.register.readReg(IP_REG));
 }
 function applyRegsStateAt(t1)
 {
