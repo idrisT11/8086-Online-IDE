@@ -71,7 +71,7 @@ class ConsoleW{
             this.fontSize=10;
             this.font=this.fontSize+"px Arial";
             this.fg=15;
-            this.bg=2;
+            this.bg=0;
             this.fontColor=COLOR_TABLE[this.fg];
             this.fontBackgroundColor=COLOR_TABLE[this.bg];
             this.cursor=0;
@@ -112,7 +112,7 @@ class ConsoleW{
             ctx.closePath();
         }
        
-        writeChar(char,fg=15,bg=2)
+        writeChar(char,fg=this.fg,bg=this.bg)
         {
             if(fg>16 || bg>16)
             {
