@@ -276,8 +276,8 @@ class Processor{
             var current_ip = this.register.readReg(IP_REG),
             current_code_seg = this.register.readReg(CS_REG);
             var secondByte = this.RAM.readByte( (current_code_seg<<4) + current_ip+1 );
-        //    if(secondByte==0x21)
-        //    {
+            if(secondByte==0x21)
+            {
                 if(((this.register.readReg(AX_REG)&0xff00)>>8)==0x01)
                 {
                     console.log("int21_01 has been executed");
@@ -315,7 +315,7 @@ class Processor{
                     
                 }
                 
-        //    } //end int 21h
+            } //end int 21h
             
            
         
