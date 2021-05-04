@@ -22,7 +22,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-          <a class="navbar-brand" href="#">Emu 8086</a>
+          <a class="navbar-brand" href="#">Vgath 8086</a>
           <ul class="navbar-nav me-auto mb-1 mb-lg-0">
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#">Home</a>
@@ -415,7 +415,7 @@
                 {regex: /,(offset|macro|proc|db|dw)\b/, token: 'tag'},     //prep
 
                 {regex: /^\b(ax|bx|cx|dx|si|di|bp|sp)/i, token: 'def'},         //REG 16
-                {regex: /^\b(al|bl|cl|dl|al|bl|cl|dl)/i, token: 'variable-3'},  //REG  8
+                {regex: /^\b(al|bl|cl|dl|ah|bh|ch|dh)/i, token: 'def'},  //REG  8
                 {regex: /^\b(cs|ds|es|ss)/i, token: 'property'},                //REG SEG
                 
                 {regex: /[-+\/*=<>!]+/, token: "tag"},
@@ -431,7 +431,7 @@
 
         });
       var codeMirror = CodeMirror(document.getElementById('textArea'), {
-          value: '',
+          value: '\norg 0h \n\nret\n',
           mode: 'asm86',
           theme: 'monokai',
           lineNumbers: true,
