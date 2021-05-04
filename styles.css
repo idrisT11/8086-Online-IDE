@@ -4,13 +4,22 @@
     background-color: #212121;
 
 }
+#navbarTogglerDemo01
+{
+    
+}
 .modal-body
 {
     background-color: #212121;
 }
-body{
+.content{
     display: flex;
     flex-direction: row;
+   margin-top: -50px;
+   width:100%;
+}
+body{
+   
 }
 #code{
     height:58vh;
@@ -26,15 +35,16 @@ body{
  
 
 }
-#myTextArea{
-    /* height:95%;
-    width: 100%;
-    background-color: #212121;
-    color: white;
-    font-size: 20px;
-    text-indent: 0px;
-    padding: 13px; */
+.CodeMirror {
+  
+    height: 72vh;
+  }
+  
+#textArea{
+  
+  
     
+
 
 }
 .box{
@@ -53,28 +63,33 @@ body{
 
 .box_ram{
    
-  
+ 
 }
 
-body > div > div > div.col-8.h-100 > div > div.row-1.dialog_box_btns > button:nth-child(n)
+body > div.content.row-11 > div.box > div > div.col-8.h-100 > div > div.row-1.control_box > button:nth-child(n)
 {
 
-    border-radius: 10px;
+   
+    border-radius: 5px;
     margin-left: 0px;
-    padding:10px 5px;
-    font-variant: small-caps;
-    font-weight: 400;
+    padding:5px 5px;
+    
+    font-size: 14px;
+    font-weight: 500;
     margin-left: 10px;
-    margin-top: 6px;
+    margin-top: 15px;
+    margin-bottom: 6px;
 }
-body > div > div > div.col-8.h-100 > div > div.row-1.control_box > button:nth-child(n)
+
+body > div.content.row-11 > div.box > div > div.col-8.h-100 > div > div.row-1.dialog_box_btns > button:nth-child(n)
 {
-    margin-top: 6px;
+    margin-top: 15px;
     border-radius: 10px;
-    margin-left: 3px;
-    padding: 4px;
+    margin-left:10px;
+    font-size: 14px;
+    padding: 10px;
     font-variant: small-caps;
-    font-weight: 400;
+    font-weight: 500;
     
    
    
@@ -192,6 +207,7 @@ input{
  background-color: transparent;
  border: 1px solid #6d6d6d;
  color:aliceblue;
+ margin-bottom:5px;
   
 }
 /************************************************/
