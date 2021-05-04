@@ -1087,14 +1087,19 @@ function applyRegsStateAt(t1)
   else console.log("ERROR:none valid state index");
 }
 //heighlight 
-function highlightFor(id,color,seconds){
-  var element = document.getElementById(id)
-  var origcolor = element.style.backgroundColor
-  element.style.backgroundColor = color;
-  var t = setTimeout(function(){
-     element.style.backgroundColor = origcolor;
-  },(seconds*1000));
-}
+  function highlightFor(id,color,seconds){
+    var element = document.getElementById(id)
+    var origcolor = element.style.backgroundColor,
+        origfontcolor = element.style.color;
+
+    element.style.backgroundColor = color;
+    element.style.color = '#EEE';
+    var t = setTimeout(function(){
+       element.style.backgroundColor = origcolor;
+       element.style.color = origfontcolor;
+    },(seconds*1000));
+  }
+
 //making the modal draggable
 
   var object = document.getElementById("modal_flags"),
