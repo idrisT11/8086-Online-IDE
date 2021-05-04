@@ -19,6 +19,13 @@
    //  p.register.writeReg(CS_REG,0x100);
      var compileRes;
      
+    var ram_container=document.getElementById("ram_container");
+    var canvas_console=document.getElementById("canvas_console");
+    var spinner_loader=document.getElementById("spinner_loader");
+     ram_container.style.display="none";
+     canvas_console.style.display="none";
+     spinner_loader.style.display="none";
+     
      ramStatesManager[t]=[];
   
      
@@ -234,6 +241,7 @@
     
      updateRegs();     
       setInterval(updateRegs,100);
+      setInterval(highlightingRam,300);
  //highlighting ram
   function highlightingRam()
   {
@@ -277,89 +285,125 @@
      
     }
   }
-  setInterval(highlightingRam,300);
+  
 
   //getting textArea value
   var compiled=false;
-  var  textArea=document.getElementById("myTextArea");
+  
+  
   var code_compile_btn=document.getElementById("code_compile_btn");
   var text;
   var  arrayOfLines;
   code_compile_btn.addEventListener("click",
   function(e)
   {
+   
+    if(code_compile_btn.innerHTML.trim()=="edit mode")
+    {
+      ram_container.style.display="none";
+      canvas_console.style.display="none";
+      codeMirror.options.readOnly = false;
+      code_compile_btn.innerHTML="compile";
      
-     compileRes=Compiler.compile(textArea.value);
-     
-    console.log(compileRes)
+    }
+    else
+    if(code_compile_btn.innerHTML.trim()=="compile")
+    {
     
     
-     if(compileRes.status)
-     {
-      var k=0;
-      while(!compileRes.finalView[k].executableLine) k++;
-      p.register.writeReg(IP_REG,compileRes.finalView[k].instructionAddr);
+     
       
-      for(let i=0;i<compileRes.finalView.length;i++)
-      {
-      
-        if(compileRes.finalView[i].executableLine)
-        {
-         for(let j=0;j<compileRes.finalView[i].opcodes.length;j++)
-            {
-              p.RAM.writeByte(compileRes.finalView[i].instructionAddr+j,compileRes.finalView[i].opcodes[j]);
-            
-            }
-        }
-      }
-      deleteVars();
-      displayVars(compileRes);
-      compiled=true;
-     }
-     else alert(compileRes.finalView+"at line: "+compileRes.errorLine+1);
-
-    
-   
-  //   //hidding the comments
-  //   text= textArea.value;
-    
-  //   let tmp=text.match(/[^\r\n]+/g);
-  //   text="";
-  //   for(let i=0;i<tmp.length;i++)
-  //   {
-  //     text+=hide_comment(tmp[i])+"\n";
-  //   }
-   
-   
-    
-   
-   
-  //    arrayOfLines = text.match(/[^\r\n]+/g);
-    
-  //    var k=0;
-    
-  //  for(let i=0;i<arrayOfLines.length;i++)
-  //  {
-  //    let opCodeLine=arrayOfLines[i];
+      var  textArea=codeMirror.getValue();
      
-  //    if(opCodeLine.length>3)
-  //    {
-  //      opCodeLine=toBcode(arrayOfLines[i]);
-  //      numInstructions++;
+       compileRes=Compiler.compile(textArea);
+       
+      console.log(compileRes)
+      
+      
+       if(compileRes.status)
+       {
+        var txtAreaBox=document.getElementById("code");
+        txtAreaBox.style.display="none";
+        spinner_loader.style.display="";
+        setTimeout(()=>{
+          spinner_loader.style.display="none";
+          ram_container.style.display="";
+          canvas_console.style.display="";
+          txtAreaBox.style.display="";
+          codeMirror.options.readOnly = true;
+          code_compile_btn.innerHTML="edit mode";
+          
+    
+        },300)
+         //
+        var k=0;
+        while(!compileRes.finalView[k].executableLine) k++;
+        p.register.writeReg(IP_REG,compileRes.finalView[k].instructionAddr);
         
-       
-  //    for(let j=0;j<opCodeLine.length;j++)
-  //    {
-  //      p.RAM.writeByte(k,opCodeLine[j]);
-  //      k++;
-  //    }
-       
-  //    }
+        for(let i=0;i<compileRes.finalView.length;i++)
+        {
+        
+          if(compileRes.finalView[i].executableLine)
+          {
+           for(let j=0;j<compileRes.finalView[i].opcodes.length;j++)
+              {
+                p.RAM.writeByte(compileRes.finalView[i].instructionAddr+j,compileRes.finalView[i].opcodes[j]);
+              
+              }
+          }
+        }
+        deleteVars();
+        displayVars(compileRes);
+        compiled=true;
+       }
+       else alert(compileRes.finalView+"at line: "+compileRes.errorLine+1);
+  
+      
      
-    
-  //  }
-   updateStates();
-   searchRam(p.register.readReg(IP_REG));
+    //   //hidding the comments
+    //   text= textArea.value;
+      
+    //   let tmp=text.match(/[^\r\n]+/g);
+    //   text="";
+    //   for(let i=0;i<tmp.length;i++)
+    //   {
+    //     text+=hide_comment(tmp[i])+"\n";
+    //   }
+     
+     
+      
+     
+     
+    //    arrayOfLines = text.match(/[^\r\n]+/g);
+      
+    //    var k=0;
+      
+    //  for(let i=0;i<arrayOfLines.length;i++)
+    //  {
+    //    let opCodeLine=arrayOfLines[i];
+       
+    //    if(opCodeLine.length>3)
+    //    {
+    //      opCodeLine=toBcode(arrayOfLines[i]);
+    //      numInstructions++;
+          
+         
+    //    for(let j=0;j<opCodeLine.length;j++)
+    //    {
+    //      p.RAM.writeByte(k,opCodeLine[j]);
+    //      k++;
+    //    }
+         
+    //    }
+       
+      
+    //  }
+     updateStates();
+     searchRam(p.register.readReg(IP_REG));
+
+    }
+
+   
    
   }
   )
