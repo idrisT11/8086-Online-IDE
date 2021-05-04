@@ -5,21 +5,57 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>emu8086</title>
+    <link rel="stylesheet" href="lib/codemirror.css">
+    <link rel="stylesheet" href="theme/monokai.css">
     <link rel="stylesheet" href="bs5/css/bootstrap.css">
-    <link rel="stylesheet" href="style_textarea.css">
+
+   
     <link rel="stylesheet" href="styles.css">
    
 </head>
+
 <body>
+  <header class="row-1">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" >
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+          <a class="navbar-brand" href="#">Emu 8086</a>
+          <ul class="navbar-nav me-auto mb-1 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Emulator</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Sending Tests</a>
+            </li>
+            
+          </ul>
+         
+        </div>
+      </div>
+    </nav>
+  </header>
  
 
 
 
-  
-    
-    <div class=" box ">
+  <div class="d-flex justify-content-center " >
+    <div class="spinner-border text-secondary" role="status" style="width: 35rem; height: 35rem;" id="spinner_loader">
+     
+    </div>
+  </div>
+
+
+
+<div class="content row-11">
+    <div class=" box " id="ram_container">
       <div class="row h-100">
-        <div class="col-4 h-100 box_reg_all" >
+        <div class="col-4 h-100 box_reg_all"  >
           <div class="box_reg ">
             <div class="row-1 box_reg_unit ">
               <div class="col-2  " class="label_reg_main" >
@@ -97,7 +133,7 @@
           </div>
         </div>
         <!--the ram column------------------------------------------------->
-        <div class=" col-8  h-100">
+        <div class=" col-8  h-100" >
           <div class="box_ram h-100">
           
            
@@ -144,68 +180,18 @@
         </div>
             </div>
  <!--the text area--------------------------------------------------------------->
- <div id="code" >
-  <div class="template row-10">
-    <main>
+ <div id="code"  >
+   <div id="textArea" style="font-size: large;" class="row-10">
+
+   </div>
+   <div class="row-2">
+    <button id="code_compile_btn"  class="col-4 btn btn-dark">
+      compile
+    </button>
   
-  <textArea class="list" id="count"  disabled >1</textArea>
-    <div class="container_ninis">
   
-      <div class="backdrop">
-        <div class="custom-area">
-         
-    
-        </div>
-      </div>
+   </div>
   
-      <textarea id="myTextArea"  onkeydown="if(event.keyCode===9){
-        var v=this.value,
-        s=this.selectionStart,
-        e=this.selectionEnd;
-    
-        this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;
-        return false;
-      }
-        var count = document.getElementById('count');
-        var count1 = document.getElementById('myTextArea')
-        var nb=1;
-        
-         for(let i = 0; i<=this.value.length; i++)
-        if(this.value[i] == '\n')nb++;
-      
-       if((event.keyCode === 13)){
-        
-        if(nb == 1) nb=2;
-        else nb+=1
-      count.value = count.value+'\n'+nb.toString();
-  }
-  
-        var count = document.getElementById('count');
-        var count1 = document.getElementById('myTextArea')
-        var nb=1;
-            for(let i = 0; i<=this.value.length; i++)
-        if(this.value[i] == '\n')nb++;
-     
-      if(event.keyCode == 8){
-        if(nb >= 9){
-          var last_line = count.value.substring(count.value.length -2);
-          if (nb < parseInt(last_line)){
-              count.value = count.value.substring(0, count.value.length -3);
-          }
-        }
-        else if(nb < parseInt(count.value.substring(count.value.length -2)))
-          count.value = count.value.substring(0, count.value.length -2);
-      }
-  "></textarea>
-  
-    </div>
-  
-    
-    </main> 
-  </div>
-  <button id="code_compile_btn"  class="row-2 btn btn-dark">
-    compile
-  </button>
  
  </div>
   <!--canvas-------------------------------------------------------------------------------->
@@ -299,7 +285,7 @@
       </thead>
          <thead  style="color: white;border-bottom:#6d6d6d">
            <tr id="states_prevVal_tr">
-             <th>previous value:</th>
+             <td>previous value:</td>
            </tr>
            <thead  style="color: white;border-bottom:#6d6d6d" >
              <tr id="states_newVal_tr">
@@ -351,7 +337,7 @@
     </div>
   </div>
  </div>
- 
+</div>
  <!--modal_stack------------------------------------------------------------------------>
  <!--modal_variables------------------------------------------------------------------------>
 
@@ -389,6 +375,10 @@
  
  <!--modal_stack------------------------------------------------------------------------>
  <!--scripts------------------------------------------------------------------------------------------------>
+    <script src="lib/codemirror.js"></script>
+    <script src="mode/javascript/javascript.js"></script>
+    <script src="mode/z80/z80.js"></script>
+    <script src="mode/simple.js"></script>
     <script src="bs5/js/bootstrap.js"></script>
     <script src="ConsoleW.js"></script>
     <script src="./Emulator/OPCODES.js"></script>
@@ -403,11 +393,58 @@
     <script src="./Compilation/SynthaxeAnalysis.js"> </script>
     <script src="./Compilation/Compilater.js"> </script>
    
-    <script src="display.js">
+   
+      
   
-      //
+      
     </script>
-    <script src="textAreaHandler.js"></script>
+    <script>
+      
+      CodeMirror.defineSimpleMode('asm86',{
+            start:[
+            {regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string"},
+            {regex: /'(?:[^\\]|\\.)*?(?:'|$)/, token: "string"},
+                
+                {regex: /[\s\t]*(add|adc|inc|sub|sbb|dec|neg|cmp|mul|imul|div|idiv|cbw|cwd|not|mov|push|pop|xchg|pushf|popf|SHL|SAL|SHR|SAR|ROL|ROR|RCL|RCR|AND|OR|TEST|XOR|REP|MOVS|CMPS|SCAS|LODS|STOS|CALL|JMP|RET|JE|JZ|JL|JNGE|JLE|JNG|JB|JNAE|JBE|JNA|JP|JPE|JO|JS|JNE|JNZ|JNL|JGE|JNLE|JG|JNB|JAE|JNBE|JA|JNP|JPO|JNO|JNS|LOOP|LOOPZ|LOOPE|LOOPNZ|LOOPNE|INT|CLC|CMC|STC|CLD|STD)\b/i, token: 'builtin', sol: true},                      //instrcution
+
+                {regex: /REP[\t\s]+(MOVS|CMPS|SCAS|LODS|STOS)/, token: 'link'}, //instrcution
+
+                {regex: /[a-z][a-z0-9]*\s*\:/, token: 'link', indent: true},    //label
+                {regex: /[\s\t]*org\b/i, token: 'tag', sol: true},
+                {regex: /[\s\t]+(offset|macro|proc|db|dw)\b/, token: 'tag'},     //prep
+                {regex: /,(offset|macro|proc|db|dw)\b/, token: 'tag'},     //prep
+
+                {regex: /^\b(ax|bx|cx|dx|si|di|bp|sp)/i, token: 'def'},         //REG 16
+                {regex: /^\b(al|bl|cl|dl|al|bl|cl|dl)/i, token: 'variable-3'},  //REG  8
+                {regex: /^\b(cs|ds|es|ss)/i, token: 'property'},                //REG SEG
+                
+                {regex: /[-+\/*=<>!]+/, token: "tag"},
+                {regex: /;.*/, token: "comment"},
+
+                {regex: /(\s+|,)(0x[0-9]+[0-9a-f]*|[0-9]+[0-9a-f]*h)|[0-9]+\b/i, token: 'number'}   //NB
+            ],
+
+
+            meta: {
+                lineComment: ";"
+            }
+
+        });
+      var codeMirror = CodeMirror(document.getElementById('textArea'), {
+          value: '',
+          mode: 'asm86',
+          theme: 'monokai',
+          lineNumbers: true,
+
+          readOnly: false
+      });
+
+      
+
+
+      
+  </script>
+     <script src="display.js"></script>
    
 </body>
 </html>
