@@ -163,7 +163,7 @@ class Processor{
                 var operandes = this.extractOperand(this.RAM.readWord((currentCodeSegment << 4) + currentIp + 1));
                 // R / M
                    
-                if (operandes.opRegister[1] == 0) 
+                if (operandes.opRegister[0] == 0) 
                 {
                     if(operandes.addr==null)
                     {
@@ -765,7 +765,7 @@ class Processor{
                     //CA FAIT MAL AUX YEUX !!!! 
                     var operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip + 1)),
                         immediateAddr = (current_code_seg<<4) + current_ip + 2 +operandes.dispSize,
-                        operandeSize = (instruction % 4 == 0b01) ? 2 : 1;
+                        operandeSize = (instruction % 4 == 0b01||instruction % 4 == 0b11) ? 2 : 1;
 
                     var instructionMode = operandes.opRegister[0];
                     
