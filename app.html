@@ -402,18 +402,20 @@
             {regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string"},
             {regex: /'(?:[^\\]|\\.)*?(?:'|$)/, token: "string"},
                 
-                {regex: /[\s\t]*(add|adc|inc|sub|sbb|dec|neg|cmp|mul|imul|div|idiv|cbw|cwd|not|mov|push|pop|xchg|pushf|popf|SHL|SAL|SHR|SAR|ROL|ROR|RCL|RCR|AND|OR|TEST|XOR|REP|MOVS|CMPS|SCAS|LODS|STOS|CALL|JMP|RET|JE|JZ|JL|JNGE|JLE|JNG|JB|JNAE|JBE|JNA|JP|JPE|JO|JS|JNE|JNZ|JNL|JGE|JNLE|JG|JNB|JAE|JNBE|JA|JNP|JPO|JNO|JNS|LOOP|LOOPZ|LOOPE|LOOPNZ|LOOPNE|INT|CLC|CMC|STC|CLD|STD)\b/i, token: 'builtin', sol: true},                      //instrcution
+                {regex: /REP[\t\s]+(MOVS|CMPS|SCAS|LODS|STOS)(b|w)\b/i, token: 'builtin'}, //instrcution
 
-                {regex: /REP[\t\s]+(MOVS|CMPS|SCAS|LODS|STOS)/, token: 'link'}, //instrcution
+                {regex: /[\s\t]*(add|adc|inc|sub|sbb|dec|neg|cmp|mul|imul|div|idiv|cbw|cwd|not|mov|push|pop|xchg|pushf|popf|SHL|SAL|SHR|SAR|ROL|ROR|RCL|RCR|AND|OR|TEST|XOR|REP|(MOVS|CMPS|SCAS|LODS|STOS)(b|w)|CALL|JMP|RET|JE|JZ|JL|JNGE|JLE|JNG|JB|JNAE|JBE|JNA|JP|JPE|JO|JS|JNE|JNZ|JNL|JGE|JNLE|JG|JNB|JAE|JNBE|JA|JNP|JPO|JNO|JNS|LOOP|LOOPZ|LOOPE|LOOPNZ|LOOPNE|INT|CLC|CMC|STC|CLD|STD)\b/i, token: 'builtin', sol: true},                      //instrcution
 
-                {regex: /[a-z][a-z0-9]*\s*\:/, token: 'link', indent: true},    //label
-                {regex: /[\s\t]*org\b/i, token: 'tag', sol: true},
-                {regex: /[\s\t]+(offset|macro|proc|db|dw)\b/, token: 'tag'},     //prep
-                {regex: /,(offset|macro|proc|db|dw)\b/, token: 'tag'},     //prep
+                
 
-                {regex: /^\b(ax|bx|cx|dx|si|di|bp|sp)/i, token: 'def'},         //REG 16
-                {regex: /^\b(al|bl|cl|dl|ah|bh|ch|dh)/i, token: 'def'},  //REG  8
-                {regex: /^\b(cs|ds|es|ss)/i, token: 'property'},                //REG SEG
+                {regex: /[a-z][a-z0-9]*\s*\:/i, token: 'link', indent: true},    //label
+                {regex: /[\s\t]*(org|endp|endm|proc)\b/i, token: 'tag', sol: true},
+                {regex: /[\s\t]+(offset|macro|db|dw)\b/, token: 'tag'},     //prep
+                {regex: /,(offset|macro|db|dw)\b/, token: 'tag'},     //prep
+
+                {regex: /^\b(ax|bx|cx|dx|si|di|bp|sp)\b/i, token: 'def'},         //REG 16
+                {regex: /^\b(al|bl|cl|dl|ah|bh|ch|dh)\b/i, token: 'def'},  //REG  8
+                {regex: /^\b(cs|ds|es|ss)\b/i, token: 'property'},                //REG SEG
                 
                 {regex: /[-+\/*=<>!]+/, token: "tag"},
                 {regex: /;.*/, token: "comment"},
@@ -431,7 +433,9 @@
           value: '\norg 0h \n\nret\n',
           mode: 'asm86',
           theme: 'monokai',
+          smartIndent: false,
           lineNumbers: true,
+          indentWithTabs: true,
 
           readOnly: false
       });
