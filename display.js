@@ -6,7 +6,8 @@
      var persentageSeg=0.005;
      var upPressed=false;
      var numInstructions=0;
-     
+     var editorWidth = codeMirror.getWrapperElement().offsetWidth;
+     codeMirror.setSize(innerWidth-58)
      var p=new Processor();
      var displayigBase=16;
      let altern=0;
@@ -304,6 +305,20 @@
       canvas_console.style.display="none";
       codeMirror.options.readOnly = false;
       code_compile_btn.innerHTML="compile";
+      p.initReg();
+      p.initRam();
+      t=0;
+       RegStatesManager=[];
+       ramStatesManager=[];
+       ramStatesManager[t]=[];
+       updateRegState();
+       p.cnsl.initCanvas();
+       ctx.fillRect(0,0,p.width,p.height);
+       p.register.writeReg(SS_REG,0x700);
+     p.register.writeReg(SP_REG,0xfffe);
+     p.RAM._writeWord((p.register.readReg(SS_REG)<<4)+p.register.readReg(SP_REG),0Xfffe);
+   //  p.register.writeReg(CS_REG,0x100);
+   codeMirror.setSize(innerWidth-58)
      
     }
     else
@@ -322,6 +337,7 @@
       
        if(compileRes.status)
        {
+
         var txtAreaBox=document.getElementById("code");
         txtAreaBox.style.display="none";
         spinner_loader.style.display="";
@@ -332,6 +348,8 @@
           txtAreaBox.style.display="";
           codeMirror.options.readOnly = true;
           code_compile_btn.innerHTML="edit mode";
+          codeMirror.setSize(editorWidth);
+         
           
     
         },300)
@@ -339,7 +357,7 @@
         var k=0;
         while(!compileRes.finalView[k].executableLine) k++;
         p.register.writeReg(IP_REG,compileRes.finalView[k].instructionAddr);
-        
+       
         for(let i=0;i<compileRes.finalView.length;i++)
         {
         
@@ -412,14 +430,19 @@ function runHandler()
 {
   if(compiled)
   {
-    for(let i=0;i<compileRes.finalView.length;i++)
-     {
-
-    
+   
+     
+      while( !((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)))
         singleStepHandler();
+
+        if(((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)))
+        {
+          console.log("end of execution!");
+          alert("end of execution");
+        }
         
        
-     }
+    
     compiled=false;
   }
 }
@@ -436,6 +459,9 @@ function runHandler()
      ramStatesManager[t]=[];
      updateRegState();
      p.cnsl.initCanvas();
+     p.register.writeReg(SS_REG,0x700);
+     p.register.writeReg(SP_REG,0xfffe);
+     p.RAM._writeWord((p.register.readReg(SS_REG)<<4)+p.register.readReg(SP_REG),0Xfffe);
      ctx.fillRect(0,0,p.width,p.height);
     
   
