@@ -352,23 +352,24 @@ class Linkage{
 
                     if (this.labelArray[j].labelName.toUpperCase() == op.name.toUpperCase()) 
                     {
-                        //We form our number
+                        //We form our numb
                         let modulo = 0;
-                        if (newLine.instName == 'JMP' && (this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) 
+                        if ((newLine.instName == 'JMP') && ((this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0))) 
                            modulo = 3;
-                        else if (newLine.instName == 'JMP' && !(this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) 
+                        else if ((newLine.instName == 'JMP') && !((this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)))
                             modulo = 2;
                         else if (newLine.instName == 'CALL')
                             modulo = 3;
                         else
                             modulo = 2;
-                        
+
+
                         let jumpValue = (this.labelArray[j].addr - virtualIP - modulo) & 0xFFFF;
 
-                        if (newLine.instName != 'JMP' && newLine.instName != 'CALL')
+                        if ((newLine.instName != 'JMP') && (newLine.instName != 'CALL'))
 
                         	jumpValue &= 0x00FF;
-                        
+
                         newLine.operands[0].name =  jumpValue.toString();  
                         newLine.operands[0].type = 'INT';
                         
@@ -386,17 +387,19 @@ class Linkage{
                     {
                         //We form our number
                         let modulo = 0;
-                        if (newLine.instName == 'JMP' && (this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) 
+                        if ((newLine.instName == 'JMP') && ((this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0))) 
                            modulo = 3;
-                        else if (newLine.instName == 'JMP' && !(this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)) 
+                        else if ((newLine.instName == 'JMP') && !((this.labelArray[j].addr - virtualIP > 128)||(this.labelArray[j].addr - virtualIP < 0)))
                             modulo = 2;
                         else if (newLine.instName == 'CALL')
                             modulo = 3;
                         else
                             modulo = 2;
+
                         
                         let jumpValue = (this.varArray[j].addr - virtualIP - modulo) & 0xFFFF;
-                        
+
+
                         if (newLine.instName != 'JMP' && newLine.instName != 'CALL')
 
                         	jumpValue &= 0x00FF;
@@ -451,7 +454,7 @@ class Linkage{
 
             }
 
-            else if ( op.type == 'STR' ) 
+            else if ( op.type == 'STR' || op.type == 'String' ) 
             {
                 
                 let strValue = op.name.trim().slice(1);
@@ -467,7 +470,7 @@ class Linkage{
 
             else
             {
-                console.log("generateVariable ::: DACHHUUU ???");
+                console.log("generateVariable ::: DACHHUUU ???", op);
             }
             
         }
