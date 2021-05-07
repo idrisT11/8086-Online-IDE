@@ -275,7 +275,8 @@ class LexicalAnalysis{
  }
 
     testMacroOperands(str){
-        let opsStr=str.toUpperCase().substring(str.indexOf(str.match(/ Macro /i)[0])+6,str.length); 
+        let opsStr=str.toUpperCase().substring(str.indexOf(str.match(/ Macro/i)[0])+6,str.length); 
+        if  (opsStr=="") return;
         let ops=opsStr.split(",") ; 
         for (let index = 0; index < ops.length; index++) {
             const element = ops[index];
