@@ -356,20 +356,44 @@ class Processor{
                         if ( instruction % 2 == 1 ) 
                         {
                             if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+                            {
+                                let valB = this.register.readWordReg(R2),
+                                    valA = this.register.readWordReg(R1);
+
                                 this.register.writeWordReg(R1, this.register.readWordReg(R2) );
+                                this.generateFlag(valB, valA, valB, 1);
+                                console.log(valB, valA);
+                            }
                             
                             else
+                            {
+                                let valB = this.register.readWordReg(R1),
+                                    valA = this.register.readWordReg(R2);
+
                                 this.register.writeWordReg(R2, this.register.readWordReg(R1) );
+                                this.generateFlag(valB, valA, valB, 1);
+                            }
                             
                         }
                         else
                         {
-                            if ((instruction >> 1) % 2) // On extrait le dif
-                                this.register.writeByteReg(R1, this.register.readByteReg(R2) );
+                            if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+                            {
+                                let valB = this.register.readByteReg(R2),
+                                    valA = this.register.readByteReg(R1);
+
+                                this.register.writeWordReg(R1, this.register.readByteReg(R2) );
+                                this.generateFlag(valB, valA, valB, 0);
+                            }
                             
                             else
-                                this.register.writeByteReg(R2, this.register.readByteReg(R1) );
-                            
+                            {
+                                let valB = this.register.readByteReg(R1),
+                                    valA = this.register.readByteReg(R2);
+
+                                this.register.writeWordReg(R2, this.register.readByteReg(R1) );
+                                this.generateFlag(valB, valA, valB, 0);
+                            }
                         } 
                     }
                     else
@@ -381,20 +405,45 @@ class Processor{
                         if ( instruction % 2 == 1 ) //16bits
                         {
                             if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+                            {
+                                let valB = this.RAM.readWord(addr),
+                                    valA = this.register.readWordReg(R);
+
                                 this.register.writeWordReg(R, this.RAM.readWord(addr));
+                                this.generateFlag(valB, valA, valB, 1);
+                            }
                             
                             else
+                            {
+                                let valA = this.RAM.readWord(addr),
+                                    valB = this.register.readWordReg(R);
+
                                 this.RAM.writeWord(addr, this.register.readWordReg(R));// d=0 => from reg
+                                this.generateFlag(valB, valA, valB, 1);
+                            }
                             
                         }
                         else    //8bits
                         {
+                            
                             if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
-                                this.register.writeByteReg(R, this.RAM.readByte(addr) );
+                            {
+                                let valB = this.RAM.readByte(addr),
+                                    valA = this.register.readByteReg(R);
+
+                                this.register.writeByteReg(R, this.RAM.readByte(addr));
+                                this.generateFlag(valB, valA, valB, 0);
+                            }
                             
-                            else // d=0 => from reg
-                                this.RAM.writeByte(addr, this.register.readByteReg(R));
-                            
+                            else
+                            {
+                                let valA = this.RAM.readByte(addr),
+                                    valB = this.register.readByteReg(R);
+
+                                this.RAM.writeByte(addr, this.register.readByteReg(R));// d=0 => from reg
+                                this.generateFlag(valB, valA, valB, 0);
+                            }
+
                         } 
                     }
 
@@ -419,9 +468,20 @@ class Processor{
                         let immediatVal = this.RAM.readWord(immediateAddr);
                        
                         if (addr == null) 
+                        {
+                            let val = this.register.readWordReg( R );
+
                             this.register.writeWordReg( R, immediatVal); 
+
+                            this.generateFlag(immediatVal, val, immediatVal, 1);
+                        }
+
                         else
+                        {
+                            let val = this.register.readWord( R );
                             this.RAM.writeWord(addr, immediatVal);
+                            this.generateFlag(immediatVal, val, immediatVal, 1);
+                        }
                     }
                     else
                     {
@@ -429,9 +489,20 @@ class Processor{
                         let immediatVal = this.RAM.readByte(immediateAddr);
 
                         if (addr == null) 
+                        {
+                            let val = this.register.readByteReg( R );
+
                             this.register.writeByteReg( R, immediatVal); 
+
+                            this.generateFlag(immediatVal, val, immediatVal, 0);
+                        }
+
                         else
+                        {
+                            let val = this.register.readByte( R );
                             this.RAM.writeByte(addr, immediatVal);
+                            this.generateFlag(immediatVal, val, immediatVal, 0);
+                        }
                     }
 
                     this.register.incIP(operandes.dispSize + (instruction % 2) + 3);
@@ -501,11 +572,22 @@ class Processor{
                         let R1 = operandes.opRegister[0],
                             R2 = operandes.opRegister[1];
 
+                        let valB = this.register.readWordReg(R2),
+                            valA = this.register.readSegReg(R1);
+
                         if ((instruction >> 1) % 2) // On extrait le d || d = 1 to reg
+                        {
                             this.register.writeSegReg(R1, this.register.readWordReg(R2) );
+
+                            this.generateFlag(valB, valA, valB, 1);
+                        }
                         
                         else
-                            this.register.writeWordReg(R2, this.register.readSegReg(R1) );    
+                        {
+                            this.register.writeWordReg(R2, this.register.readSegReg(R1) );   
+
+                            this.generateFlag(valA, valA, valB, 1); 
+                        }
                         
                     }
                     else
@@ -513,12 +595,22 @@ class Processor{
                         let R = operandes.opRegister[0],
                             addr = operandes.addr;
 
+                        let valB = this.RAM.readWord(addr),
+                            valA = this.register.readSegReg(R);
 
                         if ((instruction >> 1) % 2) // On extrait le d || d = 1 to reg
+                        {
                             this.register.writeSegReg(R, this.RAM.readWord(addr) );
+
+                            this.generateFlag(valB, valA, valB, 1); 
+                        }
                         
                         else
+                        {
                             this.RAM.writeWord(addr, this.register.readSegReg(R));    
+                            
+                            this.generateFlag(valA, valA, valB, 1); 
+                        }
                         
                     }
                    
