@@ -3388,7 +3388,7 @@ class Processor{
                  (val | 0xFF00): val;
     }
 
-    generateFlag(value, op1, op2, w=1, Flag=0b11111){
+    generateFlag(value, op1, op2, w=1, Flag=0b11111111111111){
 
         if ( (Flag & CARRY_FLAG) != 0 ) 
         {
