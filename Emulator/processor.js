@@ -3300,9 +3300,9 @@ class Processor{
 
         if ( (Flag & CARRY_FLAG) != 0 ) 
         {
-            let mask = ( w == 1) ? 0xFFFF : 0xFF;
+            let mask = ( w == 1) ? 0xFFFF0000 : 0xFFFFFF00;
 
-            if ( value & mask == 0)
+            if ( (value & mask) == 0)
                 this.register.setFlag('C', 0);
             else
                 this.register.setFlag('C', 1);
@@ -3313,8 +3313,8 @@ class Processor{
         {
             if ( value == 0 )
                 this.register.setFlag('Z', 1);
-            else ( value == 0 )
-                this.register.setFlag('Z', 1);
+            else 
+                this.register.setFlag('Z', 0);
         }
         
         if ( (Flag & PARITY_FLAG) != 0 ) 
