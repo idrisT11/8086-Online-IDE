@@ -9,7 +9,6 @@ class ImageParticle
         this.baseX = x;
         this.baseY = y;
         this.desity = Math.random()*40 +5;
-        this.velocity=Math.random()*3.5+1.5;
         this.theta=0;
 
     }
@@ -20,8 +19,11 @@ class ImageParticle
        ctx.closePath();
        ctx.fill();
     }
+   
     update()
     {
+      
+        this.x=this.x+Math.random()*2;
         let r=0.2;
         this.x=this.x+r*Math.cos(this.theta)*5;
         this.y=this.y-r*Math.sin(this.theta)*5;
