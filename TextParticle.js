@@ -21,8 +21,8 @@ class TextParticle{
     }
     update()
     {
-        let r=0.2;
-        this.x=this.x+r*Math.cos(this.theta)*5;
+        
+        this.x=this.x+Math.random()*2;
       
 
      
