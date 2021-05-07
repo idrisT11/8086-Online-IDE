@@ -3144,7 +3144,10 @@ class Processor{
                         opRegister[1] = rm;
 
                 }
-
+                
+                if (addr!= null)
+                    addr &= 0x0000FFFF;
+        
                 if ( addr != null && segmentEnabled ) {
                     let current_segment = act_seg;
                     addr += (current_segment<<4);
