@@ -3000,7 +3000,7 @@ class Processor{
                 current_code_seg = this.register.readReg(CS_REG);
         
 
-            if ( (instruction & 0xF0) == UNC_JUMP ) 
+            if ( (instruction & 0xF0) == CON_JMP ) 
             {
                 let executeJump = false;//If True, the jump instruction shall be executed
 
@@ -3075,6 +3075,8 @@ class Processor{
                 
                     this.register.incIP(2 + disp);
                 }
+                else
+                    this.register.incIP(2);
 
                 return 0;
             }
