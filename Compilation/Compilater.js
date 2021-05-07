@@ -12,7 +12,7 @@ class Compiler{
 
         if (lexicalOutput.status == false) 
         {
-
+            console.log('lexical');
             let errorLine = lexicalView.length-1,
                 message = lexicalView[errorLine].message;
 
@@ -27,7 +27,7 @@ class Compiler{
 
         if (prepResult.status == false) 
         {
-
+            console.log('postLexial');
             let errorLine = prepResult.errorLine,
                 message = prepResult.message;
 
@@ -41,25 +41,25 @@ class Compiler{
         
         if (syntResult.good == false) 
         {
-
+            console.log('syntax');
             let errorLine = syntResult.index,
                 message = syntResult.message;
 
             return Compiler.manageErrors(errorLine, message);
         }
-
+        console.log('fin syntax');
         //----------------------------------------------------------------
         let varArray = prepResult.varArray,
             labelArray = prepResult.labelArray,
             origin = prepResult.origin;
         
-        let finalView = new Linkage(varArray, labelArray, origin).addressResolving(newLexical);
+        var finalView = new Linkage(varArray, labelArray, origin).addressResolving(newLexical);
 
         let postLinkageState = PreProcessor.executePostLinkVerif(finalView);
 
         if (postLinkageState.good == false) 
         {
-
+            console.log('link');
             let errorLine = postLinkageState.errorLine,
                 message = postLinkageState.message;
 
