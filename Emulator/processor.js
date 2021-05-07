@@ -3004,7 +3004,7 @@ class Processor{
             {
                 let executeJump = false;//If True, the jump instruction shall be executed
 
-                switch(instruction)
+                switch(instruction & 0xF0)
                 {
                     case JE:
                         executeJump = this.register.extractFlag('Z')==1;
