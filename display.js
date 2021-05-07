@@ -356,7 +356,7 @@
         displayVars(compileRes);
         compiled=true;
        }
-       else alert(compileRes.finalView+"at line: "+compileRes.errorLine+1);
+       else alert(compileRes.message+"at line: "+compileRes.errorLine+1);
   
       
      
