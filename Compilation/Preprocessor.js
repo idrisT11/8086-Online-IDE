@@ -111,7 +111,7 @@ class PreProcessor {
                 {
                     let jumpValue = parseInt(line.operands[0].name);
 
-                    if (jumpValue > 128 || jumpValue <= -128) 
+                    if ((jumpValue & 0xFF00) != 0) 
                     {
                         message = 'ERROR: JMP OPERATION OUT OF BOUNDS';
                         good = false;
