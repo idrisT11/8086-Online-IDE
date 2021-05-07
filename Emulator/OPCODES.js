@@ -38,6 +38,9 @@ const   MOV_RM_RM = 0x88,
         SHL_SAL=0b11010000,
         UNC_JUMP=0b01111110,
         CON_JMP=0b01110000,
+        LOOP = 0b11100010,
+        LOOPE = 0b11100001,
+        LOOPNE = 0b11100000,
 
 
       	ADD_REG_MEM = 0x00,
@@ -103,5 +106,6 @@ const   JE  =   0b0100,
         JNP =   0b1011,
         JNO =   0b0001,
         JNS =   0b1001;
-        
+
+
 
