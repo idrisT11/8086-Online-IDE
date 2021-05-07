@@ -37,6 +37,7 @@ const   MOV_RM_RM = 0x88,
 
         SHL_SAL=0b11010000,
         UNC_JUMP=0b01111110,
+        CON_JMP=0b01110000,
 
 
       	ADD_REG_MEM = 0x00,
@@ -85,5 +86,22 @@ const	CARRY_FLAG 		= 0b0000000000000001,
 		SIGN_FLAG		= 0b0000000010000000,
 		AUXILARY_FLAG	= 0b0000000000010000,
 		OVERFLOW_FLAG	= 0b0000100000000000;
+
+const   JE  =   0b0100,
+        JL  =   0b1100,
+        JLE =   0b1110,
+        JB  =   0b0010,
+        JBE =   0b0110,
+        JP  =   0b1010,
+        JO  =   0b0000,
+        JS  =   0b1000,
+        JNE =   0b0101,
+        JNL =   0b1101,
+        JNLE=   0b1111,
+        JNB =   0b0011,
+        JNBE=   0b0111,
+        JNP =   0b1011,
+        JNO =   0b0001,
+        JNS =   0b1001;
         
 
