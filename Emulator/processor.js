@@ -2841,7 +2841,7 @@ class Processor{
         else if ( (instruction & 0xFF) == JMP_IND_SEG ) 
         {
 
-            let operandes = this.extractOperand((current_code_seg<<4) + current_ip + 1);
+            let operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip + 1));
 
             //INDIRECT JUMP In SEGMENT
             if ( operandes.opRegister[0] == 0b100 ) {
