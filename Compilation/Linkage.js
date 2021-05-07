@@ -365,7 +365,9 @@ class Linkage{
                         
                         let jumpValue = (this.labelArray[j].addr - virtualIP - modulo) & 0xFFFF;
 
-                        console.log(virtualIP - this.labelArray[j].addr);
+                        if (newLine.instName != 'JMP' && newLine.instName != 'CALL')
+
+                        	jumpValue &= 0x00FF;
                         
                         newLine.operands[0].name =  jumpValue.toString();  
                         newLine.operands[0].type = 'INT';
@@ -394,7 +396,10 @@ class Linkage{
                             modulo = 2;
                         
                         let jumpValue = (this.varArray[j].addr - virtualIP - modulo) & 0xFFFF;
+                        
+                        if (newLine.instName != 'JMP' && newLine.instName != 'CALL')
 
+                        	jumpValue &= 0x00FF;
                         
                         //We form our number
                         newLine.operands[0].name =  jumpValue.toString();  
