@@ -60,7 +60,7 @@ class Compiler{
         if (postLinkageState.good == false) 
         {
 
-            let errorLine = postLinkageState.index,
+            let errorLine = postLinkageState.errorLine,
                 message = postLinkageState.message;
 
             return this.manageErrors(errorLine, message);
@@ -106,9 +106,9 @@ class Compiler{
     static manageErrors(errorLine, message){
         return {
             status: false,
-            message: '',
+            message: message,
             errorLine: errorLine,
-            finalView: message,
+            finalView: null,
             varArray: null,
             labelArray: null
         }
