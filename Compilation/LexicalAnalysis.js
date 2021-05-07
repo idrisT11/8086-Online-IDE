@@ -602,7 +602,7 @@ class LexicalAnalysis{
                 return true;
             }
             else if (this.legalVarName(str2.trim())) {
-                this.lexical.operands.push({ name: str2.toUpperCase(), type: "LBL" });
+                this.lexical.operands.push({ name: str2.toUpperCase(), type: "VAR" });
                 return true;
             }
             
