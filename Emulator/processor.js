@@ -3130,7 +3130,7 @@ class Processor{
                         break;
 
                     case IWEN_DISP:    // The displacement can be contained in one byte
-                        addr = this.getAddrIndir(rm) + this.RAM.readByte((current_code_seg<<4) + current_ip+2);
+                        addr = this.getAddrIndir(rm) + this._convertByteToWord(this.RAM.readByte((current_code_seg<<4) + current_ip+2));
                         dispSize = 1;
                         break;
                 
