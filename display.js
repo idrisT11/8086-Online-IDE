@@ -432,7 +432,7 @@ function runHandler()
   {
    
      
-      while( !((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)))
+      if( !((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)))
         singleStepHandler();
 
         if(((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)))
