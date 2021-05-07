@@ -9,9 +9,10 @@ let mouse = {
     y:null,
     radius:50
 };
+let bound = canvas.getBoundingClientRect();
 window.addEventListener("mousemove",(e)=>{
-    mouse.x = e.x +canvas.clientTop/2;
-    mouse.y = e.y +canvas.clientTop/2;
+    mouse.x = e.clientX - bound.left - canvas.clientLeft;
+    mouse.y = e.clientY - bound.top - canvas.clientTop;;
 })
 //
 var png = new Image();
