@@ -27,7 +27,15 @@ class Processor{
             current_code_seg = this.register.readReg(CS_REG),
             instruction = this.RAM.readByte( (current_code_seg<<4) + current_ip );
 
-           
+
+        /*if(!this.pause && this.decodeSegOverride(instruction)===0)
+        {
+            console.log(" decodeSegOverride has been executed!");
+
+            instruction = this.RAM.readByte( (current_code_seg<<4) + current_ip );
+        }
+            */
+
         if( !this.pause && this.decodeMov(instruction)===0)
         {
             console.log("decode mov has been executed!");
@@ -136,15 +144,14 @@ class Processor{
         {
             console.log("decodeRet has been executed!");
         }
-        
-        // else if(!this.pause && this.  decodeSegOverride(instruction)===0)
-        // {
-        //     console.log(" decodeSegOverride has been executed!");
-        // }
-       
+        else if(!this.pause && this.decodeLoop(instruction)===0)
+        {
+            console.log("decodeLoop has been executed!");
+        }
         else{
             console.log("can't find anything to execute");
         }
+
         this.activeSegment=3;
     }
 
@@ -339,6 +346,7 @@ class Processor{
                 {
                     
                     var operandes = this.extractOperand(this.RAM.readByte((current_code_seg<<4) + current_ip+1));
+                    
 
                     if (operandes.addr == null) 
                     {   // R to R
@@ -369,7 +377,7 @@ class Processor{
                         let R = operandes.opRegister[0],
                             addr = operandes.addr;
 
-                    
+                        
                         if ( instruction % 2 == 1 ) //16bits
                         {
                             if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
@@ -2994,6 +3002,77 @@ class Processor{
         }
     }
 
+    decodeLoop(instruction)
+    {            
+
+        var current_ip = this.register.readReg(IP_REG),
+            current_code_seg = this.register.readReg(CS_REG);
+        
+
+            if ( (instruction & 0xFF) == LOOP ) 
+            {
+                
+                let cx_val = this.register.readReg(CX_REG);
+
+                if (cx_val != 0) {
+                    this.register.writeReg(CX_REG, cx_val - 1);
+
+                    let disp = this.RAM.readByte((current_code_seg<<4) + current_ip+1);
+                    
+                    disp = this._convertByteToWord(disp);
+
+                    this.register.incIP(2 + disp);
+                }
+                else
+                    this.register.incIP(2);
+               
+
+                return 0;
+            }
+
+            else if ( (instruction & 0xFF) == LOOPE ) 
+            {
+                
+                let cx_val = this.register.readReg(CX_REG);
+
+                if (cx_val != 0 || this.register.extractFlag('Z')==1) 
+                {
+                    this.register.writeReg(CX_REG, cx_val - 1);
+
+                    let disp = this.RAM.readByte((current_code_seg<<4) + current_ip+1);
+                
+                    this.register.incIP(2 + disp);
+                }
+                else
+                    this.register.incIP(2);
+               
+
+                return 0;
+            }
+
+            else if ( (instruction & 0xFF) == LOOPNE ) 
+            {
+                
+                let cx_val = this.register.readReg(CX_REG);
+
+                if (cx_val != 0 || this.register.extractFlag('Z')==0) 
+                {
+                    this.register.writeReg(CX_REG, cx_val - 1);
+
+                    let disp = this.RAM.readByte((current_code_seg<<4) + current_ip+1);
+                
+                    this.register.incIP(2 + disp);
+                }
+                else
+                    this.register.incIP(2);
+               
+
+                return 0;
+            }
+
+            else
+                return -1;
+        }
     decodeConJump(instruction)
     {
             var current_ip = this.register.readReg(IP_REG),
@@ -3004,7 +3083,7 @@ class Processor{
             {
                 let executeJump = false;//If True, the jump instruction shall be executed
 
-                switch(instruction & 0xF0)
+                switch(instruction&0x0F)
                 {
                     case JE:
                         executeJump = this.register.extractFlag('Z')==1;
@@ -3146,10 +3225,10 @@ class Processor{
                         opRegister[1] = rm;
 
                 }
-                
+
                 if (addr!= null)
                     addr &= 0x0000FFFF;
-        
+
                 if ( addr != null && segmentEnabled ) {
                     let current_segment = act_seg;
                     addr += (current_segment<<4);
