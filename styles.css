@@ -21,6 +21,10 @@
 body{
    
 }
+#code_compile_btn{
+    margin-top: 5px;
+   margin-left: 20px;
+}
 #code{
     height:58vh;
     margin-top: 100px;
@@ -32,6 +36,7 @@ body{
     color: white;
     display: flex;
     flex-direction: column;
+    
  
 
 }
