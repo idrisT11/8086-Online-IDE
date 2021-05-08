@@ -35,7 +35,7 @@ def home_page(request):
         if (test_id != tests[0].test_id or test_password != tests[0].passwd):
 
             
-            return render(request, 'home.html', context)
+            return redirect('home_page')
 
         else:
 
@@ -57,7 +57,7 @@ def home_page(request):
 
                 running_test.save()
 
-            return render(request, 'home.html', context)
+            return redirect('home_page')
     return render(request, 'home.html', context)
 
 
@@ -89,7 +89,6 @@ def admin_login(request):
 def dashboard(request):
 
     create_test_form = CreateTest(request.POST or None)
-    stop_test_form = DeleteTest(request.POST or None)
     
     if (create_test_form.is_valid()):
 
@@ -110,11 +109,10 @@ def dashboard(request):
         new_test.save()
 
     #just testing for the moment
-    test_id = Tests.objects.all().filter(is_active=False)[0].id
-    test_to_show = Tests.objects.get(id=test_id)
-    students = test_to_show.student_set.all()
+    all_tests = Tests.objects.all().filter(is_active=False)
 
-    return render(request, 'adminhome.html', locals())
+
+    return render(request, 'index.html', locals())
 
 @login_required
 def logout_view(request):
@@ -128,5 +126,12 @@ def logout_view(request):
 
 
 @login_required
-def display_tests(request):
-    pass
+def display_tests_student(request, test_id):
+
+    """ A view to display the students who passed a test given its test_id """
+
+    test = Tests.objects.get(test_id=test_id)
+    students = test.student_set.all()
+
+    return render(request, 'studenttest.html', locals())
+

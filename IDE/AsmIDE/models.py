@@ -12,7 +12,7 @@ class Student(models.Model):
     email = models.EmailField(max_length=30, blank=False, unique=True, default="")
     test_content = models.TextField(null=True)
     group = models.IntegerField(default=0)
-
+    tests = models.ForeignKey('Tests', on_delete=models.CASCADE, null=True)
     def __str__(self):
 
         return ("{} {}".format(self.first_name, self.family_name))
@@ -29,7 +29,7 @@ class Tests(models.Model):
     #if the test is still going 
     is_active = models.BooleanField(default=False)
 
-    student = models.ForeignKey('Student', on_delete=models.CASCADE, null=True)
+    
 
 
 
