@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta charset="utf-8" lang="en">
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css">
-    <link rel="stylesheet" href="{% static 'css/crtest.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/alltests.css' %}" type="text/css">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -20,27 +20,32 @@
 </head>
 <body>
 
-	<h1 class='text-center'> Create Test</h1>	
-	<div id='main'>
+	<div class="tests-table">
+		<table>
+			<thead>
+				<tr class="table-head row">
 
-		<div class="sub-main" id="sub-main-one">
-			<img src="{% static 'images/pc.svg' %}">
-		</div>
-		<div class="sub-main" id="sub-main-two">
+					<th> Test ID </th>
+					<th> Test Duration</th>
+					<th> Date</th>
 
-			<form method="POST" action="{% url 'create_test' %}">
+				</tr>
 
-				{% csrf_token %}
-				<input name='test-id' type='number' placeholder="Test id" required>
-				<input name='test-duration' type='number' placeholder="Test Duration" required>
-				<input name='test-passwd' type="password" placeholder="Test password" required>
+				{% for test in tests %}
+					<tr class="row switch-background">
+						<th> <p class="tobe-shifted-little"><a href="{% url 'display_test_students' test.test_id %}">Test  {{ test.test_id }}</a></p> </th>
+						<th> <p class="tobe-shifted">{{ test.duration }} </p></th>
+						<th> <p class="tobe-shifted"> {{ test.starting_time }} </p></th>
+					</tr>
+				{% endfor %}
+			</thead>
+		</table>
+	</div>	
 
-				<button type="submit">Create Test</button>
 
-			</form>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/alltests.js' %}"></script>
+</body>	
 
-		</div>
-</div>
-    
-</body>
+
 </html>

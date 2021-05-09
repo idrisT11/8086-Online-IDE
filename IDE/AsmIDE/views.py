@@ -88,50 +88,69 @@ def admin_login(request):
 @login_required
 def dashboard(request):
 
-    create_test_form = CreateTest(request.POST or None)
     
-    if (create_test_form.is_valid()):
-
-        test_id = create_test_form.cleaned_data['test_id']
-        test_duration = create_test_form.cleaned_data['test_duration']
-        test_passwd = create_test_form.cleaned_data['test_passwd']
-
-        #existing_tests = Tests.objects.all()
-
-        new_test = Tests(
-
-            test_id = test_id, 
-            duration = test_duration, 
-            passwd = test_passwd,
-            is_active = True,
-        )
-
-        new_test.save()
-
-    #just testing for the moment
-    all_tests = Tests.objects.all().filter(is_active=False)
-
 
     return render(request, 'index.html', locals())
 
-@login_required
-def logout_view(request):
+
+@login_required 
+def create_test(request):
 
     if (request.method == "POST"):
 
-        logout(request)
-        messages.success(request, 'Logged out successfully')
+        test_id = request.POST['test-id']
+        duration = request.POST['test-duration']
+        passwd = request.POST['test-passwd']
 
-        return redirect('home_page')
+        print(f'=========== test_id type: {type(test_id)}')
+        #check if there is not another test with the same id
+        found = False 
+        all_tests = Tests.objects.all()
+
+        for test in all_tests:
+
+            if (test.test_id == int(test_id)):
+
+                found = True 
+                break 
+
+        if (not found):
+
+            new_test = Tests(
+
+                test_id=test_id, 
+                duration=duration, 
+                passwd=passwd
+                )
+
+            new_test.save()
+
+        return redirect('dashboard')
+
+    return render(request, 'crtest.html', locals())
+@login_required
+def logout_view(request):
+
+
+    logout(request)
+    messages.success(request, 'Logged out successfully')
+
+    return redirect('home_page')
 
 
 @login_required
-def display_tests_student(request, test_id):
+def display_tests(request):
 
-    """ A view to display the students who passed a test given its test_id """
+    """ A view to display all the tests passed so far"""
 
-    test = Tests.objects.get(test_id=test_id)
-    students = test.student_set.all()
+    tests = Tests.objects.all()
 
-    return render(request, 'studenttest.html', locals())
+    return render(request, 'alltests.html', locals())
 
+@login_required
+def display_test_students(request, test_id):
+
+    """ A view to display all the students who passed a test (this test is selected by its id)"""
+
+
+    return (request, 'testsstudent.html', locals())
