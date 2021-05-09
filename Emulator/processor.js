@@ -2928,7 +2928,7 @@ class Processor{
         {
             let disp = this.RAM.readByte((current_code_seg<<4) + current_ip + 1);
 
-            disp = this.register._convertByteToWord(disp);
+            disp = this._convertByteToWord(disp);
 
             this.register.incIP(2 + disp);
 
