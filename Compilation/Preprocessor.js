@@ -174,6 +174,8 @@ class PreProcessor {
 
                         //we extract the (word/byte parameters)
                         let tailleMem = value.match(/(word|byte|w\.|b\.)/ig);
+			//then the segment override
+                        let segOver = value.match(/(cs|ds|es|ss)/ig);
                         //then the registers between the brackets
                         let reg = value.match(/(bp|bx|di|si)/ig);
                         //and then the numerical value in the brackets
@@ -194,8 +196,11 @@ class PreProcessor {
                         
                         //Finally we reconstruct to the string
                         if (tailleMem != null) 
-                            finalExpression += tailleMem;
-                        finalExpression += ' [';
+                            finalExpression += tailleMem + ' ';
+                        
+                        if (segOver != null) 
+                            finalExpression += segOver + ':';
+                        finalExpression += '[';
 
                         if (reg != null) 
                         {
