@@ -179,7 +179,7 @@ class PreProcessor {
                         //then the registers between the brackets
                         let reg = value.match(/(bp|bx|di|si)/ig);
                         //and then the numerical value in the brackets
-                        let numerical = value.replaceAll(/(word|byte|w\.|b\.|bp|bx|di|si|\[|\])/ig, ' ');
+                        let numerical = value.replaceAll(/(word|byte|w\.|b\.|es|ds|ss|cs|bp|bx|di|si|\[|\]|\:)/ig, ' ');
                         
 
                         //we do some computation before evaluing the numerical value
