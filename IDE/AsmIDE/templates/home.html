@@ -22,7 +22,7 @@
     <form action="{% url 'home_page' %}" method="POST">
         {% csrf_token %}
 
-        {{ submission_form.as_p }}    
+        
 
         <textarea id="asm-code" name="content"></textarea>
         <input type="submit" value="submit"><br>

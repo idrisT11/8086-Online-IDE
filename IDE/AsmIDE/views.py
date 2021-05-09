@@ -11,54 +11,41 @@ from django import forms
 
 def home_page(request):
         
-    submission_form = Submission(request.POST or None)
-    context = {'submission_form':submission_form}
-
-    if(submission_form.is_valid()):
-
-        #for an unknown reason it doesn't work
-        first_name = submission_form.cleaned_data['first_name']
-        family_name = submission_form.cleaned_data['family_name']
-        group = submission_form.cleaned_data['group']
-        email = submission_form.cleaned_data['email']
-        test_id = submission_form.cleaned_data['test_id']
-        content = request.POST['content']
-        test_password = submission_form.cleaned_data['test_passwd']
 
         #checking if there is only one running test
-        tests = Tests.objects.all().filter(is_active=True)
+        #tests = Tests.objects.all().filter(is_active=True)
 
-        if (len(tests) != 1):
+       #if (len(tests) != 1):
 
-            return redirect('home_page')
-        
-        if (test_id != tests[0].test_id or test_password != tests[0].passwd):
+       #    return redirect('home_page')
+       #
+       #if (test_id != tests[0].test_id or test_password != tests[0].passwd):
 
-            
-            return redirect('home_page')
+       #    
+       #    return redirect('home_page')
 
-        else:
+       #else:
 
-            #real test ID in database
-            test_id = tests[0].id 
-            running_test = Tests.objects.get(id=test_id)
-            
-            #time limit not reached
-            if (running_test.is_active):
+       #    #real test ID in database
+       #    test_id = tests[0].id 
+       #    running_test = Tests.objects.get(id=test_id)
+       #    
+       #    #time limit not reached
+       #    if (running_test.is_active):
 
-                running_test.student_set.create(
+       #        running_test.student_set.create(
 
-                    first_name = first_name, 
-                    family_name = family_name, 
-                    group = group, 
-                    test_content = content,
-                    email = email,
-                )
+        #            first_name = first_name, 
+        #            family_name = family_name, 
+        #            group = group, 
+        #            test_content = content,
+        #            email = email,
+        #        )
 
-                running_test.save()
+        #        running_test.save()
 
-            return redirect('home_page')
-    return render(request, 'home.html', context)
+        #    return redirect('home_page')
+    return render(request, 'home.html')
 
 
 def admin_login(request):
@@ -147,10 +134,22 @@ def display_tests(request):
 
     return render(request, 'alltests.html', locals())
 
-@login_required
-def display_test_students(request, test_id):
 
-    """ A view to display all the students who passed a test (this test is selected by its id)"""
+@login_required 
+def display_students(request, test_id):
+
+    """ A view to dispaly the students who submitted a test given it test_id"""
+
+    test = Tests.objects.get(id=test_id)
+
+    students = test.student_set.all()
+
+    return render(request, 'testsstudent.html', locals())
 
 
-    return (request, 'testsstudent.html', locals())
+@login_required 
+def display_student_submission(request, student_id):
+
+    """ A view to display the submission of a given student """
+
+    pass 

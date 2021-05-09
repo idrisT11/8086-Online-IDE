@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta charset="utf-8" lang="en">
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css">
-    <link rel="stylesheet" href="{% static 'css/alltests.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/testsstudent.css' %}" type="text/css">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -28,15 +28,14 @@
 					<th> First Name </th>
 					<th> Family Name</th>
 					<th> Group</th>
-					<th> Submission </th>
 
 				</tr>
 
 				{% for student in students %}
 					<tr class="row switch-background">
-						<th> <p class="tobe-shifted-little">{{ student.first_name }}</p> </th>
-						<th> <p class="tobe-shifted">{{ student.family_name }} </p></th>
-						<th> <p class="tobe-shifted"> {{ student.group }} </p></th>
+						<th> <p class="tobe-shifted-little text-center">{{ student.first_name }}</p> </th>
+						<th> <p class="tobe-shifted text-center">{{ student.family_name }} </p></th>
+						<th> <p class="tobe-shifted text-center"> {{ student.group }} </p></th>
 					</tr>
 				{% endfor %}
 			</thead>

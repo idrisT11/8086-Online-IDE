@@ -33,9 +33,9 @@
 
 				{% for test in tests %}
 					<tr class="row switch-background">
-						<th> <p class="tobe-shifted-little"><a href="{% url 'display_test_students' test.test_id %}">Test  {{ test.test_id }}</a></p> </th>
-						<th> <p class="tobe-shifted">{{ test.duration }} </p></th>
-						<th> <p class="tobe-shifted"> {{ test.starting_time }} </p></th>
+						<th> <p class="tobe-shifted-little text-center"><a href="{% url 'display_students' test.id %}">Test  {{ test.test_id }}</a></p> </th>
+						<th> <p class="tobe-shifted text-center">{{ test.duration }} </p></th>
+						<th> <p class="tobe-shifted text-center"> {{ test.starting_time }} </p></th>
 					</tr>
 				{% endfor %}
 			</thead>
