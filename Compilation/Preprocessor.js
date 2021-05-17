@@ -635,6 +635,10 @@ class PreProcessor {
     
                         // checking if there is not another declaration of a procedure inside a procedure
                         for (var j = procBegin; j < objectsArray.length; j++) {
+                            
+                            if ( objectsArray[j].expressionType == "INST" && objectsArray[j].instName == "ENDP") 
+    
+                                break; 
     
                             if (objectsArray[j].expressionType == "INST" && objectsArray[j].instName == "PROC") {
     
