@@ -1238,7 +1238,7 @@ class PreProcessor {
 					let op = table[j].operands[k];
 
                     //If the operand name correspond to the parameter name
-					if ( op.name.trim() == parameterName.name.trim() ) 
+					if ( op.name.toUpperCase().trim() == parameterName.name.trim() ) 
 					{
 
                         table[j].operands[k].name = parameterValue.name.trim();
