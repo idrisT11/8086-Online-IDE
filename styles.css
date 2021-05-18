@@ -183,6 +183,7 @@ input{
     font-weight: bold;
     padding-left:5px;
     min-width: 30px;
+    width: fit-content;
 }
 .control_box{
   
@@ -208,7 +209,8 @@ input{
 .search_box input{
   width:50%;
   display: flex;
- padding-left: 30px;
+  
+text-align: center;
  background-color: transparent;
  border: 1px solid #6d6d6d;
  color:aliceblue;
@@ -238,12 +240,22 @@ input{
   }
   #canvas_console{
     
-   
-   
+  
+   border-radius: 10px;
+
     
   }
+  #canvas_console:focus{
+    
+  border:1px solid white;
+    
+     
+   }
   #canvas_wrapper{
     margin-top: 100px;
+    width:35vw;
+    height:72vh;
+  
   }
   #canvas_wrapper:hover{
     border: none;
