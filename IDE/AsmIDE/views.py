@@ -90,6 +90,12 @@ def admin_login(request):
 def dashboard(request):
 
     
+    if (request.method == "POST"):
+
+        logout(request)
+        messages.success(request, 'Logged out successfully')
+
+        return redirect('home_page')
 
     return render(request, 'index.html', locals())
 
@@ -129,15 +135,16 @@ def create_test(request):
 
     return render(request, 'crtest.html', locals())
 
-@login_required
-def logout_view(request):
-
-
-    logout(request)
-    messages.success(request, 'Logged out successfully')
-
-    return redirect('home_page')
-
+#@login_required
+#def logout_view(request):
+#
+ #   if (request.method == "POST"):
+#
+ #       logout(request)
+ #       messages.success(request, 'Logged out successfully')
+#
+ #       return redirect('home_page')
+#
 
 @login_required
 def display_tests(request):
