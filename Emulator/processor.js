@@ -499,7 +499,7 @@ class Processor{
 
                         else
                         {
-                            let val = this.register.readByte( R );
+                            let val = this.register.readByteReg( R );
                             this.RAM.writeByte(addr, immediatVal);
                             this.generateFlag(immediatVal, val, immediatVal, 0);
                         }
