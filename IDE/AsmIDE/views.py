@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import request, Http404, HttpResponse, HttpResponseRedirect
 from .models import * 
-from django.utils import timezone 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import *
 from django import forms
+from datetime import datetime
 # Create your views here.
 
 def home_page(request):
@@ -45,6 +44,10 @@ def home_page(request):
                 #real test ID in database
                 test_id = tests[0].id 
                 running_test = Tests.objects.get(id=test_id)
+                test_starting_time = running_test.starting_time 
+                submission_time = datetime.now()
+                delta = submission_time - test_starting_time
+
 
                 running_test.student_set.create(
                  
@@ -53,6 +56,7 @@ def home_page(request):
                      group = group, 
                      test_content = content,
                      email = email,
+                     time_spent = (delta.seconds) // 60
                      )
 
                 running_test.save()
@@ -126,7 +130,9 @@ def create_test(request):
 
                 test_id=test_id, 
                 duration=duration, 
-                passwd=passwd
+                passwd=passwd, 
+                is_active=True,
+                starting_time = datetime.now(),
                 )
         
             new_test.save()
@@ -134,17 +140,6 @@ def create_test(request):
             return redirect('dashboard')
 
     return render(request, 'crtest.html', locals())
-
-#@login_required
-#def logout_view(request):
-#
- #   if (request.method == "POST"):
-#
- #       logout(request)
- #       messages.success(request, 'Logged out successfully')
-#
- #       return redirect('home_page')
-#
 
 @login_required
 def display_tests(request):

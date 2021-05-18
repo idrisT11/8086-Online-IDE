@@ -28,6 +28,7 @@
 					<th> First Name </th>
 					<th> Family Name</th>
 					<th> Group</th>
+					<th> Time Spent</th>
 
 				</tr>
 
@@ -36,6 +37,9 @@
 						<th> <p class="tobe-shifted-little text-center">{{ student.first_name }}</p> </th>
 						<th> <p class="tobe-shifted text-center">{{ student.family_name }} </p></th>
 						<th> <p class="tobe-shifted text-center"> {{ student.group }} </p></th>
+						<th> <p class="tobe-shifted text-center"> {{ student.time_spent }} min </p></th>
+
+
 					</tr>
 				{% endfor %}
 			</thead>
