@@ -11,41 +11,55 @@ from django import forms
 
 def home_page(request):
         
+        wrong_password = False 
+        wrong_test_id = False 
 
+        if (request.method == "POST"):
+
+            first_name = request.POST['first-name']
+            family_name = request.POST['family-name']
+            email = request.POST['email']
+            group = request.POST['group']
+            test_id = request.POST['test-id']
+            test_password = request.POST['test-passwd']
+            content = request.POST['content']
+            
         #checking if there is only one running test
-        #tests = Tests.objects.all().filter(is_active=True)
+            tests = Tests.objects.all().filter(is_active=True)
 
-       #if (len(tests) != 1):
+            if (len(tests) != 1):
+                
+                return redirect('home_page')
+       
+            elif (int(test_id) != tests[0].test_id):
 
-       #    return redirect('home_page')
-       #
-       #if (test_id != tests[0].test_id or test_password != tests[0].passwd):
+                wrong_test_id = True
 
-       #    
-       #    return redirect('home_page')
+            elif(test_password != tests[0].passwd):
 
-       #else:
+                wrong_password = True 
 
-       #    #real test ID in database
-       #    test_id = tests[0].id 
-       #    running_test = Tests.objects.get(id=test_id)
-       #    
-       #    #time limit not reached
-       #    if (running_test.is_active):
 
-       #        running_test.student_set.create(
+            else:
 
-        #            first_name = first_name, 
-        #            family_name = family_name, 
-        #            group = group, 
-        #            test_content = content,
-        #            email = email,
-        #        )
+                #real test ID in database
+                test_id = tests[0].id 
+                running_test = Tests.objects.get(id=test_id)
 
-        #        running_test.save()
+                running_test.student_set.create(
+                 
+                     first_name = first_name, 
+                     family_name = family_name, 
+                     group = group, 
+                     test_content = content,
+                     email = email,
+                     )
 
-        #    return redirect('home_page')
-    return render(request, 'home.html')
+                running_test.save()
+
+                return redirect('home_page')
+
+        return render(request, 'home.html', locals())
 
 
 def admin_login(request):
@@ -89,7 +103,6 @@ def create_test(request):
         duration = request.POST['test-duration']
         passwd = request.POST['test-passwd']
 
-        print(f'=========== test_id type: {type(test_id)}')
         #check if there is not another test with the same id
         found = False 
         all_tests = Tests.objects.all()
@@ -109,12 +122,13 @@ def create_test(request):
                 duration=duration, 
                 passwd=passwd
                 )
-
+        
             new_test.save()
 
-        return redirect('dashboard')
+            return redirect('dashboard')
 
     return render(request, 'crtest.html', locals())
+
 @login_required
 def logout_view(request):
 

@@ -13,6 +13,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!--Styling the logout button since i can't override the main css file-->
+    <style>
+        #logout-btn {
+          border: none; 
+          outline: none;
+          color: rgba(255, 255, 255, 0.6);
+          background: transparent;
+        }
+    </style>
   </head>
   <body>
 		
@@ -42,12 +52,21 @@
             <a href="{% url 'create_test' %}"><span class="fa fa-paper-plane mr-3"></span> Create Test</a>
           </li>
           
+          <li>
+            <form class="logout" action="" method="POST">
+              
+              {% csrf_token %}
+              <a href="#"><button id="logout-btn" type="submit"><span class="fa fa-sign-out mr-3"></span>Logout</button></a>
+            </form>
+          </li>
+          
         </ul>
 
     	</nav>
 
         <!-- Page Content  -->
       <div id="content" class="p-4 p-md-5 pt-5">
+        
         <h2 class="mb-4">Welcome admin</h2>
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
