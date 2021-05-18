@@ -160,26 +160,8 @@
                        
 
                 }
-                else if(regexPYs.test(val)===true)
-                {
-                   
-                   let physicalAddresse=parseInt(val,16);
-                   let num=physicalAddresse;
-                   let i=0;
-                   while(num>=0x144)
-                   {
-                        num-=0x144;
-                      
-                        i++;
-                   }
-                  
-                   goToSubSeg(i);
-                   if(num<=0x13f)
-                   table_ram.scrollTop=num*41;
-                   else table_ram.scrollTop=0x13f*41;
-                    
-                }
-                else alert("Please enter a hexadecimal value");
+                
+                else alert("Please enter a hexadecimal value (follow the form xxxx:xxxx)");
                
             }
        }
@@ -426,14 +408,16 @@
   }
   )
 //run button
+var step=1;
 function runHandler()
 {
-  if(compiled)
-  {
-   
-     
-      if( !((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)))
+console.log(p.register.readReg(IP_REG),p.register.readReg(SP_REG))
+      do
+      {
         singleStepHandler();
+        console.log("exec step "+step++)
+      }while( (p.register.readReg(IP_REG)!=0) && (p.register.readReg(SP_REG)!=0)&& (step<100))
+       
 
         if(((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)))
         {
@@ -443,8 +427,8 @@ function runHandler()
         
        
     
-    compiled=false;
-  }
+   
+ 
 }
 //reload button
   let reload_btn=document.getElementById('reload_btn');
@@ -463,6 +447,32 @@ function runHandler()
      p.register.writeReg(SP_REG,0xfffe);
      p.RAM._writeWord((p.register.readReg(SS_REG)<<4)+p.register.readReg(SP_REG),0Xfffe);
      ctx.fillRect(0,0,p.width,p.height);
+     //
+     var txtAreaBox=document.getElementById("code");
+  
+     
+      //
+     var k=0;
+     while(!compileRes.finalView[k].executableLine) k++;
+     p.register.writeReg(IP_REG,compileRes.finalView[k].instructionAddr);
+    
+     for(let i=0;i<compileRes.finalView.length;i++)
+     {
+     
+       if(compileRes.finalView[i].executableLine)
+       {
+        for(let j=0;j<compileRes.finalView[i].opcodes.length;j++)
+           {
+             p.RAM.writeByte(compileRes.finalView[i].instructionAddr+j,compileRes.finalView[i].opcodes[j]);
+           
+           }
+       }
+     }
+     deleteVars();
+     displayVars(compileRes);
+     compiled=true;
+     searchRam(p.register.readReg(IP_REG));
+     
     
   
   }
