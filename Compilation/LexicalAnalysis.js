@@ -451,7 +451,7 @@ class LexicalAnalysis{
             }
 
             else if ( !(op[0] == '"' || op[0] == "'") && 
-                    !this.legalName(op) && !this.isNumber(op) && Registers_Lexical.indexOf(op) == -1 ) 
+                    !this.legalName(op) && !this.isNumber(op) && Registers_Lexical.indexOf(op) == -1 && !this.isOffsetV(op)) 
             {
 
                 this.lexical.good = false;
@@ -464,8 +464,15 @@ class LexicalAnalysis{
                 this.lexical.operands[i].type = 'INT';
             else if ( this.legalName(op) )
                 this.lexical.operands[i].type = 'VAR';
-            else if ( Registers_Lexical.indexOf(op) != -1)
+            else if ( wordRegisters_Lexical.indexOf(op) != -1)
                 this.lexical.operands[i].type = 'RX';
+            else if ( byteRegisters_Lexical.indexOf(op) != -1)
+                this.lexical.operands[i].type = 'RL';
+            else if ( segmentRegisters_Lexical.indexOf(op) != -1)
+                this.lexical.operands[i].type = 'RS';
+            else if (this.isOffsetV(op)) {
+                this.lexical.operands[i].type = 'OFF';
+            }
 
 
 
