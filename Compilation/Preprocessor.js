@@ -1146,14 +1146,15 @@ class PreProcessor {
                         return 0;
                     }
 
-                    this.replaceOccMacro(this.lexicalView[i].operands, macroId);
+                    let table = this.replaceOccMacro(this.lexicalView[i].operands, macroId);
 
-                    for (var j = 0; j < this.macros[macroId].innerContent.length; j++) 
+                    for (var j = 0; j < table.length; j++) 
                     {
 
-                        let lineInMacro = this.macros[macroId].innerContent[j];
+                        let lineInMacro = table[j];
                         lineInMacro.index = line.index;
                         macroCode.push(lineInMacro);
+                        
                     }
                     
 
@@ -1180,12 +1181,12 @@ class PreProcessor {
 	//Remplacing the macro declaration and local labels
 	replaceOccMacro(operands, macroId)
 	{
-		let table = this.macros[macroId].innerContent,
+		let table = copyTable(this.macros[macroId].innerContent),
 			labelList = this.macros[macroId].localInstParameter,
 			parameterList = this.macros[macroId].op;//list of <operand objects>
         
         let macroName = this.macros[macroId].name;
-
+        console.log(table);
 		//remplacing local labels
 		for (var i = 0; i < labelList.length; i++) 
 		{
@@ -1240,7 +1241,7 @@ class PreProcessor {
                     //If the operand name correspond to the parameter name
 					if ( op.name.toUpperCase().trim() == parameterName.name.trim() ) 
 					{
-
+                        
                         table[j].operands[k].name = parameterValue.name.trim();
 						table[j].operands[k].type = parameterValue.type.trim();
 					}
@@ -1251,9 +1252,24 @@ class PreProcessor {
 			}
         }
 
-		
+		return table;
 	}
 
+}
+
+function copyTable(old_table) {
+    var table = [...old_table];
+    for (let i = 0; i < table.length; i++) {
+
+        table[i] = {...old_table[i]};
+        table[i].operands = [...old_table[i].operands];
+
+        for (let j = 0; j < old_table[i].operands.length; j++) 
+            table[i].operands[j] = {...old_table[i].operands[j]};
+        
+    }
+
+    return table;
 }
 
 
