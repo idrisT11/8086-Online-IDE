@@ -11,7 +11,11 @@ class Registers{
         for (let i = 0; i < 14; i++) 
             this.R[i] = 0;
     }
-
+    initReg()
+    {
+        for (let i = 0; i < 14; i++) 
+        this.R[i] = 0;
+    }
     readReg(registerId){
         
         return this.R[registerId];
@@ -144,23 +148,27 @@ class Registers{
             }
             else 
             {
-                this.writeWordReg(0,al>>8);//ah
-                this.writeByteReg(0,al%256);//al
+                this.writeReg(AX_REG,al);
+             
             }
         }
         else 
         {
             let val = this.readWordReg(registerId);
-            let ax = this.readWordReg(AX_REG);//ax
+            let ax = this.readReg(AX_REG);//ax
             ax*=val;
             if(ax>>16==0)
             {
-                this.writeWordReg(AX_REG,ax);
+                this.writeReg(AX_REG,ax);
             }
             else 
             {
-                this.writeWordReg(AX_REG,ax&0x0000ffff);
-                this.writeWordReg(DX_REG,ax&0xffff0000);
+               
+               
+                let dx=(((ax&0xffff0000)>>16)&0xffff);
+               // console.log(ax.toString(16),'   ',dx.toString(16))
+                this.writeReg(AX_REG,ax&0x0000ffff);
+                this.writeReg(DX_REG,dx);
             }
 
 
@@ -178,16 +186,16 @@ class Registers{
         {   
             let val = this.readByteReg(registerId);
             let al = this.readByteReg(0);//al
-            this.writeByteReg(0,Math.floor(val/al));//al
-            this.writeByteReg(0,math.floor(val%al));//ah
-            
+            this.writeReg(AX_REG,(Math.floor(val%al)<<8)+Math.floor(val/al));//ah  
+             
         }
         else 
         {
+           
             let val = this.readWordReg(registerId);
-            let ax = this.readWordReg(AX_REG);//ax
-            this.writeWordReg(AX,Math.floor(val/ax));
-            this.writeWordReg(DX,val%ax);
+            let ax = this.readReg(AX_REG);//ax'
+            this.writeReg(AX_REG,Math.floor(val/ax));
+            this.writeReg(DX_REG,val%ax);
           
 
 
@@ -196,38 +204,38 @@ class Registers{
     }
     extractFlag(flagName)
     {
-        let val=this.R[FLAG_REG];//123456789
+        let val=this.R[FLAG_REG]&0b111111111;//123456789
 
         switch(flagName)
         {
             case 'O':  
-                val=val>>11;
+                val=val>>8;
                 break;
 
             case 'D': 
-                val=val>>10%2;
+                val=(val>>7)%2;
                 break;
 
             case 'I':  
-                val=val>>9%2;
+                val=(val>>6)%2;
                 break;
 
             case 'T':  
-                val=val>>8%2;
+                val=(val>>5)%2;
                 break;
             case 'S':
-                val=val>>7%2;
+                val=(val>>4)%2;
                 break;
             case 'Z':
-                val=val>>6%2;
+                val=(val>>3)%2;
                 break;
             
             case 'A':
-                val=val>>4%2;
+                val=(val>>2)%2;
                 break;
             
             case 'P':
-                val=val>>2%2;
+                val=(val>>1)%2;
                 break;
             
             case 'C': //less significant bit
@@ -235,59 +243,64 @@ class Registers{
                 break;
           
         }
-       return val;
+       return val&0b111111111;
     }
     //
     setFlag(flagName,bit)
     {
-        let val=this.R[FLAG_REG];//123456789
+        let val=this.R[FLAG_REG]&0b111111111;//123456789
         switch(flagName)
         {
-            case 'C':  //most segnificant bit
-               if(bit) val|=0b100000000;
+            case 'O':  //most segnificant bit
+               if(bit==1) val|=0b100000000;
                else val &=0b011111111;
                 break;
 
-            case 'C':
-                if(bit) val|=0b010000000;
+            case 'D':
+                if(bit==1) val|=0b010000000;
                else val &=0b101111111;
                 break;
 
-            case 'C':
-                if(bit) val|=0b001000000;
+            case 'I':
+                if(bit==1) val|=0b001000000;
                 else val &=0b110111111;
                 break;
 
-            case 'C':
-                if(bit) val|=0b000100000;
+            case 'T':
+                if(bit==1) val|=0b000100000;
                 else val &=0b111011111;
                 break;
 
-            case 'C':
-                if(bit) val|=0b000010000;
+            case 'S':
+                if(bit==1) val|=0b000010000;
                 else val &=0b111101111;
                 break;
 
-            case 'C':
-                if(bit) val|=0b000001000;
+            case 'Z':
+                if(bit==1) val|=0b000001000;
                 else val &=0b111110111;
                 break;
 
-            case 'P':
-                if(bit) val|=0b000000100;
+            case 'A':
+                if(bit==1) val|=0b000000100;
                 else val &=0b111111011;
                 break;
+            
+            case 'P':
+                if(bit==1) val|=0b000000010;
+                  else val &=0b111111101;
+                  break;
 
             
 
             case 'C': //less significant bit
-            if(bit) val|=0b000000001;
+            if(bit==1) val|=0b000000001;
             else val &=0b111111110;
                 break;
 
           
         }
-       return val;
+       this.writeReg(FLAG_REG,val&0b111111111);
        
     }
         //

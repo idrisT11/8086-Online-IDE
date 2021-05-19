@@ -17,7 +17,6 @@ h1 {
 
 	width: 80%;
 	margin: 100px auto;
-	
 	display: flex; 
 	flex-direction: row;
 	justify-content: center; 
@@ -26,15 +25,15 @@ h1 {
 
 #main #sub-main-two {
 
-	margin-left: 30px
+	margin-left: 30px;
 }
 #main button {
 
 	position: relative;
-	left: 13%;
+	left: 10%;
 	top: 5px;
 	height: 35px;
-	width: 250px;
+	width: 180px;
 	border: none;
 	outline: none; 
 	background: #6c63ff;

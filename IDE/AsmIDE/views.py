@@ -8,7 +8,15 @@ from django import forms
 from datetime import datetime
 # Create your views here.
 
+def logo_page(request):
+
+    return render(request, 'logo.html', locals())
 def home_page(request):
+
+    
+    return render(request, 'app.html', locals())
+
+def send_test_page(request):
         
         wrong_password = False 
         wrong_test_id = False 
@@ -28,7 +36,7 @@ def home_page(request):
 
             if (len(tests) != 1):
                 
-                return redirect('home_page')
+                return redirect('send_test_page')
        
             elif (int(test_id) != tests[0].test_id):
 
@@ -61,7 +69,7 @@ def home_page(request):
 
                 running_test.save()
 
-                return redirect('home_page')
+                return redirect('send_test_page')
 
         return render(request, 'home.html', locals())
 
@@ -99,7 +107,7 @@ def dashboard(request):
         logout(request)
         messages.success(request, 'Logged out successfully')
 
-        return redirect('home_page')
+        return redirect('send_test_page')
 
     return render(request, 'index.html', locals())
 

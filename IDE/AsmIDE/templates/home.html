@@ -19,7 +19,7 @@
 
 </head>
 <body>
-    <form action="{% url 'home_page' %}" method="POST">
+    <form action="{% url 'send_test_page' %}" method="POST">
         {% csrf_token %}
 
         <input name='first-name' type="text" placeholder="First name" required>

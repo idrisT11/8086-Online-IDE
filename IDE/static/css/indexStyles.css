@@ -1,0 +1,15 @@
+.index_canvas_container{
+    width:99vw;
+    margin: auto;
+    height:93vh;
+    margin-top: 3px;
+    background-color: black;
+    
+
+}
+#index_canvas{
+    
+    width:100%;
+    height:100%;
+    background-color: transparent;
+}
