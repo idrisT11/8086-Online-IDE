@@ -1,4 +1,8 @@
-
+.mark{
+    background-color: rgba(253, 0, 0, 0.535);
+    
+    
+}
 .modal-header{
     height:7px;
     background-color: #212121;
