@@ -1,4 +1,10 @@
-
+    var modal_error = new bootstrap.Modal(document.getElementById('modal_error'), {
+      keyboard: false
+    })
+//
+var codeMirrorMarks = [];
+var  userText="";
+//
      var scrollTop=0;
      var scrollLeft=0;
      var segmentStart=0;
@@ -283,6 +289,7 @@
    
     if(code_compile_btn.innerHTML.trim()=="edit mode")
     {
+      codeMirror.setValue(userText);
       ram_container.style.display="none";
       canvas_console.style.display="none";
       codeMirror.options.readOnly = false;
@@ -310,9 +317,9 @@
     
      
       
-      var  textArea=codeMirror.getValue();
+      userText=codeMirror.getValue();
      
-       compileRes=Compiler.compile(textArea);
+       compileRes=Compiler.compile(userText);
        
       console.log(compileRes)
       
@@ -355,8 +362,33 @@
         deleteVars();
         displayVars(compileRes);
         compiled=true;
+        // setting the copiled code onto the text area
+        let tmpCode="";
+        for(let i=0;i<compileRes.finalView.length;i++)
+        {
+        
+          if(compileRes.finalView[i].executableLine)
+          {
+            tmpCode+=compileRes.finalView[i].resolvedLine+"\n";
+          }
+          codeMirror.setValue(tmpCode);
+        }
+
+        //
        }
-       else alert(compileRes.message+"at line: "+compileRes.errorLine+1);
+       else {
+       let tmp = codeMirror.markText({line:(compileRes.errorLine), ch:0},{line:(compileRes.errorLine), ch:50},{className:"mark"})
+        codeMirrorMarks.push(tmp);
+        setTimeout(()=>{
+         codeMirrorMarks.forEach((mark)=>{
+           mark.clear();
+         })
+        },10000)
+         var modal_error_text = document.getElementById("modal_error_text");
+         modal_error_text.innerHTML=compileRes.message+" at line: "+(compileRes.errorLine+1);
+         modal_error.show();
+        
+      };
   
       
      
@@ -1051,6 +1083,7 @@ function hide_comment(str) {//deletes comments from a string
 }
 function singleStepHandler()
 {
+  step_back_btn.disabled=false;
  
   t++;
   ramStatesManager[t]=[];
@@ -1064,19 +1097,13 @@ function singleStepHandler()
  
  
 }
+var step_back_btn = document.getElementById("step_back_btn");
 function stepBackHandler()
 {
   if(t<=0)
   {
-     p.initReg();
-    p.initRam();
-    t=0;
-     RegStatesManager=[];
-     ramStatesManager=[];
-     ramStatesManager[t]=[];
-     updateRegState();
-     p.cnsl.initCanvas();
-     ctx.fillRect(0,0,p.width,p.height);
+     
+     step_back_btn.disabled=true;
     
     return;
   }
@@ -1346,3 +1373,6 @@ let states_index_tr=document.getElementById("states_index_tr");
    
     })
   
+
+    //
+
