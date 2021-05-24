@@ -4,7 +4,12 @@
 //
 var codeMirrorMarks = [];
 var  userText="";
+var compiledCode = "";
+var highlightingInfoTable = [];
+var programStartAddr = 0;
+var firstTrue=0;
 //
+var table_ram=document.getElementsByClassName("scroll_it")[0];
      var scrollTop=0;
      var scrollLeft=0;
      var segmentStart=0;
@@ -57,7 +62,7 @@ var  userText="";
      
      //fixing the header
      var th=document.getElementById("table_header");
-     var table_ram=document.getElementsByClassName("scroll_it")[0];;
+    
      var scrolling= false;
      table_ram.addEventListener("scroll",
      function()
@@ -110,7 +115,7 @@ var  userText="";
      //search
        function searchRam(physicalAddresse)
        {
-     
+         console.log("search ram exec")
         let num=physicalAddresse;
         let i=0;
         while(num>=0x144)
@@ -346,6 +351,7 @@ var  userText="";
         var k=0;
         while(!compileRes.finalView[k].executableLine) k++;
         p.register.writeReg(IP_REG,compileRes.finalView[k].instructionAddr);
+        programStartAddr = compileRes.finalView[k].instructionAddr;
        
         for(let i=0;i<compileRes.finalView.length;i++)
         {
@@ -363,18 +369,55 @@ var  userText="";
         displayVars(compileRes);
         compiled=true;
         // setting the copiled code onto the text area
-        let tmpCode="";
+        
         for(let i=0;i<compileRes.finalView.length;i++)
         {
         
           if(compileRes.finalView[i].executableLine)
           {
-            tmpCode+=compileRes.finalView[i].resolvedLine+"\n";
+            compiledCode+=compileRes.finalView[i].resolvedLine+"\n";
           }
-          codeMirror.setValue(tmpCode);
+         
         }
 
+
         //
+        var cpt=0;
+        for(let i=0;i<compileRes.finalView.length;i++)
+        {
+        
+          if(compileRes.finalView[i].executableLine)
+          {
+            if(cpt==0){
+              firstTrue=i;
+            }
+      
+            highlightingInfoTable.push({index:i+firstTrue,addr:compileRes.finalView[i].instructionAddr,originalLine:compileRes.finalView[i].originalLine});
+            compiledCode+=compileRes.finalView[i].resolvedLine+"\n";
+            cpt++;
+          }
+         
+        }
+        //
+        searchRam(programStartAddr);
+        //
+        codeMirrorMarks.forEach((mark)=>{
+          mark.clear();
+        })
+        let line =0;
+        highlightingInfoTable.forEach((element)=>{
+          if(element.addr ==p.register.readReg(IP_REG))
+          {
+          
+           line = element.index;
+           console.log("///",element.addr ==p.register.readReg(IP_REG),line)
+          }
+        })
+        
+        
+        let tmp = codeMirror.markText({line:(line), ch:0},{line:(line), ch:50},{className:"mark_error"})
+        codeMirrorMarks.push(tmp);
+        
        }
        else {
        let tmp = codeMirror.markText({line:(compileRes.errorLine), ch:0},{line:(compileRes.errorLine), ch:50},{className:"mark"})
@@ -431,7 +474,7 @@ var  userText="";
       
     //  }
      updateStates();
-     searchRam(p.register.readReg(IP_REG));
+   
 
     }
 
@@ -439,6 +482,10 @@ var  userText="";
    
   }
   )
+//
+  
+
+//
 //run button
 var step=1;
 function runHandler()
@@ -503,7 +550,7 @@ console.log(p.register.readReg(IP_REG),p.register.readReg(SP_REG))
      deleteVars();
      displayVars(compileRes);
      compiled=true;
-     searchRam(p.register.readReg(IP_REG));
+   
      
     
   
@@ -1094,8 +1141,23 @@ function singleStepHandler()
   //for the states table
   updateStates();
   searchRam(p.register.readReg(IP_REG));
- 
- 
+
+  codeMirrorMarks.forEach((mark)=>{
+    mark.clear();
+  })
+  let line =0;
+  highlightingInfoTable.forEach((element)=>{
+    if(element.addr ==p.register.readReg(IP_REG))
+    {
+    
+     line = element.index;
+     console.log("///",element.addr ==p.register.readReg(IP_REG),line)
+    }
+  })
+  
+  
+  let tmp = codeMirror.markText({line:(line), ch:0},{line:(line), ch:50},{className:"mark_error"})
+  codeMirrorMarks.push(tmp);
 }
 var step_back_btn = document.getElementById("step_back_btn");
 function stepBackHandler()
@@ -1127,6 +1189,22 @@ function stepBackHandler()
   updateRegState();
  
   searchRam(p.register.readReg(IP_REG));
+  codeMirrorMarks.forEach((mark)=>{
+    mark.clear();
+  })
+  let line =0;
+  highlightingInfoTable.forEach((element)=>{
+    if(element.addr ==p.register.readReg(IP_REG))
+    {
+    
+     line = element.index;
+     console.log("///",element.addr ==p.register.readReg(IP_REG),line)
+    }
+  })
+  
+  
+  let tmp = codeMirror.markText({line:(line), ch:0},{line:(line), ch:50},{className:"mark_error"})
+  codeMirrorMarks.push(tmp);
 }
 function applyRegsStateAt(t1)
 {
