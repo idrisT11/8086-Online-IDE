@@ -69,6 +69,7 @@ class Compiler{
 
         return {
             status: true,
+            origin: newLexical.origineValue,
             message: '',
             errorLine: null,
             finalView: finalView,
@@ -106,6 +107,7 @@ class Compiler{
     static manageErrors(errorLine, message){
         return {
             status: false,
+            origin: null,
             message: message,
             errorLine: errorLine,
             finalView: null,
