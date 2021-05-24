@@ -1,7 +1,12 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 .mark{
     background-color: rgba(253, 0, 0, 0.535);
     
     
+}
+.mark_error{
+    background-color: rgba(201, 177, 40, 0.426);
+    /*rgba(201, 177, 40, 0.426)*/
 }
 .modal-header{
     height:7px;
