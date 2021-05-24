@@ -176,4 +176,7 @@ def display_student_submission(request, student_id):
 
     """ A view to display the submission of a given student """
 
-    pass 
+    student = Student.objects.get(id=student_id)
+
+    return render(request, 'submission.html', locals())
+

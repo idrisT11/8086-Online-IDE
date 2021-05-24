@@ -13,4 +13,5 @@ urlpatterns = [
     path('dashboard/create_test', views.create_test, name='create_test'),
     path('dashboard/alltests', views.display_tests, name='see_all_tests'),
     path('dashboard/tests/<int:test_id>', views.display_students, name='display_students'),
+    path('dashboard/studens/<int:student_id>', views.display_student_submission, name="view_submission"),
 ]

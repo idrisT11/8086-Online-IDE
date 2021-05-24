@@ -44,8 +44,6 @@ body {
 	padding: 10px 10px;
 }
 
-
-
 .tests-table .row {
 
 	display: flex;
@@ -88,9 +86,3 @@ body {
 
 }
 
-.switch-background th {
-
-	
-    /*width: 10%;
-    margin: auto;*/
-}

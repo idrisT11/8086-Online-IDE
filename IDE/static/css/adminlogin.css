@@ -7,8 +7,9 @@
 body {
 
     font-family: 'Poppins', sans-serif;
-    background: rgb(200,80,192);
-    background: linear-gradient(-135deg, rgba(200,80,192,1) 35%, rgba(65,88,208,1) 100%);
+    /*background: rgb(200,80,192);
+    background: linear-gradient(-135deg, rgba(200,80,192,1) 35%, rgba(65,88,208,1) 100%);*/ 
+    background: #34495e;
 }
 
 .main-container {

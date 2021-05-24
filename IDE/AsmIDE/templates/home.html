@@ -19,21 +19,24 @@
 
 </head>
 <body>
-    <form action="{% url 'send_test_page' %}" method="POST">
-        {% csrf_token %}
+    <div class="send-test">
+        <h1 class="text-center">Send Your Test</h1>
+        <form action="{% url 'send_test_page' %}" method="POST">
+            {% csrf_token %}
 
-        <input name='first-name' type="text" placeholder="First name" required>
-        <input name='family-name' type="text" placeholder="Family name" required>
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="group" type="number" placeholder="Group" required>
-        <input name="test-id" type="number" placeholder="Test Id" required>
-        <input name="test-passwd" type="password" placeholder="Test password" required>
+            <input name='first-name' type="text" placeholder="First name" required>
+            <input name='family-name' type="text" placeholder="Family name" required>
+            <input name="email" type="email" placeholder="Email" required>
+            <input name="group" type="number" placeholder="Group" required>
+            <input name="test-id" type="number" placeholder="Test Id" required>
+            <input name="test-passwd" type="password" placeholder="Test password" required>
 
 
-        <div id="asm-code" name="content"></div>
-        <input type="submit" value="submit"><br>
+            <input type="hidden" id="asm-code" name="content"></input>
+            <input type="submit" value="Send" id="login-btn">
 
-    </form> 
+        </form> 
+    </div>
 
     {% if wrong_test_id %}
         <script>alert('Wrong test id ');</script>
@@ -51,60 +54,8 @@
     <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/codemirror.js' %}"></script>
     <script src="{% static 'js/simple.js' %}"></script>
-    <script>
-        CodeMirror.defineSimpleMode('asm86',{
-            start:[
-            {regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string"},
-            {regex: /'(?:[^\\]|\\.)*?(?:'|$)/, token: "string"},
-                
-                {regex: /REP[\t\s]+(MOVS|CMPS|SCAS|LODS|STOS)(b|w)\b/i, token: 'builtin'}, //instrcution
-
-                {regex: /[\s\t]*(add|adc|inc|sub|sbb|dec|neg|cmp|mul|imul|div|idiv|cbw|cwd|not|mov|push|pop|xchg|pushf|popf|SHL|SAL|SHR|SAR|ROL|ROR|RCL|RCR|AND|OR|TEST|XOR|REP|(MOVS|CMPS|SCAS|LODS|STOS)(b|w)|CALL|JMP|RET|JE|JZ|JL|JNGE|JLE|JNG|JB|JNAE|JBE|JNA|JP|JPE|JO|JS|JNE|JNZ|JNL|JGE|JNLE|JG|JNB|JAE|JNBE|JA|JNP|JPO|JNO|JNS|LOOP|LOOPZ|LOOPE|LOOPNZ|LOOPNE|INT|CLC|CMC|STC|CLD|STD)\b/i, token: 'builtin', sol: true},                      //instrcution
-
-                
-
-                {regex: /[a-z][a-z0-9]*\s*\:/i, token: 'link', indent: true},    //label
-                {regex: /[\s\t]*(org|endp|endm|proc)\b/i, token: 'tag', sol: true},
-                {regex: /[\s\t]+(offset|macro|db|dw)\b/i, token: 'tag'},     //prep
-                {regex: /,(offset|macro|db|dw)\b/i, token: 'tag'},     //prep
-
-                {regex: /[\s\t]+(ax|bx|cx|dx|si|di|bp|sp)\b/i, token: 'def'},         //REG 16
-                {regex: /[\s\t]+(al|bl|cl|dl|ah|bh|ch|dh)\b/i, token: 'def'},  //REG  8
-                {regex: /[\s\t]+(cs|ds|es|ss)\b/i, token: 'property'},                //REG SEG
-
-                {regex: /,(ax|bx|cx|dx|si|di|bp|sp)\b/i, token: 'def'},         //REG 16
-                {regex: /,(al|bl|cl|dl|ah|bh|ch|dh)\b/i, token: 'def'},  //REG  8
-                {regex: /,(cs|ds|es|ss)\b/i, token: 'property'},                //REG SEG
-
-                {regex: /[\s\t]*(ax|bx|cx|dx|si|di|bp|sp)\b/i, token: 'def', sol:true},         //REG 16
-                {regex: /[\s\t]*(al|bl|cl|dl|ah|bh|ch|dh)\b/i, token: 'def', sol:true},  //REG  8
-                {regex: /[\s\t]*(cs|ds|es|ss)\b/i, token: 'property', sol:true},                //REG SEG
-                
-                {regex: /[-+\/*=<>![\]:]+/, token: "tag"},
-                {regex: /;.*/, token: "comment"},
-
-                {regex: /^(\s+|,|\b)(0x[0-9]+[0-9a-f]*h*|(0x)*[0-9]+[0-9a-f]*h|[0-9]+)\b/i, token: 'number'}   //NB
-            ],
-
-
-            meta: {
-                lineComment: ";"
-            }
-
-        });
-
-        var codeMirror = CodeMirror(document.getElementById('asm-code'), {
-          value: '\norg 0h \n\nret\n',
-          mode: 'asm86',
-          theme: 'monokai',
-          smartIndent: false,
-          lineNumbers: true,
-          indentWithTabs: true,
-
-          readOnly: false
-      });
-
-    </script>
+    
+    
     
 </body>
 </html>
