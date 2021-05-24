@@ -69,6 +69,7 @@ class Compiler{
 
         return {
             status: true,
+            origin: newLexical.origineValue,
             message: '',
             errorLine: null,
             finalView: finalView,
@@ -81,11 +82,9 @@ class Compiler{
             
             {
                 executableLine: boolean, //this shall be set to false for NULL instrcution
-
                 originalLine: str,
                 resolvedLine: str,
                 opcodes: int[],
-
                 instructionSize: int,
                 instructionAddr: int
             }
@@ -93,19 +92,18 @@ class Compiler{
             varArry => Array of variablesObject
             
             variablesObject = {
-
                 line : null,
                 size: null, 
                 varName: null, 
                 addr: 0,
             }
-
         */
     }
 
     static manageErrors(errorLine, message){
         return {
             status: false,
+            origin: null,
             message: message,
             errorLine: errorLine,
             finalView: null,
