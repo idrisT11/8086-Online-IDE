@@ -8,9 +8,10 @@
     <title>emu8086</title>
     <link rel="stylesheet" href="{% static 'css/codemirror.css' %}">
     <link rel="stylesheet" href="{% static 'css/monokai.css' %}">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/bs5/css/bootstrap.css' %}">
 
+   
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
    
 </head>
 
@@ -25,7 +26,7 @@
           <a class="navbar-brand" href="#">Vgath 8086</a>
           <ul class="navbar-nav me-auto mb-1 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
+              <a class="nav-link active" aria-current="page" href="{% url 'logo_page' %}">Home</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'home_page' %}">Emulator</a>
@@ -374,6 +375,22 @@
  </div>
  
  <!--modal_stack------------------------------------------------------------------------>
+<!--modal_error------------------------------------------------------------------------>
+ <div class="modal fade" id="modal_error" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Error</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modal_error_text">
+       
+      </div>
+    
+    </div>
+  </div>
+</div>
+ <!--modal_error------------------------------------------------------------------------>
  <!--scripts------------------------------------------------------------------------------------------------>
     <script src="{% static 'js/codemirror.js' %}"></script>
     <script src="{% static 'js/simple.js' %}"></script>
@@ -389,6 +406,7 @@
     <script src="{% static 'js/Compiler/Preprocessor.js' %}"> </script>
     <script src="{% static 'js/Compiler/SynthaxeAnalysis.js' %}"> </script>
     <script src="{% static 'js/Compiler/Compilater.js' %}"> </script>
+   
    
       
   
