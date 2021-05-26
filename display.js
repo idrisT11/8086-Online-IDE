@@ -5,7 +5,6 @@
       keyboard: false
     })
 //
-var stopExec = false;
 var intervalRun;
 var codeMirrorMarks = [];
 var  userText="";
