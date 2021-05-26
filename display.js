@@ -1,14 +1,56 @@
     var modal_error = new bootstrap.Modal(document.getElementById('modal_error'), {
       keyboard: false
     })
+    var modal_end_exec = new bootstrap.Modal(document.getElementById('modal_end_exec'), {
+      keyboard: false
+    })
 //
+var stopExec = false;
+var intervalRun;
 var codeMirrorMarks = [];
 var  userText="";
 var compiledCode = "";
 var highlightingInfoTable = [];
+var consoleStateManager =  [];
+
 var programStartAddr = 0;
 var firstTrue=0;
+//local storage management
+var userTextArray;
+var lastCodeIndex;
+if(localStorage.getItem("userTextArray"))
+{
+  userTextArray =JSON.parse(localStorage.getItem("userTextArray")) ;
+  lastCodeIndex = userTextArray.length-1;
+  codeMirror.setValue(userTextArray[lastCodeIndex]);
+
+}
+else 
+{
+  userTextArray = [];
+}
+window.addEventListener("keydown",(e)=>{
+
+  if(e.key=="MediaPlayPause")
+  {
+    lastCodeIndex+=(lastCodeIndex+1)%userTextArray.length;
+    codeMirror.setValue(userTextArray[lastCodeIndex]);
+    
+   
+  }
+  if(e.key=="MediaTrackPrevious")
+  {
+
+    lastCodeIndex=(lastCodeIndex-1)%userTextArray.length;
+    if(lastCodeIndex<0) lastCodeIndex = 0;
+    codeMirror.setValue(userTextArray[lastCodeIndex]);
+  }
+
+})
+
+
 //
+
 var table_ram=document.getElementsByClassName("scroll_it")[0];
      var scrollTop=0;
      var scrollLeft=0;
@@ -40,7 +82,7 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
      
      ramStatesManager[t]=[];
   
-     
+     consoleStateManager[t]={cursorRam:p.cnsl.cursorRam,cursor:p.cnsl.cursor};
     //
   setInterval(updateStack,1000);
 
@@ -115,7 +157,7 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
      //search
        function searchRam(physicalAddresse)
        {
-         console.log("search ram exec")
+       
         let num=physicalAddresse;
         let i=0;
         while(num>=0x144)
@@ -142,15 +184,11 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
             {
                 
                 let val=input.value;
-                let regex=/^([a-fA-F0-9]{4}):([a-fA-F0-9]{4}$)/;//segment:offset regex
-                let regexPYs=/([a-fA-F0-9])/;
-                if(regex.test(val)===true)
+                let inputRes=hex(val);
+                if(inputRes.value!=-1)
                 {
-                       let  index=val.search(/:/);
-                       let  segment=val.substring(0,index);
-                      
-                       let offset=val.substring(index+1,val.length);
-                       let physicalAddresse=(parseInt(segment,16)<<4)+parseInt(offset,16);
+                  
+                       let physicalAddresse=inputRes.value;
                        let num=physicalAddresse;
                        let i=0;
                        while(num>=0x144)
@@ -163,7 +201,7 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
                        if(num<=0x13f)
                        table_ram.scrollTop=num*41;
                        else table_ram.scrollTop=0x13f*41;
-                       //search(physicalAddresse);
+                   
                       
 
 
@@ -172,7 +210,7 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
 
                 }
                 
-                else alert("Please enter a hexadecimal value (follow the form xxxx:xxxx)");
+                else alert(inputRes.message);
                
             }
        }
@@ -319,10 +357,13 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
     if(code_compile_btn.innerHTML.trim()=="compile")
     {
     
-    
+      document.getElementById("run_btn").disabled = false;
      
       
       userText=codeMirror.getValue();
+      userTextArray.push(userText);
+      localStorage.setItem("userTextArray",JSON.stringify(userTextArray));
+      
      
        compileRes=Compiler.compile(userText);
        
@@ -369,17 +410,17 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
         displayVars(compileRes);
         compiled=true;
         // setting the copiled code onto the text area
+        compiledCode="";
         
         for(let i=0;i<compileRes.finalView.length;i++)
         {
         
-          if(compileRes.finalView[i].executableLine)
-          {
-            compiledCode+=compileRes.finalView[i].resolvedLine+"\n";
-          }
+         
+            compiledCode+=compileRes.finalView[i].originalLine+"\n";
+       
          
         }
-
+       codeMirror.setValue(compiledCode);
 
         //
         var cpt=0;
@@ -392,7 +433,7 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
               firstTrue=i;
             }
       
-            highlightingInfoTable.push({index:i+firstTrue,addr:compileRes.finalView[i].instructionAddr,originalLine:compileRes.finalView[i].originalLine});
+            highlightingInfoTable.push({index:i+firstTrue-1,addr:compileRes.finalView[i].instructionAddr,originalLine:compileRes.finalView[i].originalLine});
             compiledCode+=compileRes.finalView[i].resolvedLine+"\n";
             cpt++;
           }
@@ -410,7 +451,7 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
           {
           
            line = element.index;
-           console.log("///",element.addr ==p.register.readReg(IP_REG),line)
+          
           }
         })
         
@@ -488,32 +529,38 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
 //
 //run button
 var step=1;
+var modal_end_exec_text = document.getElementById("modal_end_exec_text");
 function runHandler()
 {
-console.log(p.register.readReg(IP_REG),p.register.readReg(SP_REG))
-      do
-      {
-        singleStepHandler();
-        console.log("exec step "+step++)
-      }while( (p.register.readReg(IP_REG)!=0) && (p.register.readReg(SP_REG)!=0)&& (step<100))
+   
+      intervalRun = setInterval(()=>{
        
-
-        if(((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)))
-        {
-          console.log("end of execution!");
-          alert("end of execution");
-        }
+      if(((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)&&(step<5000)))
+      {
+        
+        modal_end_exec_text.innerHTML="the execution ended succesfully";
+        modal_end_exec.show();
+        document.getElementById("run_btn").disabled = true;
+       clearInterval(intervalRun);
+       return;
+      }
+      singleStepHandler();
+      step++;
+     
+     },100)
+    
         
        
     
    
- 
+
 }
 //reload button
   let reload_btn=document.getElementById('reload_btn');
   reload_btn.addEventListener("click",
   function()
   {
+    document.getElementById("run_btn").disabled = false;
     p.initReg();
     p.initRam();
     t=0;
@@ -585,22 +632,31 @@ setInterval(()=>{
   flag_C.firstChild.data=p.register.extractFlag('C');
 },100)
 //animation fuction
+var consoleTxt="";
+
 function animate()
 {  
-        ctx.clearRect(0,0,p.width,p.height);
-        let j=0;
         
-        for(var i=0;i<p.cnsl.cursorRam &&j<p.cnsl.cursorRam  ;i+=2)
+        
+        ctx.clearRect(0,0,p.cnsl.width,p.cnsl.height);
+        let j=0;
+        consoleTxt="";
+        for(var i=0;((i<p.cnsl.cursorRam) &&(j<p.cnsl.cursor))  ;i+=2)
         {
-          
+          if((j>=p.cnsl.cursor) ||(i>=p.cnsl.cursorRam)) break;
+         
             let byte1=p.cnsl.ram.readByte((p.cnsl.videoMemorySegement<<4)+i);
             let byte2=p.cnsl.ram.readByte((p.cnsl.videoMemorySegement<<4)+i+1);
            
             p.cnsl._writeChar(j,String.fromCharCode(byte1),byte2%16,(byte2>>4)&0xff);
+            consoleTxt+=String.fromCharCode(byte1)+" ";
+           
            
 
             j++;
+          
         }
+        ctx.clearRect(0,0,p.width,p.height);
         
         if(p.cnsl.readMode)p.cnsl.updateCursor();
         
@@ -1130,6 +1186,7 @@ function hide_comment(str) {//deletes comments from a string
 }
 function singleStepHandler()
 {
+  consoleStateManager[t]={cursorRam:p.cnsl.cursorRam,cursor:p.cnsl.cursor};
   step_back_btn.disabled=false;
  
   t++;
@@ -1140,7 +1197,8 @@ function singleStepHandler()
   updateRegState();
   //for the states table
   updateStates();
-  searchRam(p.register.readReg(IP_REG));
+
+    searchRam(p.register.readReg(IP_REG));
 
   codeMirrorMarks.forEach((mark)=>{
     mark.clear();
@@ -1151,24 +1209,30 @@ function singleStepHandler()
     {
     
      line = element.index;
-     console.log("///",element.addr ==p.register.readReg(IP_REG),line)
+    
     }
   })
   
   
   let tmp = codeMirror.markText({line:(line), ch:0},{line:(line), ch:50},{className:"mark_error"})
   codeMirrorMarks.push(tmp);
+  
+  
 }
 var step_back_btn = document.getElementById("step_back_btn");
 function stepBackHandler()
 {
+  document.getElementById("run_btn").disabled = false;
   if(t<=0)
   {
      
      step_back_btn.disabled=true;
-    
+     t=0;
     return;
   }
+  p.cnsl.cursorRam=consoleStateManager[t-1].cursorRam;
+  p.cnsl.cursor=consoleStateManager[t-1].cursor;
+  
   deleteAfterStepBack();
   //ram handling
  
@@ -1183,6 +1247,7 @@ function stepBackHandler()
   //reg handling
  
   RegStatesManager.splice(t,1);
+  
   t--;
   applyRegsStateAt(t);
   RegStatesManager.splice(t,1);
@@ -1198,13 +1263,15 @@ function stepBackHandler()
     {
     
      line = element.index;
-     console.log("///",element.addr ==p.register.readReg(IP_REG),line)
+    
     }
   })
   
   
   let tmp = codeMirror.markText({line:(line), ch:0},{line:(line), ch:50},{className:"mark_error"})
   codeMirrorMarks.push(tmp);
+
+  
 }
 function applyRegsStateAt(t1)
 {
@@ -1228,18 +1295,86 @@ function applyRegsStateAt(t1)
   else console.log("ERROR:none valid state index");
 }
 //heighlight 
+var originalColors=[];
+ //
+ /*
+ updateReg('al','ah',AX_REG);
+ updateReg('bl','bh',BX_REG);
+ updateReg('cl','ch',CX_REG);
+ updateReg('dl','dh',DX_REG);
+ updateReg('cs_l','cs_h',CS_REG);
+ updateReg('ip_l','ip_h',IP_REG);
+ updateReg('ss_l','ss_h',SS_REG);
+ updateReg('sp_l','sp_h',SP_REG);
+ updateReg('bp_l','bp_h',BP_REG);
+ updateReg('si_l','si_h',SI_REG);
+ updateReg('di_l','di_h',DI_REG);
+ updateReg('ds_l','ds_h',DS_REG);
+ updateReg('es_l','es_h',ES_REG);
+ */
+
+ //
+ function highlightInit(id)
+ {
+  var element = document.getElementById(id)
+  var origcolor = element.style.backgroundColor,
+      origfontcolor = element.style.color;
+      originalColors.push({id:id,origcolor:origcolor,origfontcolor:origfontcolor});
+ }
+ highlightInit('al');
+ highlightInit('bl');
+ highlightInit('cl');
+ highlightInit('dl');
+ highlightInit('cs_l');
+ highlightInit('ip_l');
+ highlightInit('ss_l');
+ highlightInit('sp_l');
+ highlightInit('bp_l');
+ highlightInit('si_l');
+ highlightInit('di_l');
+ highlightInit('ds_l');
+ highlightInit('es_l');
+ //
+ highlightInit('ah');
+ highlightInit('bh');
+ highlightInit('ch');
+ highlightInit('dh');
+ highlightInit('cs_h');
+ highlightInit('ip_h');
+ highlightInit('ss_h');
+ highlightInit('sp_h');
+ highlightInit('bp_h');
+ highlightInit('si_h');
+ highlightInit('di_h');
+ highlightInit('ds_h');
+ highlightInit('es_h');
+ //
   function highlightFor(id,color,seconds){
     var element = document.getElementById(id)
     var origcolor = element.style.backgroundColor,
         origfontcolor = element.style.color;
 
+       
+
     element.style.backgroundColor = color;
     element.style.color = '#EEE';
-    var t = setTimeout(function(){
-       element.style.backgroundColor = origcolor;
-       element.style.color = origfontcolor;
-    },(seconds*1000));
+   
   }
+
+  function clearHighlighting()
+  {
+    originalColors.forEach((arrE)=>{
+      var element = document.getElementById(arrE.id);
+      element.style.backgroundColor = arrE.origcolor;
+      element.style.color = arrE.origfontcolor;
+     
+    })
+  
+  
+
+  }
+  setInterval(clearHighlighting,2000);
+ 
 
 //making the modal draggable
 
@@ -1261,6 +1396,7 @@ function applyRegsStateAt(t1)
       }, false);
   
   }, false);
+  
   
   object.addEventListener('touchstart', function(e) {
   
@@ -1316,7 +1452,7 @@ function displayVars()
       let cell3 = row.insertCell(3);
       let name=compileRes.varArray[i].varName;
       let size=compileRes.varArray[i].size;
-      console.log(size)
+    
       cell0.innerHTML=name;
       cell1.innerHTML=arr[i].addr;
       let ascii;
@@ -1349,7 +1485,7 @@ function displayVars()
     for(let i=0;i<trs.length;i++)
     {
       table.deleteRow(-1);
-      console.log("sss",i)
+    
     } 
  
    
@@ -1393,7 +1529,7 @@ let states_index_tr=document.getElementById("states_index_tr");
         let physicalAddresse=newVal.innerText;
        
         physicalAddresse=physicalAddresse.substring(1,physicalAddresse.length);
-        console.log(physicalAddresse)
+      
         physicalAddresse=parseInt(physicalAddresse,16);
        
       
@@ -1454,3 +1590,49 @@ let states_index_tr=document.getElementById("states_index_tr");
 
     //
 
+window.addEventListener("resize",()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+})
+
+window.addEventListener("keydown",(e)=>{
+  console.log(e.key)
+  if((e.key=" ")&&(intervalRun))
+  {
+    clearInterval(intervalRun);
+  }
+})
+
+function hex(string) {
+
+  let str = string.trim();
+
+  if (/^[a-f0-9]+$/i.test(str)) {
+
+      if ((parseInt(str, 16) >> 20) === 0)          
+          return { message: "", value: parseInt(str, 16) }
+      
+      else           
+          return  { message: "OUT OF BOUND", value: -1 }
+      
+  }
+  else if (/^[a-f0-9]+\s*\:\s*[a-f0-9]+$/i.test(str)) {
+     
+
+      let offset = str.match(/(?<=:\s*)[a-f0-9]+/i)[0];
+      let segment = str.match(/[a-f0-9]+(?=\s*\:)/i)[0];
+
+      if ((parseInt(offset, 16) >> 16) === 0 && (parseInt(segment, 16) >> 16) === 0) {
+
+          if (((parseInt(segment, 16) * 16 + parseInt(offset, 16)) >> 20) === 0)
+              return { message: "", value: (parseInt(segment, 16) * 16 + parseInt(offset, 16))}
+                  
+          else
+              return { message: "OUT OF BOUND", value: -1 }           
+      }
+      else
+             return { message: "OUT OF BOUND", value: -1 }          
+  }
+  else
+      return { message: "INVALID FORMAT", value: -1 }
+}
