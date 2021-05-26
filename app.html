@@ -139,9 +139,9 @@
            
             <div class="row-1 control_box">
               <button class="btn btn-success" id="reload_btn">reload</button>
-              <button class="btn btn-secondary" onclick="stepBackHandler()">step back</button>
+              <button class="btn btn-secondary" id="step_back_btn"onclick="stepBackHandler()">step back</button>
               <button class="btn btn-secondary" onClick="singleStepHandler()">single step</button>
-              <button class="btn btn-success"  onclick="runHandler()">run</button>
+              <button class="btn btn-success" id="run_btn" onclick="runHandler()">run</button>
            </div>
           <div class="row-1 search_box">
           <input  id="input_search" placeholder="0000:0000">
@@ -374,7 +374,7 @@
  </div>
  
  <!--modal_stack------------------------------------------------------------------------>
-<!--modal_error------------------------------------------------------------------------>
+ <!--modal_error------------------------------------------------------------------------>
  <div class="modal fade" id="modal_error" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -389,7 +389,23 @@
     </div>
   </div>
 </div>
- <!--modal_error------------------------------------------------------------------------>
+ <!--modal_end_exec------------------------------------------------------------------------>
+  <!--modal_end_exec------------------------------------------------------------------------>
+  <div class="modal fade" id="modal_end_exec" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">End of execution</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modal_end_exec_text">
+         
+        </div>
+      
+      </div>
+    </div>
+  </div>
+   <!--modal_end_exec------------------------------------------------------------------------>
  <!--scripts------------------------------------------------------------------------------------------------>
     <script src="codeMirror/codemirror.js"></script>
     <script src="codeMirror/simple.js"></script>
