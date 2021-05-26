@@ -3,6 +3,15 @@ var ctx=this.canvas.getContext("2d");
 var theKey;
 var enterPressed=false;
 var keyStored=false;
+//
+var scale = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
+canvas.width = Math.floor(canvas.width*1 );
+canvas.height = Math.floor(canvas.height * scale);
+
+// // Normalize coordinate system to use css pixels.
+ ctx.scale(1, scale);
+
+//
 async function waitEnter() 
   {
     console.log('waiting Enterkeypress..');
@@ -69,7 +78,7 @@ class ConsoleW{
             this.height=canvas.height;
             this.width=canvas.width;
             this.fontSize=10;
-            this.font=this.fontSize+"px Arial";
+            this.font=this.fontSize+"px Verdana";
             this.fg=15;
             this.bg=0;
             this.fontColor=COLOR_TABLE[this.fg];
@@ -89,6 +98,7 @@ class ConsoleW{
            
           
         }
+     
         initCanvas()
         {
            
@@ -100,6 +110,11 @@ class ConsoleW{
         }
         _writeChar(offset,char,fg=this.fg,bg=this.bg)
         {
+            if(offset>this.cursor)
+            {
+              console.log("Error:consoleW_writechar");
+              return; 
+            }
             ctx.beginPath();
             ctx.font = this.font;
             let w=Math.floor(this.width/10);
