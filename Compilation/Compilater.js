@@ -36,7 +36,7 @@ class Compiler{
 
         //----------------------------------------------------------------
         
-
+        
         let syntResult = new SyntaxAnalysis().analyse(newLexical);
         
         if (syntResult.good == false) 
