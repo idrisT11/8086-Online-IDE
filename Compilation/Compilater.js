@@ -69,7 +69,7 @@ class Compiler{
 
         return {
             status: true,
-            origin: newLexical.origineValue,
+            origin: newLexical.origin,
             message: '',
             errorLine: null,
             finalView: finalView,
