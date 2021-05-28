@@ -355,9 +355,10 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
     else
     if(code_compile_btn.innerHTML.trim()=="compile")
     {
-    
-      document.getElementById("run_btn").disabled = false;
      
+      document.getElementById("run_btn").disabled = false;
+    
+
       
       userText=codeMirror.getValue();
       userTextArray.push(userText);
@@ -366,11 +367,40 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
      
        compileRes=Compiler.compile(userText);
        
+       
       console.log(compileRes)
       
       
        if(compileRes.status)
        {
+        //compileCode
+     
+        p.initReg();
+        p.initRam();
+        t=0;
+         RegStatesManager=[];
+         ramStatesManager=[];
+         ramStatesManager[t]=[];
+         updateRegState();
+         p.cnsl.initCanvas();
+         p.register.writeReg(SS_REG,0x700);
+         p.register.writeReg(SP_REG,0xfffe);
+         p.RAM._writeWord((p.register.readReg(SS_REG)<<4)+p.register.readReg(SP_REG),0Xfffe);
+         ctx.fillRect(0,0,p.width,p.height);
+         //
+        
+      
+         
+          //
+    
+      
+         p.register.writeReg(IP_REG,compileRes.origin);
+         setTimeout(()=>{
+          searchRam(compileRes.origin)
+          console.log("...............",compileRes.origin)
+         },500)
+        
+ 
 
         var txtAreaBox=document.getElementById("code");
         txtAreaBox.style.display="none";
@@ -388,10 +418,10 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
     
         },300)
          //
-        var k=0;
-        while(!compileRes.finalView[k].executableLine) k++;
-        p.register.writeReg(IP_REG,compileRes.finalView[k].instructionAddr);
-        programStartAddr = compileRes.finalView[k].instructionAddr;
+       
+        
+         
+      
        
         for(let i=0;i<compileRes.finalView.length;i++)
         {
@@ -407,8 +437,8 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
         }
         deleteVars();
         displayVars(compileRes);
-        compiled=true;
-        // setting the copiled code onto the text area
+        compiled=true;        // setting the copiled code onto the text area
+
         compiledCode="";
         
         for(let i=0;i<compileRes.finalView.length;i++)
@@ -432,14 +462,14 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
               firstTrue=i;
             }
       
-            highlightingInfoTable.push({index:i+firstTrue-1,addr:compileRes.finalView[i].instructionAddr,originalLine:compileRes.finalView[i].originalLine});
+            highlightingInfoTable.push({index:i+firstTrue,addr:compileRes.finalView[i].instructionAddr,originalLine:compileRes.finalView[i].originalLine});
             compiledCode+=compileRes.finalView[i].resolvedLine+"\n";
             cpt++;
           }
          
         }
         //
-        searchRam(programStartAddr);
+       
         //
         codeMirrorMarks.forEach((mark)=>{
           mark.clear();
@@ -458,9 +488,11 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
         let tmp = codeMirror.markText({line:(line), ch:0},{line:(line), ch:50},{className:"mark_error"})
         codeMirrorMarks.push(tmp);
         
+        updateStates();
+        
        }
        else {
-       let tmp = codeMirror.markText({line:(compileRes.errorLine), ch:0},{line:(compileRes.errorLine), ch:50},{className:"mark"})
+       let tmp = codeMirror.markText({line:(compileRes.errorLine), ch:0},{line:(compileRes.errorLine), ch:50},{className:"mark",clearOnEnter:true})
         codeMirrorMarks.push(tmp);
         setTimeout(()=>{
          codeMirrorMarks.forEach((mark)=>{
@@ -474,46 +506,8 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
       };
   
       
+
      
-    //   //hidding the comments
-    //   text= textArea.value;
-      
-    //   let tmp=text.match(/[^\r\n]+/g);
-    //   text="";
-    //   for(let i=0;i<tmp.length;i++)
-    //   {
-    //     text+=hide_comment(tmp[i])+"\n";
-    //   }
-     
-     
-      
-     
-     
-    //    arrayOfLines = text.match(/[^\r\n]+/g);
-      
-    //    var k=0;
-      
-    //  for(let i=0;i<arrayOfLines.length;i++)
-    //  {
-    //    let opCodeLine=arrayOfLines[i];
-       
-    //    if(opCodeLine.length>3)
-    //    {
-    //      opCodeLine=toBcode(arrayOfLines[i]);
-    //      numInstructions++;
-          
-         
-    //    for(let j=0;j<opCodeLine.length;j++)
-    //    {
-    //      p.RAM.writeByte(k,opCodeLine[j]);
-    //      k++;
-    //    }
-         
-    //    }
-       
-      
-    //  }
-     updateStates();
    
 
     }
@@ -573,13 +567,14 @@ function runHandler()
      p.RAM._writeWord((p.register.readReg(SS_REG)<<4)+p.register.readReg(SP_REG),0Xfffe);
      ctx.fillRect(0,0,p.width,p.height);
      //
-     var txtAreaBox=document.getElementById("code");
+    
   
      
       //
-     var k=0;
-     while(!compileRes.finalView[k].executableLine) k++;
-     p.register.writeReg(IP_REG,compileRes.finalView[k].instructionAddr);
+
+  
+     p.register.writeReg(IP_REG,compileRes.origin);
+     searchRam(compileRes.origin)
     
      for(let i=0;i<compileRes.finalView.length;i++)
      {
@@ -597,7 +592,22 @@ function runHandler()
      displayVars(compileRes);
      compiled=true;
    
-     
+     codeMirrorMarks.forEach((mark)=>{
+      mark.clear();
+    })
+    let line =0;
+    highlightingInfoTable.forEach((element)=>{
+      if(element.addr ==p.register.readReg(IP_REG))
+      {
+      
+       line = element.index;
+      
+      }
+    })
+    
+    
+    let tmp = codeMirror.markText({line:(line), ch:0},{line:(line), ch:50},{className:"mark_error"})
+    codeMirrorMarks.push(tmp);
     
   
   }
@@ -1524,6 +1534,7 @@ let states_index_tr=document.getElementById("states_index_tr");
        
         let newVal=arr_td[i];
         arr_td[i].className="td_state";
+        arr_td[i].style.cursor="pointer";
         arr_td[i].addEventListener("click",()=>{
         let physicalAddresse=newVal.innerText;
        
@@ -1532,19 +1543,7 @@ let states_index_tr=document.getElementById("states_index_tr");
         physicalAddresse=parseInt(physicalAddresse,16);
        
       
-                       let num=physicalAddresse;
-                       let i=0;
-                       while(num>=0x144)
-                       {
-                            num-=0x144;
-                          
-                            i++;
-                       }
-                       goToSubSeg(i);
-                       if(num<=0x13f)
-                       table_ram.scrollTop=num*41;
-                       else table_ram.scrollTop=0x13f*41;
-                     //  closeOneModal("modal_states");
+                     searchRam(physicalAddresse);
 
       })
     }
@@ -1570,6 +1569,26 @@ let states_index_tr=document.getElementById("states_index_tr");
         let cell4=states_newVal_tr.deleteCell(-1);
        
       }
+    }
+    function deleteAllStates()
+    {
+      let states_addresse_tr=document.getElementById("states_addresse_tr");
+      let states_prevVal_tr=document.getElementById("states_prevVal_tr");
+      let states_newVal_tr=document.getElementById("states_newVal_tr");
+      let states_index_tr=document.getElementById("states_index_tr");
+      
+         for(let i=0;i<=t;i++)
+         {
+          for(let j=0;j<ramStatesManager[i].length;j++)
+          {
+            let cell1=states_index_tr.deleteCell(-1);
+            let cell2=states_addresse_tr.deleteCell(-1);
+            let cell3=states_prevVal_tr.deleteCell(-1);
+            let cell4=states_newVal_tr.deleteCell(-1);
+           
+          }
+         }
+          
     }
 
     window.addEventListener("keydown",(e)=>
