@@ -3097,7 +3097,7 @@ class Processor{
     decodeLoop(instruction)
     {            
 
-        var current_ip = this.register.readReg(IP_REG),
+         var current_ip = this.register.readReg(IP_REG),
             current_code_seg = this.register.readReg(CS_REG);
         
 
@@ -3105,9 +3105,10 @@ class Processor{
             {
                 
                 let cx_val = this.register.readReg(CX_REG);
-
+                this.register.writeReg(CX_REG, cx_val - 1);
+                cx_val--;
                 if (cx_val != 0) {
-                    this.register.writeReg(CX_REG, cx_val - 1);
+                    
 
                     let disp = this.RAM.readByte((current_code_seg<<4) + current_ip+1);
                     
@@ -3126,10 +3127,10 @@ class Processor{
             {
                 
                 let cx_val = this.register.readReg(CX_REG);
-
+                this.register.writeReg(CX_REG, cx_val - 1);
+                cx_val--;
                 if (cx_val != 0 || this.register.extractFlag('Z')==1) 
                 {
-                    this.register.writeReg(CX_REG, cx_val - 1);
 
                     let disp = this.RAM.readByte((current_code_seg<<4) + current_ip+1);
                 
@@ -3146,10 +3147,10 @@ class Processor{
             {
                 
                 let cx_val = this.register.readReg(CX_REG);
-
+                this.register.writeReg(CX_REG, cx_val - 1);
+                cx_val--;
                 if (cx_val != 0 || this.register.extractFlag('Z')==0) 
                 {
-                    this.register.writeReg(CX_REG, cx_val - 1);
 
                     let disp = this.RAM.readByte((current_code_seg<<4) + current_ip+1);
                 
