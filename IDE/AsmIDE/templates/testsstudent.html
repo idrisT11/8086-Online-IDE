@@ -38,7 +38,7 @@
 						<th> <p class="tobe-shifted text-center">{{ student.family_name }} </p></th>
 						<th> <p class="tobe-shifted text-center"> {{ student.group }} </p></th>
 						<th> <p class="tobe-shifted text-center"> {{ student.time_spent }} min </p></th>
-						<th> <p class="tobe-shifted text-center"> <a href="{% url 'view_submission' student.id %}">Submission</a></p></th>
+						<th> <p class="tobe-shifted text-center"> <a href="{% url 'view_submission' student.id %}" style="font-weight: 600;">Submission</a></p></th>
 
 					</tr>
 				{% endfor %}
