@@ -5,6 +5,8 @@
       keyboard: false
     })
 //
+var stepsLimit = 1000;
+var singleStepRunTime = 100;
 var intervalRun;
 var codeMirrorMarks = [];
 var  userText="";
@@ -12,7 +14,7 @@ var compiledCode = "";
 var highlightingInfoTable = [];
 var consoleStateManager =  [];
 
-var programStartAddr = 0;
+
 var firstTrue=0;
 //local storage management
 var userTextArray;
@@ -29,7 +31,7 @@ else
   userTextArray = [];
 }
 window.addEventListener("keydown",(e)=>{
-
+  console.log(e)
   if(e.key=="MediaPlayPause")
   {
     lastCodeIndex+=(lastCodeIndex+1)%userTextArray.length;
@@ -331,6 +333,7 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
    
     if(code_compile_btn.innerHTML.trim()=="edit mode")
     {
+      clearInterval(intervalRun);
       codeMirror.setValue(userText);
       ram_container.style.display="none";
       canvas_console.style.display="none";
@@ -462,7 +465,7 @@ var table_ram=document.getElementsByClassName("scroll_it")[0];
               firstTrue=i;
             }
       
-            highlightingInfoTable.push({index:i+firstTrue,addr:compileRes.finalView[i].instructionAddr,originalLine:compileRes.finalView[i].originalLine});
+            highlightingInfoTable.push({index:i,addr:compileRes.finalView[i].instructionAddr,originalLine:compileRes.finalView[i].originalLine});
             compiledCode+=compileRes.finalView[i].resolvedLine+"\n";
             cpt++;
           }
@@ -527,6 +530,14 @@ function runHandler()
 {
    
       intervalRun = setInterval(()=>{
+      if(step>stepsLimit)
+      {
+        modal_end_exec_text.innerHTML="Execution ended : an infinite loop has been detected:  ,"+step+" times";
+        modal_end_exec.show();
+        document.getElementById("run_btn").disabled = true;
+       clearInterval(intervalRun);
+       return;
+      }
        
       if(((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)&&(step<5000)))
       {
@@ -540,7 +551,7 @@ function runHandler()
       singleStepHandler();
       step++;
      
-     },100)
+     },singleStepRunTime)
     
         
        
@@ -553,6 +564,8 @@ function runHandler()
   reload_btn.addEventListener("click",
   function()
   {
+    step=0;
+   
     document.getElementById("run_btn").disabled = false;
     p.initReg();
     p.initRam();
