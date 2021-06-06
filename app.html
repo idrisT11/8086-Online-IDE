@@ -33,6 +33,9 @@
             <li class="nav-item">
               <a class="nav-link" href="#">Sending Tests</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"  data-bs-toggle="modal" data-bs-target="#modal_settings">settings</a>
+            </li>
             
           </ul>
          
@@ -390,6 +393,23 @@
   </div>
 </div>
  <!--modal_end_exec------------------------------------------------------------------------>
+ <!--modal_settings------------------------------------------------------------------------>
+ <div class="modal fade" id="modal_settings" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Error</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form onsubmit="settingsSubmitHandler">
+        <h3>Settings</h3>
+        <input placeholder="singleStepRun"/>
+      </form>
+    
+    </div>
+  </div>
+</div>
+ <!--modal_end_exec------------------------------------------------------------------------>
   <!--modal_end_exec------------------------------------------------------------------------>
   <div class="modal fade" id="modal_end_exec" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -399,7 +419,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="modal_end_exec_text">
-         
+settings
         </div>
       
       </div>
@@ -489,4 +509,3 @@
    
 </body>
 </html>
-
