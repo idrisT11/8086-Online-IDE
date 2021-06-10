@@ -539,7 +539,7 @@ function runHandler()
        return;
       }
        
-      if(((p.register.readReg(IP_REG)==0) && (p.register.readReg(SP_REG)==0)&&(step<5000)))
+      if(((p.register.readReg(IP_REG)==0xfffe) && (p.register.readReg(SP_REG)==0)))
       {
         
         modal_end_exec_text.innerHTML="the execution ended succesfully";
@@ -564,6 +564,7 @@ function runHandler()
   reload_btn.addEventListener("click",
   function()
   {
+    clearInterval(intervalRun);
     step=0;
    
     document.getElementById("run_btn").disabled = false;
@@ -1208,6 +1209,15 @@ function hide_comment(str) {//deletes comments from a string
 }
 function singleStepHandler()
 {
+  if(step>stepsLimit)
+  {
+    modal_end_exec_text.innerHTML="Execution ended : an infinite loop has been detected:  ,"+step+" times";
+    modal_end_exec.show();
+    document.getElementById("run_btn").disabled = true;
+ 
+   return;
+  }
+ 
   consoleStateManager[t]={cursorRam:p.cnsl.cursorRam,cursor:p.cnsl.cursor};
   step_back_btn.disabled=false;
  
@@ -1238,7 +1248,15 @@ function singleStepHandler()
   
   let tmp = codeMirror.markText({line:(line), ch:0},{line:(line), ch:50},{className:"mark_error"})
   codeMirrorMarks.push(tmp);
+  if(((p.register.readReg(IP_REG)==0xfffe) && (p.register.readReg(SP_REG)==0)))
+  {
+    
+    modal_end_exec_text.innerHTML="the execution ended succesfully";
+    modal_end_exec.show();
+    document.getElementById("run_btn").disabled = true;
   
+   return;
+  }
   
 }
 var step_back_btn = document.getElementById("step_back_btn");
