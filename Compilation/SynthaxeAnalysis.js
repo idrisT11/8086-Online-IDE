@@ -41,9 +41,9 @@ class SyntaxAnalysis {
     }
 
     excute(Obj) {
-        console.log("hh");
+        
         if(Obj.expressionType== "VAR" || Obj.instructionType == "prePropIns") return { message: null, good: true }
-        console.log("hh");
+       
         switch (Obj.instName) {
 
             case "MOV":
@@ -209,7 +209,7 @@ class SyntaxAnalysis {
 
                     switch (Obj.operands[0].type) {
 
-                        case "RX": case "RS": case "MW": case "MU": case "VAR16":
+                        case "RX": case "RS": case "MW": case "MU": case "VAR16": case "VARU":
 
                             return { message: null, good: true }
 
@@ -243,7 +243,7 @@ class SyntaxAnalysis {
 
 
 
-                        case "RX": case "RS": case "MW": case "MU": case "VAR16": case "LBL": case "OFF":
+                        case "RX": case "RS": case "MW": case "MU": case "VAR16": case "LBL": case "OFF":case "VARU":
 
 
 
@@ -401,7 +401,7 @@ class SyntaxAnalysis {
 
                     let comp = type1 + " " + type2;
 
-                    let exist = comp=="RX MU"||comp=="RX MB"||comp=="RX MW"||comp=="RX VAR8"||comp=="RX VAR16";
+                    let exist = comp=="RX MU"||comp=="RX MB"||comp=="RX MW"||comp=="RX VAR8"||comp=="RX VAR16"||comp=="RX VARU";
 
                     // deplacement sizecheck
 
@@ -567,7 +567,7 @@ class SyntaxAnalysis {
 
                         //the left operand should be (MU|RX|MB|MW|RL|VAR8|VAR16)
 
-                        if (/MU|RX|MB|MW|RL|VAR8|VAR16/.test(type1)) {
+                        if (/MU|RX|MB|MW|RL|VAR8|VAR16|VARU/.test(type1)) {
 
                             //deplacementcheck
 
@@ -633,7 +633,7 @@ class SyntaxAnalysis {
 
                         // that operand can be a memory or register(16 or 8)
 
-                        if (/M|RL|RX|VAR16|VAR8/.test(Obj.operands[0].type))
+                        if (/M|RL|RX|VAR16|VAR8|VARU/.test(Obj.operands[0].type))
 
                             return { message: null, good: true }
 
@@ -688,9 +688,9 @@ const opsCompinision = [
 
     ["RL RL", "RX RX"] 
 
-    ,["MU RX", "MU RL", "MB RL", "MW RX", "VAR8 RL", "VAR16 RX"] 
+    ,["MU RX", "MU RL", "MB RL", "MW RX", "VAR8 RL", "VAR16 RX","VARU RX","VARU RL"] 
 
-    ,["RX MU", "RL MU", "RL MB", "RX MW", "RL VAR8", "RX VAR16"] 
+    ,["RX MU", "RL MU", "RL MB", "RX MW", "RL VAR8", "RX VAR16","RX VARU","RL VARU"] 
 
     ,["RX OFF","MU OFF","MW OFF"] 
 
