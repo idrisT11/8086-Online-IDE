@@ -313,15 +313,18 @@ function toBcode(str) // original function to be class later
                 //********** */
             }
             else if (/I/.test(operands[1])){
+                
                 if (getS(operands[0],1))
                 {
                     arr.push(106);
-                    arr.push(operands[0]);
+                    arr.push(convert(operands[0]));
+                    
                 }
                 else
-                    arr.push(104);
-                    console.log(splitNum(convert(operands[0]),0));
+                {   arr.push(104);
+                    
                     arr=arr.concat(splitNum(convert(operands[0]),0));
+                }
                 
             }
             break;
