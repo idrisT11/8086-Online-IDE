@@ -1208,17 +1208,18 @@ class PreProcessor {
                     //On remplace
                     this.lexicalView.splice(i, 1, ...macroCode);
 
-                    //i += macroCode.length; //Pour passer la macro(eviter la recursiviter)
+                    i += macroCode.length; //Pour passer la macro(eviter la recursiviter)
                 }
 
             }  
-
+            
             nbParcours++;
         }
         if ( nbParcours >= 50 ) {
             this.message = 'ERROR : MACRO RECURTION DETECTED ';
             this.errorLine = null;
             this.good = false;
+            return 0;
         }
 
         return 1;
