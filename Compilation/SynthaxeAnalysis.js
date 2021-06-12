@@ -111,7 +111,7 @@ class SyntaxAnalysis {
 
                             //to know if the int fit in one or two byte we use gets
 
-                            let s = getS(Obj.operands[1].name, 0);
+                            let s = getS(Obj.operands[1].name, 1);
 
 
 
@@ -427,8 +427,8 @@ class SyntaxAnalysis {
                 if (Obj.operands.length==1){
                     if (Obj.operands[0].type=="INT")
                     {
-                        console.log(getS(Obj.operands[0].name) );
-                        if (this.range(Obj.operands[0].name) && getS(Obj.operands[0].name))
+                        
+                        if (this.range(Obj.operands[0].name) && getS(Obj.operands[0].name, 1))
                             return  { message: null, good: true }
                         else 
                             return  { message: "NUMBER OVERFLLOW", good: false };
@@ -503,7 +503,7 @@ class SyntaxAnalysis {
 
                                     return { message: "NUMBER OVERFLLOW", good: false };
 
-                                let s = getS(Obj.operands[1].name, 0);
+                                let s = getS(Obj.operands[1].name, 1);
 
                                 if (/RL|MB/.test(type1)) {
 
@@ -579,7 +579,7 @@ class SyntaxAnalysis {
 
                             //the right operand could be int in one byte  
 
-                            if (type2 == "INT" && this.range(Obj.operands[1].name) && getS(Obj.operands[1].name))
+                            if (type2 == "INT" && this.range(Obj.operands[1].name) && getS(Obj.operands[1].name, 1))
 
                                 return { message: null, good: true }
 
