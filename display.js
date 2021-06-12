@@ -1209,6 +1209,7 @@ function hide_comment(str) {//deletes comments from a string
 }
 function singleStepHandler()
 {
+  
   if(step>stepsLimit)
   {
     modal_end_exec_text.innerHTML="Execution ended : an infinite loop has been detected:  ,"+step+" times";
@@ -1223,6 +1224,7 @@ function singleStepHandler()
  
   t++;
   ramStatesManager[t]=[];
+  
   p.decode();
   
   
