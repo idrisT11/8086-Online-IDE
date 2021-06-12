@@ -416,6 +416,10 @@ class PreProcessor {
 
                     variablesObject.size = "WORD";
 
+                else if(/DU/.test(objectsArray[i].variableClass))
+
+                    variablesObject.size = "UNKNOWN";
+
                 this.variables.push(variablesObject);
                
             }
@@ -476,6 +480,9 @@ class PreProcessor {
 
                             else if (/WORD/.test(this.variables[k].size))
                                 objectsArray[i].operands[j].type = "VAR16";
+
+                            else if (/UNKNOWN/.test(this.variables[k].size))
+                                objectsArray[i].operands[j].type = "VARU";
 
                             break;
                             
@@ -1080,12 +1087,12 @@ class PreProcessor {
                         {
                             stringParameter.push({
                                 value: line.operands[j].name,
-                                variableName: '__VAR' + line.instName + j.toString(),
+                                variableName: '__VAR_' + line.instName + '__N°_' + j.toString(),
 
                             });
 
-                            this.lexicalView[i].operands[j].type = "VAR8";
-                            this.lexicalView[i].operands[j].name = '__VAR' + line.instName + j.toString();
+                            this.lexicalView[i].operands[j].type = "VARU";
+                            this.lexicalView[i].operands[j].name = '__VAR_' + line.instName + '__N°_'  + j.toString();
                         }
                     }
 
@@ -1105,7 +1112,7 @@ class PreProcessor {
                                 {name: '0', type: 'INT'}
                             ],
                             variableName: stringParameter[j].variableName,
-                            variableClass: 'DB',
+                            variableClass: 'DU',
 
                             index: line.index
                         });
@@ -1132,7 +1139,35 @@ class PreProcessor {
 
                             index: line.index
                         });
+
+                        //UN PEU DE DECO
+                        macroCode.unshift({
+                            label: ['___VARIABLE_MACRO'],
+                            expressionType: 'NULL',
+                            instructionType: null,
+                            instName: null,
+                            good: true,
+                            operands: [],
+                            variableName: null,
+                            variableType: null,
+
+                            index: line.index
+                        });
+
+                        
                     }
+                    macroCode.push({
+                        label: ['___MACRO_BEGINING'],
+                        expressionType: 'NULL',
+                        instructionType: null,
+                        instName: null,
+                        good: true,
+                        operands: [],
+                        variableName: null,
+                        variableType: null,
+
+                        index: line.index
+                    });
 
                     //------------------------------------------------------------
                     //------------------------------------------------------------
@@ -1157,6 +1192,18 @@ class PreProcessor {
                         
                     }
                     
+                    macroCode.push({
+                        label: ['___MACRO_END'],
+                        expressionType: 'NULL',
+                        instructionType: null,
+                        instName: null,
+                        good: true,
+                        operands: [],
+                        variableName: null,
+                        variableType: null,
+
+                        index: line.index
+                    });
 
                     //On remplace
                     this.lexicalView.splice(i, 1, ...macroCode);
