@@ -461,10 +461,10 @@ settings
 
                 
 
-                {regex: /[a-z][a-z0-9]*\s*\:/i, token: 'link', indent: true},    //label
+                {regex: /[a-z_][a-z0-9_°]*\s*\:/i, token: 'link', indent: true},    //label
                 {regex: /[\s\t]*(org|endp|endm|proc)\b/i, token: 'tag', sol: true},
-                {regex: /[\s\t]+(offset|macro|db|dw)\b/i, token: 'tag'},     //prep
-                {regex: /,(offset|macro|db|dw)\b/i, token: 'tag'},     //prep
+                {regex: /[\s\t]+(offset|macro|db|du|dw)\b/i, token: 'tag'},     //prep
+                {regex: /,(offset|macro|db|du|dw)\b/i, token: 'tag'},     //prep
 
                 {regex: /[\s\t]+(ax|bx|cx|dx|si|di|bp|sp)\b/i, token: 'def'},         //REG 16
                 {regex: /[\s\t]+(al|bl|cl|dl|ah|bh|ch|dh)\b/i, token: 'def'},  //REG  8
