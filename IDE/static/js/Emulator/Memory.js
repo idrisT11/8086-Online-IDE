@@ -25,7 +25,7 @@ class Memory{
 
     readWord(address){
         address = this.testAddress(address);
-
+        
         return  this._buffer[address] + (this._buffer[address+1] << 8);
     }
 

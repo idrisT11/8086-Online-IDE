@@ -276,7 +276,7 @@ class Linkage{
 
             let op = newLine.operands[i];
 
-            if ( op.type == 'VAR16' || op.type == 'VAR8' ) 
+            if ( op.type == 'VAR16' || op.type == 'VAR8' || op.type == "VARU") 
             {
                 
                 for (let j = 0; j < this.varArray.length; j++) 
@@ -285,9 +285,18 @@ class Linkage{
                     {
                         
                         //We form our number
-                        let avdu = (op.type == 'VAR16') ? ' word [' : ' byte [ ';
+                        let avdu = '';
+
+                        if ( op.type == 'VAR16' ) 
+                            avdu = 'word ';
+
+                        if ( op.type == 'VAR8' ) 
+                            avdu = 'byte ';
+
+                        avdu +=  '[';
+                        
                         newLine.operands[i].name = avdu + (this.varArray[j].addr& 0xFFFF).toString() + ' ]';  
-                        newLine.operands[i].type = (op.type == 'VAR8') ? 'MB' : 'MW';
+                        newLine.operands[i].type = (op.type == 'VARU') ? 'MU' : (op.type == 'VAR16') ? 'MW': 'MB';
                         
                         break;
                     }
@@ -442,7 +451,7 @@ class Linkage{
                 let numValue = parseInt(op.name);
                 
                 //If it's a one byte number
-                if (varType == 'DB') 
+                if (varType == 'DB' || varType == 'DU') 
                     byteArray.push(numValue);
 
                 //If it's a two bytes number
@@ -484,7 +493,7 @@ class Linkage{
         let strInst = '';
 
         //We Add the labels if requested
-
+        
         if (addLabels && line.label != null) 
         {
             if (chbaha && line.instName == 'PROC') 

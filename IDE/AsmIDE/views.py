@@ -98,7 +98,7 @@ def admin_login(request):
         
     return render(request, 'adminlogin.html', locals())
 
-@login_required
+#@login_required
 def dashboard(request):
 
     
@@ -112,7 +112,7 @@ def dashboard(request):
     return render(request, 'index.html', locals())
 
 
-@login_required 
+#@login_required 
 def create_test(request):
 
     if (request.method == "POST"):
@@ -149,7 +149,7 @@ def create_test(request):
 
     return render(request, 'crtest.html', locals())
 
-@login_required
+#@login_required
 def display_tests(request):
 
     """ A view to display all the tests passed so far"""
@@ -159,7 +159,7 @@ def display_tests(request):
     return render(request, 'alltests.html', locals())
 
 
-@login_required 
+#@login_required 
 def display_students(request, test_id):
 
     """ A view to dispaly the students who submitted a test given it test_id"""
@@ -170,8 +170,14 @@ def display_students(request, test_id):
 
     return render(request, 'testsstudent.html', locals())
 
+    
+#@login_required
+def display_live(request):
+    return render(request, 'live.html', locals())
 
-@login_required 
+
+
+#@login_required 
 def display_student_submission(request, student_id):
 
     """ A view to display the submission of a given student """
