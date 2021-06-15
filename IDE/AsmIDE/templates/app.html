@@ -96,13 +96,13 @@
           <a class="navbar-brand" href="#">Vgath 8086</a>
           <ul class="navbar-nav me-auto mb-1 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+              <a class="nav-link active" aria-current="page" href="{% url 'logo_page' %}">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="app.html">Emulator</a>
+              <a class="nav-link" href="{% url 'home_page' %}">Emulator</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Sending Tests</a>
+              <a class="nav-link" href="{% url 'send_test_page' %}">Sending Tests</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#"  data-bs-toggle="modal" data-bs-target="#modal_settings">settings</a>
