@@ -33,19 +33,14 @@ def send_test_page(request):
             
         #checking if there is only one running test
             tests = Tests.objects.all().filter(is_active=True)
-
-            if (len(tests) != 1):
-                
-                return redirect('send_test_page')
        
-            elif (int(test_id) != tests[0].test_id):
+            if (int(test_id) != tests[0].test_id):
 
                 wrong_test_id = True
 
             elif(test_password != tests[0].passwd):
 
                 wrong_password = True 
-
 
             else:
 
@@ -69,7 +64,7 @@ def send_test_page(request):
 
                 running_test.save()
 
-                return redirect('send_test_page')
+                
 
         return render(request, 'home.html', locals())
 
@@ -180,5 +175,6 @@ def display_student_submission(request, student_id):
 
     return render(request, 'submission.html', locals())
 
-
-
+@login_required
+def display_live(request):
+    return render(request, 'live.html', locals())

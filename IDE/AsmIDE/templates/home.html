@@ -22,6 +22,7 @@
     <div class="send-test">
         <h1 class="text-center">Send Your Test</h1>
         <form action="{% url 'send_test_page' %}" method="POST">
+
             {% csrf_token %}
 
             <input name='first-name' type="text" placeholder="First name" required>
