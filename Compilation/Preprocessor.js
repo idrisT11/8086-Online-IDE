@@ -1054,10 +1054,10 @@ class PreProcessor {
 		let nbParcours = 0,
             finAnalyse = false;
         
-        while( nbParcours < 50 && !finAnalyse )
+        while( (nbParcours < 50) && !finAnalyse )
         {
             finAnalyse = true;
-
+            console.log(nbParcours);
             for (var i = 0; i < this.lexicalView.length; i++) {
                 let line = this.lexicalView[i];
 
@@ -1180,7 +1180,7 @@ class PreProcessor {
 
                         return 0;
                     }
-
+                    
                     let table = this.replaceOccMacro(this.lexicalView[i].operands, macroId);
 
                     for (var j = 0; j < table.length; j++) 
@@ -1208,18 +1208,17 @@ class PreProcessor {
                     //On remplace
                     this.lexicalView.splice(i, 1, ...macroCode);
 
-                    i += macroCode.length; //Pour passer la macro(eviter la recursiviter)
+                    //i += macroCode.length; //Pour passer la macro(eviter la recursiviter)
                 }
 
             }  
-            
+
             nbParcours++;
         }
         if ( nbParcours >= 50 ) {
             this.message = 'ERROR : MACRO RECURTION DETECTED ';
             this.errorLine = null;
             this.good = false;
-            return 0;
         }
 
         return 1;
