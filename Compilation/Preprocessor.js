@@ -69,12 +69,14 @@ class PreProcessor {
 
         this.getVariables(this.lexicalView);
 
+        console.log(this.lexicalView, this.variables);
+
         if(this.manageVariables(this.lexicalView) == -1)
             return this.generatePrepoError();
-
+        
         if (this.verifyVarDeclaration(this.lexicalView) == -1 )
             return this.generatePrepoError();
-
+        
         if (this.verifyOrigin(this.lexicalView) == -1) 
             return this.generatePrepoError();
 	    
@@ -461,16 +463,16 @@ class PreProcessor {
 
         // looking for a specific variable in variables array
         for(var i = 0; i < objectsArray.length; i++) {
-
+            console.log(objectsArray[i]);
             for (var j = 0; j < objectsArray[i].operands.length; j++) {
-
+                console.log(objectsArray[i].operands[j].type);
 
                 if (/VAR/.test(objectsArray[i].operands[j].type)) {
-
+                   
                     found = false;
 
                     for (var k = 0; k < this.variables.length; k++) {
-
+                        console.log(this.variables[k].varName.toUpperCase() , objectsArray[i].operands[j].name.toUpperCase());
                         if (this.variables[k].varName.toUpperCase() == objectsArray[i].operands[j].name.toUpperCase()) {
 
                             found = true; 
@@ -510,7 +512,7 @@ class PreProcessor {
                 }
 
                 else if (/OFF/.test(objectsArray[i].operands[j].type)) {
-
+                    
                     let opsVars = objectsArray[i].operands[j].name.split(" "); 
                     if (!this._checkVariable(opsVars[1].trim().toUpperCase())) {
 
@@ -1293,7 +1295,10 @@ class PreProcessor {
 						table[j].operands[k].type = parameterValue.type.trim();
 					}
 
-						
+                    if (op.name.trim().split(" ")[1] != undefined && op.name.trim().split(" ")[1].toUpperCase() == parameterName.name.trim())
+                    {
+                        table[j].operands[k].name = "offset " + parameterValue.name.trim();
+                    }
 
 				}
 			}
