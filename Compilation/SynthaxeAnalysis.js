@@ -115,7 +115,7 @@ class SyntaxAnalysis {
 
 
 
-                            if (/RL|MB/.test(type1)) {
+                            if (/RL|MB|VAR8|VARU/.test(type1)) {
 
                                 //s==1 means one byte    
 
@@ -131,7 +131,7 @@ class SyntaxAnalysis {
 
                             }
 
-                            if (/MU|RX|MW/.test(type1))
+                            if (/RX|MW|VAR16|VARU/.test(type1))
 
 
 
@@ -505,7 +505,7 @@ class SyntaxAnalysis {
 
                                 let s = getS(Obj.operands[1].name, 1);
 
-                                if (/RL|MB/.test(type1)) {
+                                if (/RL|MB|VAR8|VARU/.test(type1)) {
 
                                     if (s == 1)
 
@@ -517,7 +517,7 @@ class SyntaxAnalysis {
 
                                 }
 
-                                if (/MU|RX|MW/.test(type1))
+                                if (/RX|MW|VAR16|VARU/.test(type1))
 
                                     return { message: null, good: true }
 
@@ -529,7 +529,7 @@ class SyntaxAnalysis {
 
 
 
-                                if (/RX|MW|MU/.test(type1))
+                                if (/RX|MW|MU|VAR16/.test(type1))
 
                                     return { message: null, good: true }
 
