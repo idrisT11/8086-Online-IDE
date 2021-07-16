@@ -9,18 +9,19 @@ const segmentRegisters = ['CS', 'DS', 'ES', 'SS'];
 
 const Registers = ['DI', 'SI', 'SP', 'BP', 'IP'];
 */
+
 const arithmetic = ["ADD", "ADC", "SUB", "SSB", "CMP", "AND", "TEST", "OR", "XOR"];
 
 const oneops = ["INC", "DEC", "MUL", "DIV", "IDIV", "IMUL", "NEG", "NOT"];
 
 const noops = ["RET","MOVSB", "CMPSB", "SCASB", "LODSB", "STOSB", "MOVSW", "CMPSW", "SAHF", "SCASW", "LODSW", "STOSW", "CBW", "CLC", "CLD", "CLI", "CMC", "STC", "STD", "STI", "CWD", "HLT", "LAHF", "PUSHF", "POPF"];
 
-const labels = ["JE", "JC", "JNC", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE", "JBE", "JNA", "JP", "JPE", "JO", "JS", "JNE", "JNZ", "JNL", "JGE", "JNLE", "JG", "JNB", "JAE", "JNBE", "JA", "JNP", "JPO", "JNO", "JNS", "LOOP", "LOOPZ", "LOOPE", "LOOPNZ", "LOOPNE", "JCXZ"];
+const labels = ["JC", "JE", "JC", "JNC", "JZ", "JL", "JNGE", "JLE", "JNG", "JB", "JNAE", "JBE", "JNA", "JP", "JPE", "JO", "JS", "JNE", "JNZ", "JNL", "JGE", "JNLE", "JG", "JNB", "JAE", "JNBE", "JA", "JNP", "JPO", "JNO", "JNS", "LOOP", "LOOPZ", "LOOPE", "LOOPNZ", "LOOPNE", "JCXZ"];
 
 const shift = ["SHL", "SAL", "SHR", "SAR", "ROL", "ROR", "RCL", "RCR"];
 
 class SyntaxAnalysis {
-       analyse(arr) {
+    analyse(arr) {
         let temp={ good: true, message: ''}, index;
 
         for (index = 0; index < arr.length; index++) 
@@ -136,10 +137,20 @@ class SyntaxAnalysis {
 
 
                                 return { message: null, good: true }
-
+                                
+                            
                             /*
+                                if the first parameter is of "unkown memory size" 
+                                and the second is an INT, We are in an ambiguous case
+                            */
+                            if (/MU/.test(type1))
 
-                            in this else the left operand dosen't accept INT ex:(RS,INT,LBL) 
+
+                                return { message: "Ambiguous paremeters, please precise the memory size", good: false }
+                            
+                                /*
+
+                            in this else the left operand doesn't accept INT ex:(RS,INT,LBL) 
 
                             as a left operand     */
 
@@ -521,6 +532,15 @@ class SyntaxAnalysis {
 
                                     return { message: null, good: true }
 
+                                 /*
+                                if the first parameter is of "unkown memory size" 
+                                and the second is an INT, We are in an ambiguous case
+                                */
+                                if (/MU/.test(type1))
+
+                                    return { message: "Ambiguous paremeters, please precise the memory size", good: false }
+                            
+
                                 else return { message: "Wrong Operands", good: false }
 
                             }
@@ -556,7 +576,7 @@ class SyntaxAnalysis {
                 }
 
                 if (shift.includes(Obj.instName)) {
-
+                    
                     //like mov shift accepts more than 2 operands but without any effect 
 
                     if (Obj.operands.length > 1) {
@@ -566,9 +586,16 @@ class SyntaxAnalysis {
                         let type2 = Obj.operands[1].type;
 
                         //the left operand should be (MU|RX|MB|MW|RL|VAR8|VAR16)
+                        
+                        if (/RX|MB|MW|RL|VAR8|VAR16|VARU/.test(type1)) {
 
-                        if (/MU|RX|MB|MW|RL|VAR8|VAR16|VARU/.test(type1)) {
+                            // the register CL     
+                            
+                            if (type2 == "RL" && Obj.operands[1].name == "CL")
 
+                                return { message: null, good: true }
+
+                            console.log(Obj.operands[1].name);
                             //deplacementcheck
 
                            
@@ -583,15 +610,16 @@ class SyntaxAnalysis {
 
                                 return { message: null, good: true }
 
-                            // or the register CL     
-
-                            if (type2 == "RL" && Obj.operands[1].name == "CL")
-
-                                return { message: null, good: true }
+                            
 
                         } // if not return false
 
-                        return { message: "Illegal Paremeters", good: false }
+                        else if (/MU/.test(type1)) 
+
+                            return{ message: "Ambiguous paremeters, please precise the memory size", good: false }
+                        
+                        else
+                            return { message: "Illegal Paremeters", good: false }
 
                     }
 
@@ -633,12 +661,15 @@ class SyntaxAnalysis {
 
                         // that operand can be a memory or register(16 or 8)
 
-                        if (/M|RL|RX|VAR16|VAR8|VARU/.test(Obj.operands[0].type))
+                        if (/MB|MW|RL|RX|VAR16|VAR8|VARU/.test(Obj.operands[0].type))
 
                             return { message: null, good: true }
 
                         // if not return false
 
+                        if (/MU/.test(Obj.operands[0].type))
+                            return { message: "Ambiguous paremeters, please precise the memory size", good: false }
+                            
                         else
 
                             return { message: "Illegal Paremeters", good: false };

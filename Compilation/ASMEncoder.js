@@ -363,7 +363,7 @@ function toBcode(str) // original function to be class later
             arr.push(0b10011100);
             break;
         case "POPF":
-            arr.push(0b10011100);
+            arr.push(0b10011101);
             break;
         case "ADD":
 
@@ -581,6 +581,13 @@ function toBcode(str) // original function to be class later
         case "NOT":
             arr.push(0b11110110 + w);
             arr.push((mode << 6) + (0b010000) + regmem);
+            if (/M/.test(operands[1])) {
+                arr = byteConcat(str, arr);
+            }
+            break;
+        case "NEG":
+            arr.push(0b11110110 + w);
+            arr.push((mode << 6) + (0b011000) + regmem);
             if (/M/.test(operands[1])) {
                 arr = byteConcat(str, arr);
             }
@@ -968,7 +975,7 @@ function toBcode(str) // original function to be class later
             arr.push(0b01111110);
             arr.push(convert(operands[0]));
             break;
-        case "JB": case "JNAE":
+        case "JB": case "JNAE": case "JC":
             arr.push(0b01110010);
             arr.push(convert(operands[0]));
             break;

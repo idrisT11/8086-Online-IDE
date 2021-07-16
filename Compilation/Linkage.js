@@ -1,7 +1,7 @@
 //NOTE A FAIRE
 //GERER DB ET DW
 
-const FLOW_INSTRUCTION = ['JMP', 'CALL', 'JE', 'JNE', 'JZ', 'JL', 'JNGE', 'JLE', 'JNG', 'JB', 'JNAE', 'JBE', 'JNA', 'JP', 'JPE', 'JP', 'JS', 'JNZ', 'JGE', 'JNLE', 'JNL', 'JG', 'JNB', 'JAE', 'JNBE', 'JA', 'JNP', 'JPO', 'JNO', 'JNS', 'LOOP', 'LOOPZ', 'LOOPE', 'LOOPNZ', 'LOOPNE']
+const FLOW_INSTRUCTION = ['JMP', 'CALL', 'JC','JE', 'JNE', 'JZ', 'JL', 'JNGE', 'JLE', 'JNG', 'JB', 'JNAE', 'JBE', 'JNA', 'JP', 'JPE', 'JP', 'JS', 'JNZ', 'JGE', 'JNLE', 'JNL', 'JG', 'JNB', 'JAE', 'JNBE', 'JA', 'JNP', 'JPO', 'JNO', 'JNS', 'LOOP', 'LOOPZ', 'LOOPE', 'LOOPNZ', 'LOOPNE']
 const LONG_FLOW = ['JMP', 'CALL']
 
 class Linkage{

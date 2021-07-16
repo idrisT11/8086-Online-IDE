@@ -2,7 +2,7 @@ const wordRegisters_Lexical = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', '
 const byteRegisters_Lexical = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH'];
 const segmentRegisters_Lexical = ['CS', 'DS', 'ES', 'SS'];
 const Registers_Lexical = ['AX', 'BX', 'CX', 'DX', 'CS', 'DS', 'ES', 'SS', 'DI', 'SI', 'SP', 'BP', 'IP', 'AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DL', 'DH', 'CS', 'DS', 'ES', 'SS'];
-const instructions=["JNE", "INT","JE","JE","JZ","JL","JNGE","JLE","JNG","JB","JNAE","JBE","JNA","JP","JPE","JO","JS","JNE","JNZ","JNL","JGE","JNLE","JG","JNB","JAE","JNBE","JA","JNP","JPO","JNO","JNS","LOOP","LOOPZ","LOOPE","LOOPNZ","LOOPNE","INT","CLC","CMC","STC","CLD","STD", "ENDM","JMP","CLC","RET","EQU","DEFINE","ORG","ENDP","MOV","PUSH", "POP", "XCHG","LEA","LAHF","SAHF","PUSHF","POPF" ,"ADD","ADC","DEC" ,"INC","AAA","SUB","SSB" ,"NEG" ,"CMP" ,"MUL","IMUL","DIV","IDIV","CBW","CWD","NOT","SHL","SAL","SHR", "SAR","ROL","ROR", "RCL","RCR","AND","TEST","OR","XOR","REP","MOVSB", "CMPSB", "SCASB","LODSB","STOSB","MOVSW", "CMPSW", "SCASW","LODSW","STOSW","CALL"]
+const instructions=["JC" ,"JNE", "INT","JE","JE","JZ","JL","JNGE","JLE","JNG","JB","JNAE","JBE","JNA","JP","JPE","JO","JS","JNE","JNZ","JNL","JGE","JNLE","JG","JNB","JAE","JNBE","JA","JNP","JPO","JNO","JNS","LOOP","LOOPZ","LOOPE","LOOPNZ","LOOPNE","INT","CLC","CMC","STC","CLD","STD", "ENDM","JMP","CLC","RET","EQU","DEFINE","ORG","ENDP","MOV","PUSH", "POP", "XCHG","LEA","LAHF","SAHF","PUSHF","POPF" ,"ADD","ADC","DEC" ,"INC","AAA","SUB","SSB" ,"NEG" ,"CMP" ,"MUL","IMUL","DIV","IDIV","CBW","CWD","NOT","SHL","SAL","SHR", "SAR","ROL","ROR", "RCL","RCR","AND","TEST","OR","XOR","REP","MOVSB", "CMPSB", "SCASB","LODSB","STOSB","MOVSW", "CMPSW", "SCASW","LODSW","STOSW","CALL"]
 const keywords=["MACRO","PROC"] ;
 const BracketRegister = ['BX', 'BP', 'SI', 'DI'];
 const preProIns = ["ORG", "DEFINE", "EQU", "PROC", "LOCAL", "ENDM", "ENDP", "OFFSET"];
@@ -46,7 +46,7 @@ class LexicalAnalysis{
         for (let index = 0; index < tab.length; index++) 
         {
             
-            const element = this.hide_comment(tab[index]);
+            const element = this.getRideOfTab( this.hide_comment(tab[index]) );
             
             temp = this.execute(element);
             temp.index = index;
@@ -202,18 +202,18 @@ class LexicalAnalysis{
  return arr;
  }
 
- spl(str){
-            str=str.trim();
+    spl(str){
+        str=str.trim();
            
-            str=str.replace(/(?<=DUP\s*\([a-z0-9,\s]*),(?=[a-z0-9,\s]*\))/ig,"verreplacementinsup")
-         let   ops=this.rpl(str);
+        str=str.replace(/(?<=DUP\s*\([a-z0-9,\s]*),(?=[a-z0-9,\s]*\))/ig,"verreplacementinsup")
+        let ops=this.rpl(str);
 
          
         for (let index = 0; index < ops.length; index++) {
             ops[index]=ops[index].replace(/verreplacementinsup/g,",");
         } 
- return ops;
- }
+        return ops;
+    }
  
  testVarOperands(strt) {
      
@@ -227,21 +227,24 @@ class LexicalAnalysis{
            this.lexical.message="ERROR : Wrong varibale value";
            return false;
          }
-         else if (/^"/.test(element)||/^'/.test(element)){
-             if (/(^").*("$)/.test(element)||/(^').*('$)/.test(element))
-                 this.lexical.operands.push({name:element,type:"String"})
-             else{ 
-                  console.log("ERROR :  mismatched or misplaced quotes"); 
-                 this.lexical.message="ERROR : mismatched or misplaced quotes";
-                 this.lexical.good=false;
-                 return ;
-             }
+         else if (/^"/.test(element)||/^'/.test(element))
+         {
+            if (/(^").*("$)/.test(element)||/(^').*('$)/.test(element))
+
+                this.lexical.operands.push({name:element.trim().toUpperCase(),type:"String"})
+            else
+            { 
+                console.log("ERROR :  mismatched or misplaced quotes"); 
+                this.lexical.message="ERROR : mismatched or misplaced quotes";
+                this.lexical.good=false;
+                return ;
+            }
          }
-         else if (this.isNumber(element)){
-             this.lexical.operands.push({name:element,type:"INT"})
+        else if (this.isNumber(element)){
+            this.lexical.operands.push({name:element.trim().toUpperCase(),type:"INT"})
          
 
-         }
+        }
          else if (this.dupTest(element)){
              this.dupcheck(element);
            
@@ -643,7 +646,7 @@ class LexicalAnalysis{
             for (let i = 0; i < operands.length; i++)
             {
                 if (this.verifyOps(operands[i])) 
-                    this.lexical.operands.push((this.opsType(operands[i])==="OFF")?{name:operands[i].trim(),type:this.opsType(operands[i])}:{name:operands[i].replace(/\s/g, "").replace(/word(?=[edcs]s)/i,"word ").replace(/byte(?=[edcs]s)/i,"byte "),type:this.opsType(operands[i])});
+                    this.lexical.operands.push((this.opsType(operands[i])==="OFF")?{name:operands[i].trim().toUpperCase(),type:this.opsType(operands[i])}:{name:operands[i].replace(/\s/g, "").replace(/word(?=[edcs]s)/i,"word ").replace(/byte(?=[edcs]s)/i,"byte ").trim().toUpperCase(),type:this.opsType(operands[i])});
                 
                 else
                     return false;
@@ -744,6 +747,12 @@ class LexicalAnalysis{
        
         return str.substring(0, i);
     
+    }
+
+    getRideOfTab(str){
+        str.replace(/\t/g, '    ');
+
+        return str;
     }
 
 }
