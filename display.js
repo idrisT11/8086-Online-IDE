@@ -9,7 +9,7 @@ var stepsLimit = 1000;
 var singleStepRunTime = 100;
 var intervalRun;
 var codeMirrorMarks = [];
-var  userText="";
+var userText="";
 var compiledCode = "";
 var highlightingInfoTable = [];
 var consoleStateManager =  [];
@@ -19,17 +19,18 @@ var firstTrue=0;
 //local storage management
 var userTextArray;
 var lastCodeIndex;
+
 if(localStorage.getItem("userTextArray"))
 {
   userTextArray =JSON.parse(localStorage.getItem("userTextArray")) ;
   lastCodeIndex = userTextArray.length-1;
   codeMirror.setValue(userTextArray[lastCodeIndex]);
-
 }
 else 
 {
   userTextArray = [];
 }
+/*
 window.addEventListener("keydown",(e)=>{
   console.log(e)
   if(e.key=="MediaPlayPause")
@@ -48,11 +49,11 @@ window.addEventListener("keydown",(e)=>{
   }
 
 })
-
+*/
 
 //
 
-var table_ram=document.getElementsByClassName("scroll_it")[0];
+var table_ram = document.getElementsByClassName("scroll_it")[0];
      var scrollTop=0;
      var scrollLeft=0;
      var segmentStart=0;

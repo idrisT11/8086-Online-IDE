@@ -430,7 +430,7 @@ settings
     <script src="codeMirror/codemirror.js"></script>
     <script src="codeMirror/simple.js"></script>
     <script src="bs5/js/bootstrap.js"></script>
-    <script src="ConsoleW.js"></script>
+    <script src="./Emulator/ConsoleW.js"></script>
     <script src="./Emulator/OPCODES.js"></script>
     <script src="./Emulator/Memory.js"></script>
     <script src="./Emulator/Registers.js"></script>
@@ -457,7 +457,9 @@ settings
                 
                 {regex: /REP[\t\s]+(MOVS|CMPS|SCAS|LODS|STOS)(b|w)\b/i, token: 'builtin'}, //instrcution
 
-                {regex: /[\s\t]*(add|adc|inc|sub|sbb|dec|neg|cmp|mul|imul|div|idiv|cbw|cwd|not|mov|push|pop|xchg|pushf|popf|SHL|SAL|SHR|SAR|ROL|ROR|RCL|RCR|AND|OR|TEST|XOR|REP|(MOVS|CMPS|SCAS|LODS|STOS)(b|w)|CALL|JMP|RET|JE|JZ|JL|JNGE|JLE|JNG|JB|JNAE|JBE|JNA|JP|JPE|JO|JS|JNE|JNZ|JNL|JGE|JNLE|JG|JNB|JAE|JNBE|JA|JNP|JPO|JNO|JNS|LOOP|LOOPZ|LOOPE|LOOPNZ|LOOPNE|INT|CLC|CMC|STC|CLD|STD)\b/i, token: 'builtin', sol: true},                      //instrcution
+                {regex: /[\s\t]*(jc|lea|add|adc|inc|sub|sbb|dec|neg|cmp|mul|imul|div|idiv|cbw|cwd|not|mov|push|pop|xchg|pushf|popf|SHL|SAL|SHR|SAR|ROL|ROR|RCL|RCR|AND|OR|TEST|XOR|REP|(MOVS|CMPS|SCAS|LODS|STOS)(b|w)|CALL|JMP|RET|JE|JZ|JL|JNGE|JLE|JNG|JB|JNAE|JBE|JNA|JP|JPE|JO|JS|JNE|JNZ|JNL|JGE|JNLE|JG|JNB|JAE|JNBE|JA|JNP|JPO|JNO|JNS|LOOP|LOOPZ|LOOPE|LOOPNZ|LOOPNE|INT|CLC|CMC|STC|CLD|STD)\b/i, token: 'builtin', sol: true},                      //instrcution
+                
+                {regex: /(byte|word)/i, token: 'property'},    //byte word
 
                 
 
@@ -481,7 +483,7 @@ settings
                 {regex: /[-+\/*=<>![\]:]+/, token: "tag"},
                 {regex: /;.*/, token: "comment"},
 
-                {regex: /^(\s+|,|\b)(0x[0-9]+[0-9a-f]*h*|(0x)*[0-9]+[0-9a-f]*h|[0-9]+)\b/i, token: 'number'}   //NB
+                {regex: /^(\s+|,|\b)(0x[0-9a-f]*h*|(0x)*[0-9]+[0-9a-f]*h|[0-9]+)\b/i, token: 'number'}   //NB
             ],
 
 
@@ -509,3 +511,79 @@ settings
    
 </body>
 </html>
+
+<!--
+Code par defaut:
+
+org 0h 
+	
+	push 10
+	push offset result
+	
+	call decToHex
+	add sp, 4
+	
+	printByteNum offset result
+	
+ret
+
+
+num db "64", 0
+result db 20 DUP(48)
+
+proc decToHex
+	push bp
+	mov bp, sp
+	
+	mov di, ss:[bp+4]
+	mov bx, ss:[bp+6]
+	
+	
+	lp:
+		mov ax, 2
+		div bx
+		cmp dx, 0
+		je push_zero
+		
+		mov [di], '1'
+		jmp ctn
+		push_zero:
+			mov [di], '0'
+			
+		ctn:
+		inc di
+		
+		shr bx, 1
+		cmp bx, 0
+		jne lp
+	
+	mov sp, bp
+	pop bp
+	
+	ret
+endp
+					
+printByteNum macro numAdr
+	local lp
+	mov ah, 2
+	mov dl, '0'
+	int 21h
+	mov dl, 'b'
+	int 21h
+		
+	mov di, numAdr
+	add di, 7
+
+	lp:
+		mov dl, [di]
+		int 21h
+		dec di
+		
+		cmp di, numAdr
+		jne lp
+	
+	mov dl, [di]
+	int 21h
+endm
+
+-->
