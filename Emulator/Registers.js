@@ -133,15 +133,18 @@ class Registers{
         //multiplication 
     mulReg(registerId,type)
     {
+        //HEUU IMUL
         if(type==SEGMENT_REGISTER )
         {
-            console.log("Error:multiplication by a segment register is not allowed");
+            console.error("Error:multiplication by a segment register is not allowed");
         }
         else if(type==BYTE_REGISTER)
         {   
             let val = this.readByteReg(registerId);
             let al = this.readByteReg(0);//al
+
             al*=val;
+
             if(al>>8==0)
             {
                 this.writeByteReg(0,al);
