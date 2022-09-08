@@ -3057,7 +3057,7 @@ class Processor{
                 
                 this.RAM.writeWord(effictiveAdress1, this.RAM.readWord(effictiveAdress2));
         
-                if(this.register.extractFlag('D'))
+                if(!this.register.extractFlag('D'))
                 {
                     this.register.writeReg(DI_REG, offset1 + 2);
                     this.register.writeReg(SI_REG, offset2 + 2);
@@ -3115,7 +3115,7 @@ class Processor{
     
                 this.register.writeReg(AX_REG,data);
     
-                if(this.register.extractFlag('D'))
+                if(!this.register.extractFlag('D'))
                     this.register.writeReg(SI_REG, offset1 + 2);
                 else
                     this.register.writeReg(SI_REG, offset1 - 2);
@@ -3129,7 +3129,7 @@ class Processor{
     
                 this.register.writeByteReg(AX_REG,data);
     
-                if(this.register.extractFlag('D'))
+                if(!this.register.extractFlag('D'))
                     this.register.writeReg(SI_REG, offset1 + 1);
 
                 else
@@ -3157,7 +3157,7 @@ class Processor{
     
                 this.RAM.writeWord((segment1 << 4) + offset1,this.register.readReg(AX_REG));
     
-                if(this.register.extractFlag('D'))
+                if(!this.register.extractFlag('D'))
                     this.register.writeReg(DI_REG, offset1 + 2);
 
                 else
@@ -3170,7 +3170,7 @@ class Processor{
 
                 this.RAM.writeByte((segment1 << 4) + offset1, this.register.readByteReg(AX_REG));
     
-                if(this.register.extractFlag('D'))
+                if(!this.register.extractFlag('D'))
                     this.register.writeReg(DI_REG, offset1 + 1);
                 else
                     this.register.writeReg(DI_REG, offset1 - 1);
