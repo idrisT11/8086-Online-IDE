@@ -215,7 +215,7 @@ class Processor{
         var currentStackSegment = this.register.readReg(SS_REG),
             currentStackPointer = this.register.readReg(SP_REG);
           
-        var    adressStack = (currentStackSegment << 4) + currentStackPointer;
+        var adressStack = (currentStackSegment << 4) + currentStackPointer;
     
             if((instruction & 0b11111111) == POP_REG_MEM) 
             {  
@@ -3233,7 +3233,7 @@ class Processor{
     }
 
     decodeDEC(instruction) {
-              var currentIp = this.register.readReg(IP_REG),
+        var currentIp = this.register.readReg(IP_REG),
             currentCodeSegment = this.register.readReg(CS_REG);
 
         var value = (currentCodeSegment << 4) + currentIp;
@@ -3247,22 +3247,39 @@ class Processor{
                 if (operandes.addr != null)
                 {
                 
-                    if (instruction % 2) 
+                    if (instruction % 2) {
                         this.RAM.writeWord(operandes.addr, this.RAM.readWord(operandes.addr)-1);
+                        this.generateFlag(this.RAM.readWord(operandes.addr)-1, operandes.addr, this.RAM.readWord(operandes.addr), 1);
 
-                    else  
+                    }
+
+                    else {
                         this.RAM.writeByte(operandes.addr, this.RAM.readByte(operandes.addr)-1);
+                        this.generateFlag(this.RAM.readByte(operandes.addr)-1, operandes.addr, this.RAM.readByte(operandes.addr), 0);
+
+                    }
+
                 }
 
                 else
                 {
                     let reg = operandes.opRegister[1];
 
-                    if (instruction % 2) 
-                        this.register.writeWordReg(reg, this.register.readWordReg(reg)-1);
+                    if (instruction % 2) {
+                        const valA = this.register.readWordReg(reg);
 
-                    else  
-                        this.register.writeByteReg(reg, this.register.readByteReg(reg)-1);
+                        this.register.writeWordReg(reg, valA-1);
+                        this.generateFlag(valA-1, valA, valA, 1);
+
+                    }
+
+                    else  {
+                        const valA = this.register.readByteReg(reg);
+
+                        this.register.writeByteReg(reg, valA-1);
+                        this.generateFlag(valA-1, operandes.addr, valA, 0);
+
+                    }
                 
                 }
             
