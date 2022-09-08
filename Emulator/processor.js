@@ -3336,7 +3336,7 @@ class Processor{
     
         if((instruction & 0xFF) == 0b11111101){
      
-            this.register.setFlag('D', 0);
+            this.register.setFlag('D', 1);
             
             this.register.incIP(1);
     
