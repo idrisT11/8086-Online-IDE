@@ -115,7 +115,7 @@ class Processor{
         }
         else if(!this.pause && this.decodeXCHG(instruction)===0)
         {
-            console.log("decode test has been executed!");
+            console.log("decode xchg has been executed!");
         }
         else if(!this.pause && this.decodeImmARIT(instruction)===0)
         {
@@ -152,6 +152,9 @@ class Processor{
         else if(!this.pause && this.decodeJmpCall(instruction)===0)
         {
             console.log("decodeJmpCall has been executed!");
+        }
+        else if (!this.pause && this.decodeRep(instruction) ===0) {
+            console.log("decodeRep has been executed!");
         }
         else if (!this.pause && this.decodeMOVS(instruction) ===0) {
            console.log("decodeMOVS has been executed!");
@@ -3122,11 +3125,39 @@ class Processor{
     //================================================================================
     //YANIS_MAN
     //================================================================================
+    decodeRep(instruction) {
+        if ( (instruction & 0b11111110) == REP_INS ) {
+            
+            let current_ip=this.register.readReg(IP_REG);
+            let current_code_segement=this.register.readReg(CS_REG);
+            let next_instruction = this.RAM.readByte(current_ip + (current_code_segement << 4) + 1)
+
+            if (this.register.readReg(CX_REG) == 0) {
+                this.register.incIP(2);
+                return 0;
+            }
+
+            if (this.decodeMOVS(next_instruction, true) == 0) {
+                console.log('rep movs');
+            }
+            else if (this.decodeLODS(next_instruction, true) == 0) {
+                console.log('rep lods');
+            }
+            else if (this.decodeSTOS(next_instruction, true) == 0) {
+                console.log('rep stos');
+            }
+            else {
+                console.error('REP error');
+            }
+
+            this.register.writeReg(CX_REG, this.register.readReg(CX_REG) - 1);
+
+            return 0;
+        }
+        return 1;
+    }
+
     decodeMOVS(instruction, given = false){
-   
-        if(given == true)
-            value += 1
-   
 
         if((instruction & 0b11111110) == MOVS_INS)
         {
@@ -3142,7 +3173,6 @@ class Processor{
             if (instruction % 2)
             {
        
-               
                 this.RAM.writeWord(effictiveAdress1, this.RAM.readWord(effictiveAdress2));
        
                 if(!this.register.extractFlag('D'))
@@ -3177,8 +3207,9 @@ class Processor{
        
             }
 
+            if (!given)
+                this.register.incIP(1);
 
-            this.register.incIP(1);
             return 0;
 
         }
@@ -3290,22 +3321,33 @@ class Processor{
                 if (operandes.addr != null)
                 {
                
-                    if (instruction % 2)
+                    if (instruction % 2) {
                         this.RAM.writeWord(operandes.addr, this.RAM.readWord(operandes.addr)+1);
+                        this.generateFlag(this.RAM.readWord(operandes.addr)+1, 0x0001, this.RAM.readWord(operandes.addr), 1);
 
-                    else  
+                    }
+
+                    else  {
                         this.RAM.writeByte(operandes.addr, this.RAM.readByte(operandes.addr)+1);
+                        this.generateFlag(this.RAM.readByte(operandes.addr)+1, 0x0001, this.RAM.readByte(operandes.addr), 0);
+                    }
                 }
 
                 else
                 {
                     let reg = operandes.opRegister[1];
 
-                    if (instruction % 2)
+                    if (instruction % 2) {
                         this.register.writeWordReg(reg, this.register.readWordReg(reg)+1);
+                        this.generateFlag(this.register.readWordReg(reg)+1, 0x0001, this.register.readWordReg(reg), 1);
 
-                    else  
+                    }
+
+                    else  {
                         this.register.writeByteReg(reg, this.register.readByteReg(reg)+1);
+                        this.generateFlag(this.register.readByteReg(reg)+1, 0x0001, this.register.readByteReg(reg), 0);
+
+                    }
                
                 }
            
@@ -3337,13 +3379,13 @@ class Processor{
                
                     if (instruction % 2) {
                         this.RAM.writeWord(operandes.addr, this.RAM.readWord(operandes.addr)-1);
-                        this.generateFlag(this.RAM.readWord(operandes.addr)-1, operandes.addr, this.RAM.readWord(operandes.addr), 1);
+                        this.generateFlag(this.RAM.readWord(operandes.addr)-1, 0x0001, this.RAM.readWord(operandes.addr), 1);
 
                     }
 
                     else {
                         this.RAM.writeByte(operandes.addr, this.RAM.readByte(operandes.addr)-1);
-                        this.generateFlag(this.RAM.readByte(operandes.addr)-1, operandes.addr, this.RAM.readByte(operandes.addr), 0);
+                        this.generateFlag(this.RAM.readByte(operandes.addr)-1, 0x0001, this.RAM.readByte(operandes.addr), 0);
 
                     }
 
@@ -3357,7 +3399,7 @@ class Processor{
                         const valA = this.register.readWordReg(reg);
 
                         this.register.writeWordReg(reg, valA-1);
-                        this.generateFlag(valA-1, valA, valA, 1);
+                        this.generateFlag(valA-1, 0x0001, valA, 1);
 
                     }
 
@@ -3365,7 +3407,7 @@ class Processor{
                         const valA = this.register.readByteReg(reg);
 
                         this.register.writeByteReg(reg, valA-1);
-                        this.generateFlag(valA-1, operandes.addr, valA, 0);
+                        this.generateFlag(valA-1, 0x0001, valA, 0);
 
                     }
                
