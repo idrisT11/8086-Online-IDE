@@ -5,7 +5,7 @@ var enterPressed=false;
 var keyStored=false;
 //
 var scale = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
-canvas.width = Math.floor(canvas.width*1 );
+canvas.width = Math.floor(canvas.width * scale );
 canvas.height = Math.floor(canvas.height * scale);
 
 // // Normalize coordinate system to use css pixels.
@@ -46,12 +46,11 @@ async function waitEnter()
     return new Promise((resolve) => {
       document.addEventListener('keydown', onKeyHandler);
       function onKeyHandler(e) {
-         
-
+        
         if (e.key!="Enter" && e.key.length==1) {
-            theKey = e.key;
-            keyStored=true;
-             console.log("you entered:",theKey);
+          theKey = e.key;
+          keyStored=true;
+          console.log("you entered:", theKey);
           document.removeEventListener('keydown', onKeyHandler);
           resolve();
         }
@@ -71,10 +70,8 @@ function delay(ms)
   }
 class ConsoleW{
 
-       
         constructor(p)
         {
-            
             this.height=canvas.height;
             this.width=canvas.width;
             this.fontSize=10;
@@ -101,11 +98,9 @@ class ConsoleW{
      
         initCanvas()
         {
-           
           ctx.clearRect(0,0,canvas.width,canvas.height);
           this.cursor=0;
           this.cursorRam=0;
-          
 
         }
         _writeChar(offset,char,fg=this.fg,bg=this.bg)
@@ -120,7 +115,7 @@ class ConsoleW{
             let w=Math.floor(this.width/10);
             let y=Math.floor(offset/(w));
             let x=offset%(w);
-            ctx.fillStyle =COLOR_TABLE[bg];
+            ctx.fillStyle = COLOR_TABLE[bg];
             ctx.fillRect(x*10, y*10, this.fontSize, this.fontSize);
             ctx.fillStyle =COLOR_TABLE[fg];
             ctx.fillText(char,x*10, y*10+10);
@@ -143,39 +138,31 @@ class ConsoleW{
                 this.cursorRam+=2;
                 this.cursor++;
             }
-           
             
         }
         updateCursor()
         {
-            let w=Math.floor(this.width/10);
+          let w=Math.floor(this.width/10);
+        
+          let y=Math.floor(this.cursor/(w));
+          let x=this.cursor%(w);  
           
-            let y=Math.floor(this.cursor/(w));
-            let x=this.cursor%(w);
+          setTimeout(()=>{
+              ctx.beginPath();
+              ctx.moveTo(x*10,y*10+2);
+              ctx.lineTo(x*10,y*10+10);
+              ctx.strokeStyle="white";
+              ctx.lineWidth=1;
+              ctx.stroke();
+              ctx.closePath();
+          },500)
+        
+          setTimeout(()=>{
+             ctx.fillStyle ="black";
+             ctx.clearRect(x*10, y*10, ctx.lineWidth, this.fontSize);
+          },1000)
            
-            
-            
-           
-                setTimeout(()=>{
-                    ctx.beginPath();
-                    ctx.moveTo(x*10,y*10+2);
-                    ctx.lineTo(x*10,y*10+10);
-                    ctx.strokeStyle="white";
-                    ctx.lineWidth=1;
-                    ctx.stroke();
-                    ctx.closePath();
-                },500)
-               
-                
-          
-                 setTimeout(()=>{
-                    ctx.fillStyle ="black";
-                    ctx.clearRect(x*10, y*10, ctx.lineWidth, this.fontSize);
-                  },1000)
-           
-               
-            
-          
+
         }
         readChar()
         {
@@ -184,12 +171,10 @@ class ConsoleW{
            this.readMode=true;
            this.p.pause=true;
            waitkey();
-          
-           
         }
         _waitForKey()
         {
-               if(keyStored)
+            if(keyStored)
                {
                 this.key=theKey;
                 console.log("key is stored");
@@ -240,12 +225,6 @@ class ConsoleW{
             }
             
         }
-        
-        
-        
-
-
-
 
 }
 const XL=0,XH=1,XX=2;
@@ -266,5 +245,4 @@ GREEN="green",
  LIGHT_MAGENTA="#ff80ff",
  YELLOW="yellow",
  WHITE="white";
-const
-COLOR_TABLE = [BLACK, BLUE, GREEN, CYAN,RED,MAGENTA,BROWN,LIGHT_GRAY,DARK_GRAY,LIGHT_BLUE,LIGHT_GREEN,LIGHT_CYAN,LIGHT_RED,LIGHT_MAGENTA,YELLOW,WHITE];
+const COLOR_TABLE = [BLACK, BLUE, GREEN, CYAN,RED,MAGENTA,BROWN,LIGHT_GRAY,DARK_GRAY,LIGHT_BLUE,LIGHT_GREEN,LIGHT_CYAN,LIGHT_RED,LIGHT_MAGENTA,YELLOW,WHITE];
