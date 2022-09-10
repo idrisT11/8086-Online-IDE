@@ -167,6 +167,14 @@ class Processor{
         {
             console.log("decodeSTOS has been executed!");
         }
+        else if(!this.pause && this.decodeCMPS(instruction)===0)
+        {
+            console.log("decodeCMPS has been executed!");
+        }
+        else if(!this.pause && this.decodeSCAS(instruction)===0)
+        {
+            console.log("decodeSCAS has been executed!");
+        }
         else if(!this.pause && this.decodeINC(instruction)===0)
         {
             console.log("decodeINC has been executed!");
@@ -3146,6 +3154,9 @@ class Processor{
             else if (this.decodeSTOS(next_instruction, true) == 0) {
                 console.log('rep stos');
             }
+            else if (this.decodeCMPS(next_instruction, true) == 0) {
+                console.log('rep cmp');
+            }
             else {
                 console.error('REP error');
             }
@@ -3229,7 +3240,6 @@ class Processor{
 
             if(instruction % 2 )
             {
-
                 var data = this.RAM.readWord(segment1 << 4 + offset1);
    
                 this.register.writeReg(AX_REG,data);
@@ -3237,16 +3247,14 @@ class Processor{
                 if(!this.register.extractFlag('D'))
                     this.register.writeReg(SI_REG, offset1 + 2);
                 else
-                    this.register.writeReg(SI_REG, offset1 - 2);
-               
+                    this.register.writeReg(SI_REG, offset1 - 2);   
    
             }
             else  
             {
-
                 let data = this.RAM.readByte((segment1 << 4) + offset1);
    
-                this.register.writeByteReg(AX_REG,data);
+                this.register.writeByteReg(AX_REG,data); // ça pue, AX à la place de AL, mais ça marche
    
                 if(!this.register.extractFlag('D'))
                     this.register.writeReg(SI_REG, offset1 + 1);
@@ -3272,8 +3280,8 @@ class Processor{
             let offset1 = this.register.readReg(DI_REG),
                 segment1 = this.register.readReg(ES_REG);
 
-            if(instruction % 2){
-   
+            if(instruction % 2)
+            {
                 this.RAM.writeWord((segment1 << 4) + offset1,this.register.readReg(AX_REG));
    
                 if(!this.register.extractFlag('D'))
@@ -3286,7 +3294,6 @@ class Processor{
    
             else
             {
-
                 this.RAM.writeByte((segment1 << 4) + offset1, this.register.readByteReg(AX_REG));
    
                 if(!this.register.extractFlag('D'))
@@ -3294,11 +3301,103 @@ class Processor{
                 else
                     this.register.writeReg(DI_REG, offset1 - 1);
                
-   
             }
 
             if(!given)
                 this.register.incIP(1);
+               
+            return 0;
+        }
+        return -1;
+    }
+
+    decodeCMPS(instruction, given = false){
+
+        if((instruction & 0b11111110) == CMPS_INS)
+        {
+            let offset1 = this.register.readReg(DI_REG),
+                offset2 = this.register.readReg(SI_REG),
+                segment1 = this.register.readReg(ES_REG),
+                segment2 = this.register.readReg(DS_REG);
+       
+            let effictiveAdress1 = (segment1 << 4) + offset1,
+                effictiveAdress2 = (segment2 << 4) + offset2;//destination
+
+            if(instruction % 2 )
+            {
+                let valB = this.RAM.readWord(effictiveAdress1),
+                    valA = this.RAM.readWord(effictiveAdress2);
+
+                this.generateFlag(valA-valB, valA, valB, 1); //Verifier l'ordre !!!!
+   
+                if(!this.register.extractFlag('D'))
+                    this.register.writeReg(SI_REG, offset1 + 2);
+                else
+                    this.register.writeReg(SI_REG, offset1 - 2);
+               
+            }
+            else  
+            {
+                let valB = this.RAM.readByte(effictiveAdress1),
+                    valA = this.RAM.readByte(effictiveAdress2);
+
+                this.generateFlag(valA-valB, valA, valB, 0); //Verifier l'ordre !!!!
+   
+                if(!this.register.extractFlag('D'))
+                    this.register.writeReg(SI_REG, offset1 + 1);
+
+                else
+                    this.register.writeReg(SI_REG, offset1 - 1);
+               
+            }  
+   
+            if (!given)
+                this.register.incIP(1)
+               
+            return 0;
+        }
+        return -1;
+    }
+
+    decodeSCAS(instruction, given = false){
+
+        if((instruction & 0b11111110) == SCAS_INS)
+        {
+            let offset1 = this.register.readReg(DI_REG),
+                segment1 = this.register.readReg(ES_REG);
+       
+            let effictiveAdress1 = (segment1 << 4) + offset1;//destination
+
+            if(instruction % 2 )
+            {
+                let valB = this.RAM.readWord(effictiveAdress1),
+                    valA = this.register.readReg(AX_REG);
+
+                this.generateFlag(valA-valB, valA, valB, 1);
+   
+                if(!this.register.extractFlag('D'))
+                    this.register.writeReg(SI_REG, offset1 + 2);
+                else
+                    this.register.writeReg(SI_REG, offset1 - 2);
+               
+            }
+            else  
+            {
+                let valB = this.RAM.readByte(effictiveAdress1),
+                    valA = this.register.readByteReg(AX_REG);
+
+                this.generateFlag(valA-valB, valA, valB, 0); //Verifier l'ordre !!!!, normalement c'est bon
+   
+                if(!this.register.extractFlag('D'))
+                    this.register.writeReg(SI_REG, offset1 + 1);
+
+                else
+                    this.register.writeReg(SI_REG, offset1 - 1);
+               
+            }  
+   
+            if (!given)
+                this.register.incIP(1)
                
             return 0;
         }
@@ -3986,7 +4085,7 @@ class Processor{
         if ( (Flag & CARRY_FLAG) != 0 )
         {
             let mask = ( w == 1) ? 0xFFFF0000 : 0xFFFFFF00;
-            console.log(mask, value, '--');
+
             if ( (value & mask) == 0)
                 this.register.setFlag('C', 0);
             else
