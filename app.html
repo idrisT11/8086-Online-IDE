@@ -456,9 +456,9 @@ settings
             {regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string"},
             {regex: /'(?:[^\\]|\\.)*?(?:'|$)/, token: "string"},
                 
-                {regex: /REP[\t\s]+(MOVS|CMPS|SCAS|LODS|STOS)(b|w)\b/i, token: 'builtin'}, //instrcution
+                {regex: /(REP|REPE|REPNE)[\t\s]+(MOVS|CMPS|SCAS|LODS|STOS)(b|w)\b/i, token: 'builtin'}, //instrcution
 
-                {regex: /[\s\t]*(jc|lea|add|adc|inc|sub|sbb|dec|neg|cmp|mul|imul|div|idiv|cbw|cwd|not|mov|push|pop|xchg|pushf|popf|SHL|SAL|SHR|SAR|ROL|ROR|RCL|RCR|AND|OR|TEST|XOR|REP|(MOVS|CMPS|SCAS|LODS|STOS)(b|w)|CALL|JMP|RET|JE|JZ|JL|JNGE|JLE|JNG|JB|JNAE|JBE|JNA|JP|JPE|JO|JS|JNE|JNZ|JNL|JGE|JNLE|JG|JNB|JAE|JNBE|JA|JNP|JPO|JNO|JNS|LOOP|LOOPZ|LOOPE|LOOPNZ|LOOPNE|INT|CLC|CMC|STC|CLD|STD)\b/i, token: 'builtin', sol: true},                      //instrcution
+                {regex: /[\s\t]*(jc|lea|add|adc|inc|sub|sbb|dec|neg|cmp|mul|imul|div|idiv|cbw|cwd|not|mov|push|pop|xchg|pushf|popf|SHL|SAL|SHR|SAR|ROL|ROR|RCL|RCR|AND|OR|TEST|XOR|REP|REPE|REPNE|(MOVS|CMPS|SCAS|LODS|STOS)(b|w)|CALL|JMP|RET|JE|JZ|JL|JNGE|JLE|JNG|JB|JNAE|JBE|JNA|JP|JPE|JO|JS|JNE|JNZ|JNL|JGE|JNLE|JG|JNB|JAE|JNBE|JA|JNP|JPO|JNO|JNS|LOOP|LOOPZ|LOOPE|LOOPNZ|LOOPNE|INT|CLC|CMC|STC|CLD|STD)\b/i, token: 'builtin', sol: true},                      //instrcution
                 
                 {regex: /(byte|word)/i, token: 'property'},    //byte word
 
