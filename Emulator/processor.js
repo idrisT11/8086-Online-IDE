@@ -3140,10 +3140,13 @@ class Processor{
             let current_code_segement=this.register.readReg(CS_REG);
             let next_instruction = this.RAM.readByte(current_ip + (current_code_segement << 4) + 1)
 
-            if (this.register.readReg(CX_REG) == 0) {
+            if (this.register.readReg(CX_REG) == 0 
+             || ((instruction % 2) == 0 && this.register.extractFlag('Z') == 1)) // For REPNE 
+            {
                 this.register.incIP(2);
                 return 0;
             }
+
 
             if (this.decodeMOVS(next_instruction, true) == 0) {
                 console.log('rep movs');
@@ -3155,7 +3158,10 @@ class Processor{
                 console.log('rep stos');
             }
             else if (this.decodeCMPS(next_instruction, true) == 0) {
-                console.log('rep cmp');
+                console.log('rep cmps');
+            }
+            else if (this.decodeSCAS(next_instruction, true) == 0) {
+                console.log('rep scas');
             }
             else {
                 console.error('REP error');
@@ -3331,23 +3337,34 @@ class Processor{
                 this.generateFlag(valA-valB, valA, valB, 1); //Verifier l'ordre !!!!
    
                 if(!this.register.extractFlag('D'))
-                    this.register.writeReg(SI_REG, offset1 + 2);
+                {
+                    this.register.writeReg(DI_REG, offset1 + 2);
+                    this.register.writeReg(SI_REG, offset2 + 2);
+                }
                 else
-                    this.register.writeReg(SI_REG, offset1 - 2);
+                {
+                    this.register.writeReg(DI_REG, offset1 - 2);
+                    this.register.writeReg(SI_REG, offset2 - 2);
+                }
                
             }
             else  
             {
                 let valB = this.RAM.readByte(effictiveAdress1),
                     valA = this.RAM.readByte(effictiveAdress2);
-
+                console.log(valA, valB, '896');
                 this.generateFlag(valA-valB, valA, valB, 0); //Verifier l'ordre !!!!
    
                 if(!this.register.extractFlag('D'))
-                    this.register.writeReg(SI_REG, offset1 + 1);
-
+                {
+                    this.register.writeReg(DI_REG, offset1 + 1);
+                    this.register.writeReg(SI_REG, offset2 + 1);
+                }
                 else
-                    this.register.writeReg(SI_REG, offset1 - 1);
+                {
+                    this.register.writeReg(DI_REG, offset1 - 1);
+                    this.register.writeReg(SI_REG, offset2 - 1);
+                }
                
             }  
    
@@ -3376,9 +3393,9 @@ class Processor{
                 this.generateFlag(valA-valB, valA, valB, 1);
    
                 if(!this.register.extractFlag('D'))
-                    this.register.writeReg(SI_REG, offset1 + 2);
+                    this.register.writeReg(DI_REG, offset1 + 2);
                 else
-                    this.register.writeReg(SI_REG, offset1 - 2);
+                    this.register.writeReg(DI_REG, offset1 - 2);
                
             }
             else  
@@ -3389,10 +3406,10 @@ class Processor{
                 this.generateFlag(valA-valB, valA, valB, 0); //Verifier l'ordre !!!!, normalement c'est bon
    
                 if(!this.register.extractFlag('D'))
-                    this.register.writeReg(SI_REG, offset1 + 1);
+                    this.register.writeReg(DI_REG, offset1 + 1);
 
                 else
-                    this.register.writeReg(SI_REG, offset1 - 1);
+                    this.register.writeReg(DI_REG, offset1 - 1);
                
             }  
    
