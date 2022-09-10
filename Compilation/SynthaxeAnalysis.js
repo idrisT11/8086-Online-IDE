@@ -453,6 +453,8 @@ class SyntaxAnalysis {
 
 
             case "REP":
+            case "REPE":
+            case "REPNE":
                 if (Obj.operands.length==1){
                     if (Obj.operands[0].type=="INS")
                             return  { message: null, good: true }
@@ -501,9 +503,6 @@ class SyntaxAnalysis {
                         if (z != -1 && !this.range(getNum(Obj.operands[z].name)))
 
                             return { message: "DEPLACEMENT OVERFLLOW", good: false };
-
-
-
 
 
                         if (!exist) {
