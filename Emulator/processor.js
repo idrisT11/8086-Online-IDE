@@ -3140,9 +3140,7 @@ class Processor{
             let current_code_segement=this.register.readReg(CS_REG);
             let next_instruction = this.RAM.readByte(current_ip + (current_code_segement << 4) + 1)
 
-            if (this.register.readReg(CX_REG) == 0 
-             || ((instruction % 2) == 1 && this.register.extractFlag('Z') == 0)
-             || ((instruction % 2) == 0 && this.register.extractFlag('Z') == 1)) // For REPNE 
+            if (this.register.readReg(CX_REG) == 0)
             {
                 this.register.incIP(2);
                 return 0;
@@ -3169,6 +3167,13 @@ class Processor{
             }
 
             this.register.writeReg(CX_REG, this.register.readReg(CX_REG) - 1);
+            
+            if( ((instruction % 2) == 1 && this.register.extractFlag('Z') == 0)
+             || ((instruction % 2) == 0 && this.register.extractFlag('Z') == 1)) // For REPNE 
+            {
+                this.register.incIP(2);
+                return 0;
+            }
 
             return 0;
         }
