@@ -568,14 +568,15 @@ class LexicalAnalysis{
          return true;
      }
      else if (/offset\s/i.test(operand)) {
-         operand = operand.replace("offset ", "");
-         operand = operand.trim();
+        operand = operand.replace(/offset/i, "");
+        operand = operand.trim();
          
          
          if (this.legalVarName(operand)) {
              return true;
          }
          else {
+             console.log(operand, this.legalVarName(operand));
              this.lexical.message="INVALID OFFSET OR VARIABLE NAME";
              return false;
       }
