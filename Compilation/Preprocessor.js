@@ -64,12 +64,10 @@ class PreProcessor {
 
         if (this.manageProcedures(this.lexicalView) == -1) 
             return this.generatePrepoError();
-        
 
 
         this.getVariables(this.lexicalView);
 
-        console.log(this.lexicalView, this.variables);
 
         if(this.manageVariables(this.lexicalView) == -1)
             return this.generatePrepoError();
@@ -160,7 +158,7 @@ class PreProcessor {
                         if ( line.operands[opId].type == 'DUP' && value.trim() == '?') {
                             value = '0';
                         }
-                        
+                        console.log(value, this.chartoascii(value), this.hexBinAcceptable(value), '===========zdq');
                         value = this.chartoascii(value);
                         value = this.hexBinAcceptable(value);
                         value = (value.trim() != '')? eval(value).toString(10): '0';
@@ -333,7 +331,7 @@ class PreProcessor {
         if(tabHex != null)
         {
             for (let i = 0; i < tabHex.length; i++) {
-                str = str.replace(/[0-9]+[a-f0-9]*(h|H)/, '0x' + tabHex[i].slice(0, tabHex[0].length-1));
+                str = str.replace(/^[0-9]+[a-f0-9]*(h|H)$/, '0x' + tabHex[i].slice(0, tabHex[0].length-1));
                 
             }
         }
@@ -341,7 +339,7 @@ class PreProcessor {
         if(tabBin != null)
         {
             for (let i = 0; i < tabBin.length; i++) {
-                str = str.replace(/[0-1]+(b|B)/, '0b' + tabBin[i].slice(0, tabBin[0].length-1));
+                str = str.replace(/^[0-1]+(b|B)$/, '0b' + tabBin[i].slice(0, tabBin[0].length-1));
                 
             }
         }
