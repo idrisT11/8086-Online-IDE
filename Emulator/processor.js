@@ -3146,6 +3146,7 @@ class Processor{
                 return 0;
             }
 
+            let cmpDecoded = false;
 
             if (this.decodeMOVS(next_instruction, true) == 0) {
                 console.log('rep movs');
@@ -3158,9 +3159,11 @@ class Processor{
             }
             else if (this.decodeCMPS(next_instruction, true) == 0) {
                 console.log('rep cmps');
+                cmpDecoded = true;
             }
             else if (this.decodeSCAS(next_instruction, true) == 0) {
                 console.log('rep scas');
+                cmpDecoded = true;
             }
             else {
                 console.error('REP error');
@@ -3168,7 +3171,7 @@ class Processor{
 
             this.register.writeReg(CX_REG, this.register.readReg(CX_REG) - 1);
             
-            if( ((instruction % 2) == 1 && this.register.extractFlag('Z') == 0)
+            if( (((instruction % 2) == 1 && this.register.extractFlag('Z') == 0) && cmpDecoded)
              || ((instruction % 2) == 0 && this.register.extractFlag('Z') == 1)) // For REPNE 
             {
                 this.register.incIP(2);
