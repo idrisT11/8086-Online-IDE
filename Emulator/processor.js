@@ -4097,7 +4097,7 @@ class Processor{
                     case XOR_MODE:
                         return (op1 ^ op2);
                     case CMP_MODE:
-                        return (op1 - op2);
+                        return (op2 - op1);
                 }
     }
                    
