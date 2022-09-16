@@ -596,7 +596,7 @@ class Processor{
                                 let valB = this.register.readByteReg(R2),
                                     valA = this.register.readByteReg(R1);
 
-                                this.register.writeWordReg(R1, this.register.readByteReg(R2) );
+                                this.register.writeByteReg(R1, this.register.readByteReg(R2) );
                                 this.generateFlag(valB, valA, valB, 0);
                             }
                            
@@ -605,7 +605,7 @@ class Processor{
                                 let valB = this.register.readByteReg(R1),
                                     valA = this.register.readByteReg(R2);
 
-                                this.register.writeWordReg(R2, this.register.readByteReg(R1) );
+                                this.register.writeByteReg(R2, this.register.readByteReg(R1) );
                                 this.generateFlag(valB, valA, valB, 0);
                             }
                         }
