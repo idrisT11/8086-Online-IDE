@@ -1013,12 +1013,12 @@ class Processor{
                            
                             if ((instruction >> 1) % 2) {// On extrait le dif ||d=1 =>to Reg
                                 this.register.writeWordReg(R1, value & 0xFFFF);
-                                this.generateFlag((value & 0xFFFF), value1, value2, 1);
+                                this.generateFlag((value & 0xFFFF), value1, (-value2)&0xFFFF, 1);
                             }
                            
                             else {
                                 this.register.writeWordReg(R2, (-value) & 0xFFFF);
-                                this.generateFlag((-value) & 0xFFFF, value1, value2, 1);
+                                this.generateFlag((-value) & 0xFFFF, value1, (-value2)&0xFFFF, 1);
                             }
                            
                         }
@@ -1030,12 +1030,12 @@ class Processor{
 
                             if ((instruction >> 1) % 2) {// On extrait le dif ||d=1 =>to Reg    
                                 this.register.writeByteReg(R1, value & 0xFF);
-                                this.generateFlag(value & 0xFFFF, value1, value2, 0);
+                                this.generateFlag(value & 0xFFFF, value1, (-value2)&0xFF, 0);
                             }
                            
                             else {
                                 this.register.writeByteReg(R2, (-value) & 0xFF);
-                                this.generateFlag((-value) & 0xFFFF, value1, value2, 0);
+                                this.generateFlag((-value) & 0xFFFF, value1, (-value2)&0xFF, 0);
                             }
                            
                         }
@@ -1053,12 +1053,12 @@ class Processor{
 
                             if ((instruction >> 1) % 2) {// On extrait le dif ||d=1 =>to Reg
                                 this.register.writeWordReg(R, value & 0xFFFF);
-                                this.generateFlag(value & 0xFFFF, value1, value2, 1);
+                                this.generateFlag(value & 0xFFFF, value1, (-value2)&0xFFFF, 1);
                             }
                            
                             else {   // d=0 => from reg
                                 this.RAM.writeWord(addr, (-value) & 0xFFFF);
-                                this.generateFlag((-value) & 0xFFFF, value1, value2, 1);
+                                this.generateFlag((-value) & 0xFFFF, value1, (-value2)&0xFFFF, 1);
                             }
                            
                         }
@@ -1070,12 +1070,12 @@ class Processor{
 
                             if ((instruction >> 1) % 2) { // On extrait le dif ||d=1 =>to Reg
                                 this.register.writeByteReg(R, value & 0xFF);
-                                this.generateFlag(value & 0xFFFF, value1, value2, 0);
+                                this.generateFlag(value & 0xFFFF, value1, (-value2)&0xFF, 0);
                             }
 
                             else {
                                 this.RAM.writeByte(addr, (-value) & 0xFF);
-                                this.generateFlag((-value) & 0xFFFF, value1, value2, 0);
+                                this.generateFlag((-value) & 0xFFFF, value1, (-value2)&0xFF, 0);
                             }
                            
                         }
@@ -1158,12 +1158,16 @@ class Processor{
                        
                             value = this._executeArthLogic(instructionMode, op1, opImm);
 
-                            if ( instructionMode != CMP_MODE )
-                                this.register.writeWordReg(R, value & 0xFFFF);
-                            //flags manipulation
                             let w = (instruction % 2 );
 
-                            this.generateFlag(value,op1,opImm,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
+                            if ( instructionMode != CMP_MODE ) 
+                                this.register.writeWordReg(R, value & 0xFFFF);
+                            //flags manipulation
+
+                            if ( instructionMode != CMP_MODE && instructionMode != SUB_MODE) 
+                                this.generateFlag(value,op1,opImm,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
+                            else 
+                                this.generateFlag(value,op1,(-opImm)&0xFFFF,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
 
                         }
 
@@ -1175,12 +1179,20 @@ class Processor{
                             let op1     = this.register.readByteReg(R),
                                 opImm   = this.RAM.readByte(immediateAddr),
                                 value   = this._executeArthLogic(instructionMode, op1, opImm);
-
+                                
+                                
                             if ( instructionMode != CMP_MODE )
                                 this.register.writeByteReg(R, value & 0xFF);
-                                let w=(instruction % 2 );
-                            this.generateFlag(value,op1,opImm,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
+                            
+                            let w=(instruction % 2 );
+
+                            if ( instructionMode != CMP_MODE && instructionMode != SUB_MODE) 
+                                this.generateFlag(value,op1,opImm,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
+                            else 
+                                this.generateFlag(value,op1,(-opImm)&0xFF,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
                         }
+
+                        
                     }
                     //####################################################################
                     //IMMEDIAT TO MEMORY
@@ -1209,9 +1221,14 @@ class Processor{
 
                             if ( instructionMode != CMP_MODE )
                                 this.RAM.writeWord(addr, value & 0xFFFF);
-                                let w=(instruction % 2 );
-                            this.generateFlag(value,op1,opImm,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
+                            
+                            let w=(instruction % 2 );
                            
+                            if ( instructionMode != CMP_MODE && instructionMode != SUB_MODE) 
+                                this.generateFlag(value,op1,opImm,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
+                            else 
+                                this.generateFlag(value,op1,(-opImm)&0xFFFF,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
+
                         }
 
                         //----------------------------------------------
@@ -1225,8 +1242,13 @@ class Processor{
 
                             if ( instructionMode != CMP_MODE )
                                 this.RAM.writeByte(addr, value & 0xFF);
-                                let w=(instruction % 2 );
-                            this.generateFlag(value,op1,opImm,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
+                            
+                            let w=(instruction % 2 );
+
+                            if ( instructionMode != CMP_MODE && instructionMode != SUB_MODE) 
+                                this.generateFlag(value,op1,opImm,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
+                            else 
+                                this.generateFlag(value,op1,(-opImm)&0xFF,w,CARRY_FLAG | SIGN_FLAG |PARITY_FLAG|ZERO_FLAG|AUXILARY_FLAG|OVERFLOW_FLAG);
                         }
                     }
 
@@ -1481,40 +1503,34 @@ class Processor{
                    
                 if ( instruction % 2 == 1 )
                 {
+                    let valB = this.register.readWordReg(R2),
+                        valA = this.register.readWordReg(R1);
+
                     if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
                     {
-                        let valB = this.register.readWordReg(R2),
-                            valA = this.register.readWordReg(R1);
-
-                        this.generateFlag(valA-valB, valA, valB, 1);
-                       
+                        this.generateFlag(valA-valB, valA, (-valB) & 0xFFFF, 1); 
                     }
                    
                     else
                     {
-                        let valB = this.register.readWordReg(R1),
-                            valA = this.register.readWordReg(R2);
-
-                        this.generateFlag(valB-valA, valB, valA, 1);
+                        this.generateFlag(valB-valA, valB, (-valA) & 0xFFFF, 1);
                     }
                    
                 }
                 else
                 {
-                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
-                    {
-                        let valB = this.register.readByteReg(R2),
+                    let valB = this.register.readByteReg(R2),
                             valA = this.register.readByteReg(R1);
 
-                        this.generateFlag(valA-valB, valA, valB, 0);
+                    if ((instruction >> 1) % 2) // On extrait le dif ||d=1 =>to Reg
+                    {
+
+                        this.generateFlag(valA-valB, valA, (-valB) & 0xFF, 0);
                     }
                    
                     else
                     {
-                        let valB = this.register.readByteReg(R1),
-                            valA = this.register.readByteReg(R2);
-
-                        this.generateFlag(valB-valA, valB, valA, 0);
+                        this.generateFlag(valB-valA, valB, (-valA) & 0xFF, 0);
                     }
                 }
 
@@ -1533,7 +1549,7 @@ class Processor{
                             valA = this.register.readWordReg(R);
                            
 
-                        this.generateFlag(valA-valB, valA, valB, 1);
+                        this.generateFlag(valA-valB, valA, (-valB) & 0xFFFF, 1);
                     }
                    
                     else
@@ -1541,7 +1557,7 @@ class Processor{
                         let valA = this.RAM.readWord(addr),
                             valB = this.register.readWordReg(R);
                        
-                        this.generateFlag(valB-valA, valB, valA, 1);
+                        this.generateFlag(valB-valA, valB, (-valA) & 0xFFFF, 1);
                     }
                    
                 }
@@ -1553,7 +1569,7 @@ class Processor{
                         let valB = this.RAM.readByte(addr),
                             valA = this.register.readByteReg(R);
 
-                        this.generateFlag(valA-valB, valA, valB, 0);
+                        this.generateFlag(valA-valB, valA, (-valB) & 0xFF, 0);
                     }
                    
                     else
@@ -1561,7 +1577,7 @@ class Processor{
                         let valA = this.RAM.readByte(addr),
                             valB = this.register.readByteReg(R);// d=0 => from reg
 
-                        this.generateFlag(valB-valA, valB, valA, 0);
+                        this.generateFlag(valB-valA, valB, (-valA) & 0xFF, 0);
                     }
                 }
 
@@ -4097,7 +4113,7 @@ class Processor{
                     case XOR_MODE:
                         return (op1 ^ op2);
                     case CMP_MODE:
-                        return (op2 - op1);
+                        return (op1 - op2);
                 }
     }
                    
