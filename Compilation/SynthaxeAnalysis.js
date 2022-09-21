@@ -104,7 +104,7 @@ class SyntaxAnalysis {
 
                             if (!this.range(Obj.operands[1].name))
 
-                                return { message: "NUMBER OVERFLLOW", good: false };
+                                return { message: "NUMBER OVERFLOW", good: false };
 
                             //after the test above we are sure that the int can fit in 2 byte at most
 
@@ -114,7 +114,7 @@ class SyntaxAnalysis {
 
                             let s = getS(Obj.operands[1].name, 1);
 
-
+                            console.log(s);
 
                             if (/RL|MB|VAR8|VARU/.test(type1)) {
 
@@ -146,7 +146,7 @@ class SyntaxAnalysis {
                             if (/MU/.test(type1))
 
 
-                                return { message: "Ambiguous paremeters, please precise the memory size", good: false }
+                                return { message: "Ambiguous paremeters, please precise the memory size (byte/word)", good: false }
                             
                                 /*
 
@@ -737,13 +737,15 @@ const opsCompinision = [
 
 function getS(str, i = 0) {
 
-    let fun;
-    fun = (i === 0) ? getNum : function (x) { return x };
+    console.error(str, i)
+    console.error(convert(str), i)
+    let fun = (i === 0) ? getNum : function (x) { return x };
+
     if (/\-/.test(str)) {
         return (convert(fun(str)) > 255) ? 0 : 1;
     }
     else {
-        return (convert(fun(str)) > 127) ? 0 : 1;
+        return (convert(fun(str)) > 255) ? 0 : 1;
     }
 }
 
