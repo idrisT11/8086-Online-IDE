@@ -114,7 +114,6 @@ class SyntaxAnalysis {
 
                             let s = getS(Obj.operands[1].name, 1);
 
-                            console.log(s);
 
                             if (/RL|MB|VAR8|VARU/.test(type1)) {
 
@@ -737,8 +736,6 @@ const opsCompinision = [
 
 function getS(str, i = 0) {
 
-    console.error(str, i)
-    console.error(convert(str), i)
     let fun = (i === 0) ? getNum : function (x) { return x };
 
     if (/\-/.test(str)) {
