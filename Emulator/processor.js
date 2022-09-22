@@ -1404,12 +1404,8 @@ class Processor{
                        
                         let val = this.RAM.readWord(operandes.addr);
                         let ax = this.register.readReg(AX_REG);//ax
-                        this.register.writeReg(AX_REG,Math.floor(val/ax));
-                        this.register.writeReg(DX_REG,val%ax);
-                       
-                       
-                   
-                   
+                        this.register.writeReg(AX_REG,Math.floor(ax/val));
+                        this.register.writeReg(DX_REG,ax%val);
                        
                     }
                     else
