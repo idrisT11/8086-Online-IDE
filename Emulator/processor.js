@@ -1413,7 +1413,7 @@ class Processor{
                        
                         let val = this.RAM.readByte(operandes.addr);
                         let al = this.register.readByteReg(0);//al
-                        this.register.writeReg(AX_REG,(Math.floor(val%al)<<8)+Math.floor(val/al));
+                        this.register.writeReg(AX_REG,(Math.floor(al%val)<<8)+Math.floor(al/val));
                      
 
                     }
