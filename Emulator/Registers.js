@@ -188,20 +188,17 @@ class Registers{
         else if(type==BYTE_REGISTER)
         {   
             let val = this.readByteReg(registerId);
-            let al = this.readByteReg(0);//al
-            this.writeReg(AX_REG,(Math.floor(val%al)<<8)+Math.floor(val/al));//ah  
-             
+            let ax = this.readWordReg(0);//al
+            
+            this.writeReg(AX_REG,(Math.floor(ax%val)<<8)+Math.floor(ax/val));//ah  
         }
         else 
         {
-           
             let val = this.readWordReg(registerId);
-            let ax = this.readReg(AX_REG);//ax'
-            this.writeReg(AX_REG,Math.floor(val/ax));
-            this.writeReg(DX_REG,val%ax);
-          
+            let ax = this.readReg(AX_REG);//ax' here we should update it to Dx<<8 + AX
 
-
+            this.writeReg(AX_REG,Math.floor(ax/val));
+            this.writeReg(DX_REG,ax%val);
         }
 
     }
