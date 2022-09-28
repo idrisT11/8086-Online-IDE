@@ -1158,3 +1158,6 @@ function regToId(regname) {
 
     }
 }
+console.log('***************************************');
+console.log( toBcode('mov ax,200'));
+console.log('***************************************');
