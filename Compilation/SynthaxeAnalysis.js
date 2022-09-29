@@ -110,9 +110,9 @@ class SyntaxAnalysis {
 
 
 
-                            //to know if the int fit in one or two byte we use gets
+                            //to know if the int fit in one or two byte we use synth_getS
 
-                            let s = getS(Obj.operands[1].name, 1);
+                            let s = synth_getS(Obj.operands[1].name, 1);
 
 
                             if (/RL|MB|VAR8|VARU/.test(type1)) {
@@ -438,7 +438,7 @@ class SyntaxAnalysis {
                     if (Obj.operands[0].type=="INT")
                     {
                         
-                        if (this.range(Obj.operands[0].name) && getS(Obj.operands[0].name, 1))
+                        if (this.range(Obj.operands[0].name) && synth_getS(Obj.operands[0].name, 1))
                             return  { message: null, good: true }
                         else 
                             return  { message: "NUMBER OVERFLLOW", good: false };
@@ -512,7 +512,7 @@ class SyntaxAnalysis {
 
                                     return { message: "NUMBER OVERFLLOW", good: false };
 
-                                let s = getS(Obj.operands[1].name, 1);
+                                let s = synth_getS(Obj.operands[1].name, 1);
 
                                 if (/RL|MB|VAR8|VARU/.test(type1)) {
 
@@ -604,7 +604,7 @@ class SyntaxAnalysis {
 
                             //the right operand could be int in one byte  
 
-                            if (type2 == "INT" && this.range(Obj.operands[1].name) && getS(Obj.operands[1].name, 1))
+                            if (type2 == "INT" && this.range(Obj.operands[1].name) && synth_getS(Obj.operands[1].name, 1))
 
                                 return { message: null, good: true }
 
@@ -734,7 +734,7 @@ const opsCompinision = [
 
 
 
-function getS(str, i = 0) {
+function synth_getS(str, i = 0) {
 
     let fun = (i === 0) ? getNum : function (x) { return x };
 
